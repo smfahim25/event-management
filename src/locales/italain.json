@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "logo": "Les sorties de Diane",
+    "menuItems": ["Home", "Eventi", "Contatto", "Diventa un Organizzatore"],
+    "events": {
+      "title": "Eventi",
+      "items": ["Tutti gli Eventi", "Prossimi Eventi", "Eventi in Evidenza"]
+    }
+  },
+  "hero": {
+    "title": ["Vivi il momento,", "Ama l'esperienza."],
+    "ctaButton": "Tutti gli Eventi"
+  },
+  "info": {
+    "welcome": "Benvenuto a tutti alle uscite di Diane",
+    "title": ["Noi ", "ispiriamo ", "le persone ad uscire di più"],
+    "description": "Le Serate di Diane sono una serie di eventi eccezionali che promettono serate indimenticabili all'insegna della cultura, dell'eleganza e dell'intrattenimento. Immergiti nel mondo dell'arte, della musica e della letteratura mentre le Serate di Diane mettono in mostra i talenti di artisti e performer di fama mondiale. I nostri eventi accuratamente selezionati si svolgono in luoghi esclusivi, creando un'atmosfera intima e incantevole per il tuo divertimento. Da affascinanti mostre a coinvolgenti spettacoli, ogni evento è un'esperienza unica che ti lascerà ispirato e desideroso di altro. Unisciti a noi alle Serate di Diane e immergiti nella bellezza delle arti."
+  },
+  "infoSecond": {
+    "title": "PARTECIPA CON NOI",
+    "subtitle": ["Riunire ", "le persone ", "insieme"],
+    "description": "Vivi l'apice della cultura, dell'eleganza, dell'intrattenimento, della gastronomia e della ristorazione alle Les Sorties de Diane. Questa eccezionale serie di eventi mette in mostra i talenti di artisti e performer di fama mondiale e ti immerge nel mondo dell'arte, della musica, della letteratura e della gastronomia. Preparati a essere affascinato da affascinanti mostre e coinvolgenti spettacoli che si svolgono in luoghi esclusivi, creando un'atmosfera intima e incantevole. Ogni evento è un'esperienza unica, una che ti ispira e ti lascia desiderare di più. Indulgi nella bellezza delle arti e unisciti a noi alle Les Sorties de Diane per serate indimenticabili che accenderanno la tua passione."
+  },
+  "events": {
+    "events": "Eventi",
+    "grabyour": "Prendi i tuoi",
+    "seats": "Posti",
+    "upcoming": "Prossimi",
+    "all": "Tutti",
+    "seemore": "Vedi di più"
+  },
+  "footer": {
+    "companyName": "Les sorties de Diane",
+    "tagline": "La tua porta d'accesso agli eventi",
+    "quickLinks": {
+      "title": "Collegamenti rapidi",
+      "items": ["Home", "Eventi", "Contattaci"]
+    },
+    "userLinks": {
+      "title": "Link utente",
+      "items": ["Il mio account", "Cronologia ordini", "Biglietti"]
+    },
+    "legal": {
+      "title": "Legale",
+      "items": ["Informativa sulla privacy", "Termini di servizio"]
+    },
+    "socialMedia": ["Facebook", "Twitter", "Instagram"],
+    "newsletter": {
+      "label": "Iscriviti alla nostra newsletter",
+      "placeholder": "Indirizzo email",
+      "buttonText": "Iscriviti"
+    },
+    "copyright": "Les sorties de Diane. Tutti i diritti riservati."
+  },
+  "contactPage": {
+    "title": "Contattaci",
+    "form": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Il tuo nome",
+        "error": "Il nome è obbligatorio."
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "La tua email",
+        "error": "L'email è obbligatoria.",
+        "invalidError": "Inserisci un indirizzo email valido."
+      },
+      "message": {
+        "label": "Messaggio",
+        "placeholder": "Il tuo messaggio",
+        "error": "Il messaggio non può essere vuoto."
+      },
+      "submitButton": {
+        "default": "Invia messaggio",
+        "loading": "Invio..."
+      }
+    },
+    "apiError": "Si è verificato un errore. Riprova più tardi.",
+    "successMessage": "Grazie per il tuo feedback! Ti risponderemo presto."
+  },
+  "profilePage": {
+    "createEventButton": "Crea nuovo evento",
+    "tabs": {
+      "events": "Eventi creati da me",
+      "tickets": "Biglietti acquistati",
+      "dashboard": "Dashboard"
+    },
+    "eventsSection": {
+      "title": "Eventi creati da me",
+      "noEvents": "Nessun evento creato ancora."
+    },
+    "ticketsSection": {
+      "title": "Biglietti acquistati",
+      "noTickets": "Nessun biglietto acquistato ancora."
+    }
+  },
+  "eventCard": {
+    "title": "Eventi",
+    "organizedBy": "Organizzato da",
+    "searchButton": "Cerca",
+    "searchResults": "Risultati della ricerca"
+  },
+  "eventDetails": {
+    "eventPosterAlt": "Poster dell'evento",
+    "eventanalytics": "Analisi evento",
+    "ticketPriceLabel": "Prezzo del biglietto:",
+    "ticketPrice": "$",
+    "ticketsOverview": "Panoramica biglietti",
+    "totalTickets": "Biglietti totali:",
+    "ticketsSold": "Biglietti venduti:",
+    "ticketsRemaining": "Biglietti rimanenti:",
+    "financialOverview": "Panoramica finanziaria",
+    "pricePerTicket": "Prezzo per biglietto:",
+    "totalSales": "Vendite totali:",
+    "editEventButton": "Modifica evento",
+    "manageTicketsButton": "Gestisci biglietti",
+    "viewTicketButton": "Visualizza biglietto",
+    "registerButton": "Registrati per l'evento"
+  },
+  "stripeDashboard": {
+    "title": "Dashboard",
+    "balance": {
+      "sectionTitle": "Saldo",
+      "available": "Disponibile",
+      "pending": "In sospeso"
+    },
+    "payouts": {
+      "sectionTitle": "Pagamenti recenti",
+      "noPayouts": "Nessun pagamento disponibile"
+    },
+    "transactions": {
+      "sectionTitle": "Transazioni recenti",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "amount": "Importo",
+          "date": "Data",
+          "status": "Stato",
+          "type": "Tipo"
+        }
+      }
+    }
+  }
+}

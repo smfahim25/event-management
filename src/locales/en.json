@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "logo": "Les sorties de Diane",
+    "menuItems": ["Home", "Events", "Contact", "Become an Organizer"],
+    "events": {
+      "title": "Events",
+      "items": ["All Events", "Upcoming Events", "Featured Events"]
+    }
+  },
+  "hero": {
+    "title": ["Live the moment,", "Love the experience."],
+    "ctaButton": "All Events"
+  },
+  "info": {
+    "welcome": "Welcome everyone to Diane's outings",
+    "title": ["We ", "inspire ", "people to go out more"],
+    "description": "Diane's Nights Out is a series of exceptional events that promise unforgettable evenings filled with culture, elegance, and entertainment. Immerse yourself in the world of art, music, and literature as Diane's Nights Out showcases the talents of renowned artists and performers. Our carefully selected events take place in exclusive venues, creating an intimate and enchanting atmosphere for you to enjoy. From captivating exhibitions to captivating performances, each event is a unique experience that will leave you inspired and wanting more. Join us at Diane's Nights Out and indulge in the beauty of the arts."
+  },
+  "infoSecond": {
+    "title": "PARTICIPATE WITH US",
+    "subtitle": ["Bringing ", "people ", "together"],
+    "description": "Experience the pinnacle of culture, elegance, entertainment, gastronomy and dining at Les Sorties de Diane. This exceptional series of events showcases the talents of renowned artists and performers and immerses you in the world of art, music, literature and gastronomy. Prepare to be captivated by captivating exhibitions and captivating performances held in exclusive venues, creating an intimate and enchanting atmosphere. Each event is a unique experience, one that inspires you and leaves you wanting more. Indulge in the beauty of the arts and join us at Les Sorties de Diane for unforgettable evenings that will ignite your passion."
+  },
+  "events": {
+    "events": "Events",
+    "grabyour": "Grab Your",
+    "seats": "Seats",
+    "upcoming": "Upcoming",
+    "all": "All",
+    "seemore": "See more"
+  },
+  "footer": {
+    "companyName": "Les sorties de Diane",
+    "tagline": "Your Gateway to Events",
+    "quickLinks": {
+      "title": "Quick Links",
+      "items": ["Home", "Events", "Contact Us"]
+    },
+    "userLinks": {
+      "title": "User Links",
+      "items": ["My Account", "Order History", "Tickets"]
+    },
+    "legal": {
+      "title": "Legal",
+      "items": ["Privacy Policy", "Terms of Service"]
+    },
+    "socialMedia": ["Facebook", "Twitter", "Instagram"],
+    "newsletter": {
+      "label": "Subscribe to our newsletter",
+      "placeholder": "Email address",
+      "buttonText": "Subscribe"
+    },
+    "copyright": "Les sorties de Diane. All rights reserved."
+  },
+  "contactPage": {
+    "title": "Contact Us",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Your Name",
+        "error": "Name is required."
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Your Email",
+        "error": "Email is required.",
+        "invalidError": "Please enter a valid email."
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Your Message",
+        "error": "Message cannot be empty."
+      },
+      "submitButton": {
+        "default": "Send Message",
+        "loading": "Sending..."
+      }
+    },
+    "apiError": "Something went wrong. Please try again later.",
+    "successMessage": "Thank you for your feedback! We will get back to you soon."
+  },
+  "profilePage": {
+    "createEventButton": "Create New Event",
+    "tabs": {
+      "events": "Events Created by Me",
+      "tickets": "Tickets Bought",
+      "dashboard": "Dashboard"
+    },
+    "eventsSection": {
+      "title": "Events Created by Me",
+      "noEvents": "No events created yet."
+    },
+    "ticketsSection": {
+      "title": "Tickets Bought",
+      "noTickets": "No tickets bought yet."
+    }
+  },
+  "eventCard": {
+    "title": "Events",
+    "organizedBy": "Organized By",
+    "searchButton": "Search",
+    "searchResults": "Search Results"
+  },
+  "eventDetails": {
+    "eventPosterAlt": "Event Poster",
+    "eventanalytics": "Event Analytics",
+    "ticketPriceLabel": "Ticket Price:",
+    "ticketPrice": "$",
+    "ticketsOverview": "Ticket Overview",
+    "totalTickets": "Total Tickets:",
+    "ticketsSold": "Tickets Sold:",
+    "ticketsRemaining": "Tickets Remaining:",
+    "financialOverview": "Financial Overview",
+    "pricePerTicket": "Price per Ticket:",
+    "totalSales": "Total Sales:",
+    "editEventButton": "Edit Event",
+    "manageTicketsButton": "Manage Tickets",
+    "viewTicketButton": "View ticket",
+    "registerButton": "Register for Event"
+  },
+  "stripeDashboard": {
+    "title": "Dashboard",
+    "balance": {
+      "sectionTitle": "Balance",
+      "available": "Available",
+      "pending": "Pending"
+    },
+    "payouts": {
+      "sectionTitle": "Recent Payouts",
+      "noPayouts": "No Payout Available"
+    },
+    "transactions": {
+      "sectionTitle": "Recent Transactions",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "amount": "Amount",
+          "date": "Date",
+          "status": "Status",
+          "type": "Type"
+        }
+      }
+    }
+  }
+}

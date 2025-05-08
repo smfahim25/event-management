@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "logo": "Les sorties de Diane",
+    "menuItems": ["Início", "Eventos", "Contato", "Torne-se um Organizador"],
+    "events": {
+      "title": "Eventos",
+      "items": ["Todos os Eventos", "Próximos Eventos", "Eventos em Destaque"]
+    }
+  },
+  "hero": {
+    "title": ["Viva o momento,", "Ame a experiência."],
+    "ctaButton": "Todos os Eventos"
+  },
+  "info": {
+    "welcome": "Bem-vindo a todos aos passeios de Diane",
+    "title": ["Nós ", "inspiramos ", "as pessoas a sair mais"],
+    "description": "As Noites de Diane são uma série de eventos excepcionais que prometem noites inesquecíveis repletas de cultura, elegância e entretenimento. Mergulhe no mundo da arte, da música e da literatura enquanto as Noites de Diane apresentam os talentos de artistas e performers renomados. Nossos eventos cuidadosamente selecionados acontecem em locais exclusivos, criando uma atmosfera íntima e encantadora para você aproveitar. De exposições cativantes a apresentações envolventes, cada evento é uma experiência única que o deixará inspirado e com vontade de mais. Junte-se a nós nas Noites de Diane e desfrute da beleza das artes."
+  },
+  "infoSecond": {
+    "title": "PARTICIPE CONOSCO",
+    "subtitle": ["Reunindo ", "as pessoas ", "juntas"],
+    "description": "Experimente o auge da cultura, elegância, entretenimento, gastronomia e jantar nas Les Sorties de Diane. Esta série excepcional de eventos apresenta os talentos de artistas e performers renomados e o imerge no mundo da arte, música, literatura e gastronomia. Prepare-se para ser cativado por exposições fascinantes e apresentações envolventes realizadas em locais exclusivos, criando uma atmosfera íntima e encantadora. Cada evento é uma experiência única, que o inspira e o deixa com vontade de mais. Indulga na beleza das artes e junte-se a nós nas Les Sorties de Diane para noites inesquecíveis que acenderão sua paixão."
+  },
+  "events": {
+    "events": "Eventos",
+    "grabyour": "Pegue seus",
+    "seats": "Lugares",
+    "upcoming": "Próximos",
+    "all": "Todos",
+    "seemore": "Ver mais"
+  },
+  "footer": {
+    "companyName": "Les sorties de Diane",
+    "tagline": "Seu Portal para Eventos",
+    "quickLinks": {
+      "title": "Links Rápidos",
+      "items": ["Início", "Eventos", "Contate-nos"]
+    },
+    "userLinks": {
+      "title": "Links do Usuário",
+      "items": ["Minha Conta", "Histórico de Pedidos", "Ingressos"]
+    },
+    "legal": {
+      "title": "Legal",
+      "items": ["Política de Privacidade", "Termos de Serviço"]
+    },
+    "socialMedia": ["Facebook", "Twitter", "Instagram"],
+    "newsletter": {
+      "label": "Assine nossa newsletter",
+      "placeholder": "Endereço de email",
+      "buttonText": "Assinar"
+    },
+    "copyright": " Les sorties de Diane. Todos os direitos reservados."
+  },
+  "contactPage": {
+    "title": "Contate-nos",
+    "form": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Seu Nome",
+        "error": "Nome é obrigatório."
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Seu Email",
+        "error": "Email é obrigatório.",
+        "invalidError": "Por favor, insira um email válido."
+      },
+      "message": {
+        "label": "Mensagem",
+        "placeholder": "Sua Mensagem",
+        "error": "A mensagem não pode estar vazia."
+      },
+      "submitButton": {
+        "default": "Enviar Mensagem",
+        "loading": "Enviando..."
+      }
+    },
+    "apiError": "Algo deu errado. Por favor, tente novamente mais tarde.",
+    "successMessage": "Obrigado pelo seu feedback! Entraremos em contato em breve."
+  },
+  "profilePage": {
+    "createEventButton": "Criar Novo Evento",
+    "tabs": {
+      "events": "Eventos Criados por Mim",
+      "tickets": "Ingressos Comprados",
+      "dashboard": "Painel"
+    },
+    "eventsSection": {
+      "title": "Eventos Criados por Mim",
+      "noEvents": "Nenhum evento criado ainda."
+    },
+    "ticketsSection": {
+      "title": "Ingressos Comprados",
+      "noTickets": "Nenhum ingresso comprado ainda."
+    }
+  },
+  "eventCard": {
+    "title": "Eventos",
+    "organizedBy": "Organizado Por",
+    "searchButton": "Pesquisar",
+    "searchResults": "Resultados da Pesquisa"
+  },
+  "eventDetails": {
+    "eventPosterAlt": "Poster do Evento",
+    "eventanalytics": "Análise do Evento",
+    "ticketPriceLabel": "Preço do Ingresso:",
+    "ticketPrice": "$",
+    "ticketsOverview": "Visão Geral dos Ingressos",
+    "totalTickets": "Ingressos Totais:",
+    "ticketsSold": "Ingressos Vendidos:",
+    "ticketsRemaining": "Ingressos Restantes:",
+    "financialOverview": "Visão Geral Financeira",
+    "pricePerTicket": "Preço por Ingresso:",
+    "totalSales": "Vendas Totais:",
+    "editEventButton": "Editar Evento",
+    "manageTicketsButton": "Gerenciar Ingressos",
+    "viewTicketButton": "Visualizar ingresso",
+    "registerButton": "Registrar-se para o Evento"
+  },
+  "stripeDashboard": {
+    "title": "Painel",
+    "balance": {
+      "sectionTitle": "Saldo",
+      "available": "Disponível",
+      "pending": "Pendente"
+    },
+    "payouts": {
+      "sectionTitle": "Pagamentos Recentes",
+      "noPayouts": "Nenhum Pagamento Disponível"
+    },
+    "transactions": {
+      "sectionTitle": "Transações Recentes",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "amount": "Valor",
+          "date": "Data",
+          "status": "Status",
+          "type": "Tipo"
+        }
+      }
+    }
+  }
+}

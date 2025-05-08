@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "logo": "Les sorties de Diane",
+    "menuItems": ["Home", "Evenementen", "Contact", "Word een Organisator"],
+    "events": {
+      "title": "Evenementen",
+      "items": [
+        "Alle evenementen",
+        "Aanstaande evenementen",
+        "Aanbevolen evenementen"
+      ]
+    }
+  },
+  "hero": {
+    "title": ["Leef het moment,", "Houd van de ervaring."],
+    "ctaButton": "Alle evenementen"
+  },
+  "info": {
+    "welcome": "Welkom op de uitjes van Diane",
+    "title": ["Wij ", "inspireren ", "mensen om meer uit te gaan"],
+    "description": "Diane's Nights Out is een reeks uitzonderlijke evenementen die onvergetelijke avonden beloven vol cultuur, elegantie en entertainment. Dompel jezelf onder in de wereld van kunst, muziek en literatuur terwijl Diane's Nights Out het talent van gerenommeerde kunstenaars en performers presenteert. Onze zorgvuldig geselecteerde evenementen vinden plaats op exclusieve locaties, waardoor een intieme en betoverende sfeer ontstaat voor uw plezier. Van fascinerende tentoonstellingen tot meeslepende uitvoeringen, elk evenement is een unieke ervaring die u zal inspireren en meer verlangen. Doe mee met Diane's Nights Out en geniet van de schoonheid van de kunsten."
+  },
+  "infoSecond": {
+    "title": "DOE MEE MET ONS",
+    "subtitle": ["Mensen ", "samenbrengen"],
+    "description": "Ervaar het hoogtepunt van cultuur, elegantie, entertainment, gastronomie en dineren bij Les Sorties de Diane. Deze uitzonderlijke reeks evenementen presenteert het talent van gerenommeerde kunstenaars en performers en dompelt u onder in de wereld van kunst, muziek, literatuur en gastronomie. Bereid je voor om gefascineerd te raken door fascinerende tentoonstellingen en meeslepende uitvoeringen op exclusieve locaties, waardoor een intieme en betoverende sfeer ontstaat. Elk evenement is een unieke ervaring die u inspireert en meer wilt. Geniet van de schoonheid van de kunsten en doe mee met Les Sorties de Diane voor onvergetelijke avonden die uw passie zullen ontsteken."
+  },
+  "events": {
+    "events": "Evenementen",
+    "grabyour": "Pak uw",
+    "seats": "Zitplaatsen",
+    "upcoming": "Aanstaande",
+    "all": "Alle",
+    "seemore": "Meer zien"
+  },
+  "footer": {
+    "companyName": "Les sorties de Diane",
+    "tagline": "Uw toegangspoort tot evenementen",
+    "quickLinks": {
+      "title": "Snelle links",
+      "items": ["Home", "Evenementen", "Contact"]
+    },
+    "userLinks": {
+      "title": "Gebruikerslinks",
+      "items": ["Mijn account", "Bestelgeschiedenis", "Tickets"]
+    },
+    "legal": {
+      "title": "Juridisch",
+      "items": ["Privacybeleid", "Servicevoorwaarden"]
+    },
+    "socialMedia": ["Facebook", "Twitter", "Instagram"],
+    "newsletter": {
+      "label": "Abonneer op onze nieuwsbrief",
+      "placeholder": "E-mailadres",
+      "buttonText": "Abonneren"
+    },
+    "copyright": "Les sorties de Diane. Alle rechten voorbehouden."
+  },
+  "contactPage": {
+    "title": "Contact",
+    "form": {
+      "name": {
+        "label": "Naam",
+        "placeholder": "Uw naam",
+        "error": "Naam is vereist."
+      },
+      "email": {
+        "label": "E-mail",
+        "placeholder": "Uw e-mail",
+        "error": "E-mail is vereist.",
+        "invalidError": "Voer een geldig e-mailadres in."
+      },
+      "message": {
+        "label": "Bericht",
+        "placeholder": "Uw bericht",
+        "error": "Bericht mag niet leeg zijn."
+      },
+      "submitButton": {
+        "default": "Bericht verzenden",
+        "loading": "Verzenden..."
+      }
+    },
+    "apiError": "Er is iets misgegaan. Probeer het later opnieuw.",
+    "successMessage": "Bedankt voor uw feedback! We nemen binnenkort contact met u op."
+  },
+  "profilePage": {
+    "createEventButton": "Nieuw evenement maken",
+    "tabs": {
+      "events": "Evenementen door mij gemaakt",
+      "tickets": "Gekochte tickets",
+      "dashboard": "Dashboard"
+    },
+    "eventsSection": {
+      "title": "Evenementen door mij gemaakt",
+      "noEvents": "Nog geen evenementen gemaakt."
+    },
+    "ticketsSection": {
+      "title": "Gekochte tickets",
+      "noTickets": "Nog geen tickets gekocht."
+    }
+  },
+  "eventCard": {
+    "title": "Evenementen",
+    "organizedBy": "Georganiseerd door",
+    "searchButton": "Zoeken",
+    "searchResults": "Zoekresultaten"
+  },
+  "eventDetails": {
+    "eventPosterAlt": "Evenementsplakat",
+    "eventanalytics": "Evenementenanalyse",
+    "ticketPriceLabel": "Ticketprijs:",
+    "ticketPrice": "$",
+    "ticketsOverview": "Ticketoverzicht",
+    "totalTickets": "Totaal aantal tickets:",
+    "ticketsSold": "Verkochte tickets:",
+    "ticketsRemaining": "Overige tickets:",
+    "financialOverview": "Financieel overzicht",
+    "pricePerTicket": "Prijs per ticket:",
+    "totalSales": "Totale omzet:",
+    "editEventButton": "Evenement bewerken",
+    "manageTicketsButton": "Tickets beheren",
+    "viewTicketButton": "Ticket bekijken",
+    "registerButton": "Registreer voor evenement"
+  },
+  "stripeDashboard": {
+    "title": "Dashboard",
+    "balance": {
+      "sectionTitle": "Saldo",
+      "available": "Beschikbaar",
+      "pending": "In afwachting"
+    },
+    "payouts": {
+      "sectionTitle": "Recente uitbetalingen",
+      "noPayouts": "Geen uitbetaling beschikbaar"
+    },
+    "transactions": {
+      "sectionTitle": "Recente transacties",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "amount": "Bedrag",
+          "date": "Datum",
+          "status": "Status",
+          "type": "Type"
+        }
+      }
+    }
+  }
+}
