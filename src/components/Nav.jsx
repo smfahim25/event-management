@@ -60,13 +60,13 @@ const Nav = () => {
       ref={navRef}
       className={`nav w-full z-40 text-white ${
         isProfilePage ? "bg-black" : "bg-black/30"
-      } h-[8vh] flex justify-between items-center md:px-12 px-8 fixed top-0 left-0`}
+      } h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0`}
     >
       <div
         onClick={() => {
           navigate("/");
         }}
-        className="logo qwigley-regular text-2xl md:text-4xl"
+        className="logo qwigley-regular text-2xl md:text-3xl lg:text-3xl xl:text-4xl"
         style={{
           cursor: "pointer",
         }}
@@ -86,7 +86,7 @@ const Nav = () => {
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-[#0c0311] text-white transform ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 ease-in-out md:hidden z-50`}
+        } transition-transform duration-300 ease-in-out lg:hidden z-50`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           {/* Profile Icon */}
@@ -149,7 +149,7 @@ const Nav = () => {
       </div>
 
       {/* Desktop Menu */}
-      <ul className="hidden md:flex gap-10 font-semibold text-lg ml-36">
+      <ul className="hidden lg:flex gap-4 lg:gap-6 xl:gap-10 font-semibold text-lg md:ml-8 lg:ml-16 xl:ml-36">
         <li
           style={{
             cursor: "pointer",
@@ -198,17 +198,20 @@ const Nav = () => {
         </li>
       </ul>
 
-      <div className=" flex gap-5">
+      <div className="flex gap-3 md:gap-4 lg:gap-5">
         <div className="">
           <LanguageDropdown />
         </div>
 
         {/* Hamburger Icon for Mobile */}
-        <button className="md:hidden text-white text-3xl" onClick={toggleMenu}>
+        <button
+          className="sm:block lg:hidden text-white text-3xl"
+          onClick={toggleMenu}
+        >
           {isMenuOpen ? <RiCloseLine /> : <RiMenu3Line />}
         </button>
         {/* Profile Icon for Desktop */}
-        <div className="profile h-10 w-10 rounded-full bg-black/40 hidden md:flex items-center justify-center">
+        <div className="profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-black/40 hidden lg:flex items-center justify-center">
           {isSignedIn ? (
             <CustomUserButton />
           ) : (

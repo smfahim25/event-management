@@ -218,10 +218,6 @@ function LoginPage() {
             </p>
           </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 -ml-24 -mt-24 w-80 h-80 bg-purple-100 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 -mr-24 -mb-24 w-80 h-80 bg-indigo-100 rounded-full opacity-20 blur-3xl"></div>
       </div>
     </div>
   );

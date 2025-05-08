@@ -69,7 +69,7 @@ const EventCard = ({
     <div
       style={{ cursor: "pointer" }}
       onClick={() => navigate(`/app/eventDetails/${_id || id}`)}
-      className="w-full lg:w-[285px] h-[400px] rounded-xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col"
+      className="w-full md:w-[285px] lg:w-[285px] h-[400px] rounded-xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col"
     >
       <div className="relative w-full h-[180px] min-h-[180px] overflow-hidden flex-shrink-0">
         <img

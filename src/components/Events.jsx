@@ -87,7 +87,7 @@ const Events = () => {
       <div className="w-full flex-col flex min-h-screen py-20 md:px-12 px-8">
         {/* Upcoming Events Section */}
         <div className="w-full flex items-center justify-between min-h-[42vh] md:pl-12 flex-col mb-16">
-          <div className="flex flex-col w-[80%]">
+          <div className="flex flex-col w-full xl:w-[80%]">
             <div className="w-full">
               <h1 className="md:text-4xl text-3xl text-[#3D004D] font-semibold mb-3">
                 {defaultTexts.events.upcoming} <br />{" "}
@@ -96,7 +96,7 @@ const Events = () => {
               <hr className="border-[2.5px] border-[#3D004D] w-16" />
             </div>
           </div>
-          <div className="w-[75vw] h-full gap-5 flex items-center flex-wrap justify-center md:justify-start mt-3">
+          <div className="xl:w-[75vw] h-full gap-5 flex items-center flex-wrap justify-center md:justify-start mt-3">
             {upcomingEvents.map((event) => (
               <EventCard key={event.id} {...event} />
             ))}
@@ -105,7 +105,7 @@ const Events = () => {
 
         {/* All Events Section */}
         <div className="w-full flex items-center justify-between min-h-[42vh] md:pl-12 flex-col">
-          <div className="flex flex-col w-[80%]">
+          <div className="flex flex-col w-full xl:w-[80%]">
             <div className="w-full">
               <h1 className="md:text-4xl text-3xl text-[#3D004D] font-semibold mb-3">
                 {defaultTexts.events.all} <br /> {defaultTexts.events.events}
@@ -114,7 +114,7 @@ const Events = () => {
             </div>
           </div>
 
-          <div className="w-[75vw] h-full flex items-center gap-5 flex-wrap justify-center md:justify-start mt-3">
+          <div className="xl:w-[75vw] h-full flex items-center gap-5 flex-wrap justify-center md:justify-start mt-3">
             {sortedAllEvents.map((event) => (
               <EventCard key={event.id} {...event} />
             ))}
