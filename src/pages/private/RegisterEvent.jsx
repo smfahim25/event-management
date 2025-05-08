@@ -69,7 +69,7 @@ const RegisterForm = ({ details, ticketQuantity, setTicketQuantity }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-xl overflow-hidden lg:px-10">
+    <div className="container mx-auto *:bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="bg-gradient-to-r from-purple-600 to-purple-800 py-6 px-8 rounded-t-xl shadow-md">
         <h2 className="text-2xl font-bold text-white flex items-center">
           <FaTicketAlt className="mr-3" />
@@ -85,12 +85,12 @@ const RegisterForm = ({ details, ticketQuantity, setTicketQuantity }) => {
             <label className="block text-gray-700 font-medium mb-3">
               Select Ticket Type
             </label>
-            <div className="flex flex-col md:flex-row md:items-center gap-5">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-5">
               {details.price.map((p, index) => (
                 <div
                   key={index}
                   onClick={() => handlePriceSelection(p.value)}
-                  className={`md:w-1/4 flex justify-between items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                  className={`lg:w-1/4 flex justify-between items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                     selectedPrice === p.value
                       ? "border-purple-500 bg-purple-50"
                       : "border-gray-200 hover:border-purple-300"
@@ -149,8 +149,8 @@ const RegisterForm = ({ details, ticketQuantity, setTicketQuantity }) => {
           <label className="block text-gray-700 font-medium mb-3">
             Contact Information
           </label>
-          <div className="flex flex-col md:flex-row md:items-center gap-5">
-            <div className="relative">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-5">
+            <div className="relative lg:w-1/4">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
                 <FaUser />
               </div>
@@ -165,7 +165,7 @@ const RegisterForm = ({ details, ticketQuantity, setTicketQuantity }) => {
               />
             </div>
 
-            <div className="relative">
+            <div className="relative lg:w-1/4">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
                 <FaEnvelope />
               </div>

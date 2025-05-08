@@ -109,7 +109,7 @@ const Ticket = ({ data }) => {
     <div>
       <div
         onClick={handlePreview}
-        className="w-[290px] cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-100 group"
+        className="lg:w-[285px] cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-100 group"
       >
         <div className="relative h-40 w-full overflow-hidden">
           <img

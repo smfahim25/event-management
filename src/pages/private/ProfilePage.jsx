@@ -148,11 +148,12 @@ function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Nav />
 
-      <div className="container mx-auto px-4 py-8 pt-[15vh]">
-        <div className="mb-8 overflow-hidden rounded-xl bg-white p-6 shadow-md relative">
-          <div className="flex flex-col items-center md:flex-row">
-            <div className="flex flex-col items-center md:flex-row md:items-center">
-              <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-purple-100 shadow-md md:h-28 md:w-28">
+      <div className="px-4 py-8 pt-[15vh] max-w-7xl mx-auto">
+        {/* Profile Card - Improved Responsiveness */}
+        <div className="mb-8 overflow-hidden rounded-xl bg-white p-4 sm:p-6 shadow-md relative">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full">
+            <div className="flex flex-col items-center sm:flex-row sm:items-center">
+              <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
                   src={user.imageUrl || "/placeholder.svg"}
                   alt={user.fullName}
@@ -160,38 +161,40 @@ function ProfilePage() {
                 />
               </div>
 
-              <div className="mt-4 text-center md:ml-6 md:text-left">
-                <h1 className="text-2xl font-bold md:text-3xl">
+              <div className="mt-4 sm:mt-0 text-center sm:text-left sm:ml-6">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
                   {user.fullName}
                 </h1>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm sm:text-base truncate max-w-[250px] sm:max-w-none">
                   {user.emailAddresses[0].emailAddress}
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* Buttons positioned at bottom right corner */}
-          <div className="absolute bottom-4 right-4 flex flex-col gap-2 sm:flex-row">
-            {profile && !profile.isOrganizer && (
-              <button
-                onClick={handleCreateStripeAccount}
-                className="inline-flex items-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
-              >
-                <FiCreditCard className="mr-2 h-4 w-4" />
-                Create Seller Account
-              </button>
-            )}
+            {/* Buttons - Responsive positioning */}
+            <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
+              <div className="flex flex-col xs:flex-row gap-2">
+                {profile && !profile.isOrganizer && (
+                  <button
+                    onClick={handleCreateStripeAccount}
+                    className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
+                  >
+                    <FiCreditCard className="mr-2 h-4 w-4" />
+                    Create Seller Account
+                  </button>
+                )}
 
-            {profile && profile.isOrganizer && (
-              <button
-                onClick={() => setIsCreatingEvent(true)}
-                className="inline-flex items-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
-              >
-                <FiPlus className="mr-2 h-4 w-4" />
-                {profilePage.createEventButton}
-              </button>
-            )}
+                {profile && profile.isOrganizer && (
+                  <button
+                    onClick={() => setIsCreatingEvent(true)}
+                    className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
+                  >
+                    <FiPlus className="mr-2 h-4 w-4" />
+                    {profilePage.createEventButton}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -202,79 +205,83 @@ function ProfilePage() {
           <CreateEventForm onCancel={() => setIsCreatingEvent(false)} />
         </Modal>
 
-        {/* Tabs */}
+        {/* Tabs - Improved Responsiveness */}
         <div className="overflow-hidden rounded-xl bg-white shadow-md">
           <div className="grid grid-cols-3 border-b">
             <button
               onClick={() => setActiveTab("events")}
-              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex items-center justify-center px-2 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors ${
                 activeTab === "events"
                   ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
                   : "text-gray-600 hover:text-purple-600"
               }`}
             >
-              <FiCalendar className="mr-2 h-4 w-4" />
-              {profilePage.tabs.events}
+              <FiCalendar className="mr-1 sm:mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{profilePage.tabs.events}</span>
             </button>
             <button
               onClick={() => setActiveTab("tickets")}
-              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex items-center justify-center px-2 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors ${
                 activeTab === "tickets"
                   ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
                   : "text-gray-600 hover:text-purple-600"
               }`}
             >
-              <PiTicket className="mr-2 h-4 w-4" />
-              {profilePage.tabs.tickets}
+              <PiTicket className="mr-1 sm:mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{profilePage.tabs.tickets}</span>
             </button>
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex items-center justify-center px-2 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors ${
                 activeTab === "dashboard"
                   ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
                   : "text-gray-600 hover:text-purple-600"
               }`}
             >
-              <FiCreditCard className="mr-2 h-4 w-4" />
-              {defaultTexts.stripeDashboard.title}
+              <FiCreditCard className="mr-1 sm:mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">
+                {defaultTexts.stripeDashboard.title}
+              </span>
             </button>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {activeTab === "events" && (
-              <div>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {profilePage.eventsSection.title}
-                  </h2>
-                </div>
+              <div className="flex items-center justify-center">
+                <div className="w-full">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                      {profilePage.eventsSection.title}
+                    </h2>
+                  </div>
 
-                {Array.isArray(createdEvents) && createdEvents.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {createdEvents.map((event) => (
-                      <EventCard key={event.id} {...event} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
-                    <p className="text-center text-gray-500">
-                      {profilePage.eventsSection.noEvents}
-                    </p>
-                  </div>
-                )}
+                  {Array.isArray(createdEvents) && createdEvents.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                      {createdEvents.map((event) => (
+                        <EventCard key={event.id} {...event} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+                      <p className="text-center text-gray-500">
+                        {profilePage.eventsSection.noEvents}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {activeTab === "tickets" && (
               <div>
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     {profilePage.ticketsSection.title}
                   </h2>
                 </div>
 
                 {boughtTickets && boughtTickets.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
                     {boughtTickets.map((ticket) => (
                       <React.Fragment key={ticket.id}>
                         <Ticket data={ticket} />

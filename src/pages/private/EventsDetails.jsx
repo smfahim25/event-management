@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Nav from "../../components/Nav";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { VscOrganization } from "react-icons/vsc";
 import {
   FaRegCalendar,
@@ -14,6 +13,7 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoLocationOutline } from "react-icons/io5";
 import RegisterForm from "./RegisterEvent";
 import { useData } from "../../context/DataContext";
@@ -24,6 +24,14 @@ const EventsDetails = () => {
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [isBought /*setIsBought*/] = useState(false);
   const { defaultTexts } = useData();
+  const [showMap, setShowMap] = useState(false);
+
+  const scrollToSection = (elementId) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const details = {
     name: "AI Summit 2025",
@@ -59,8 +67,18 @@ const EventsDetails = () => {
     const startDate = new Date(eventDate);
     const endDate = new Date(eventDate);
 
-    startDate.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
-    endDate.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
+    startDate.setHours(
+      Number.parseInt(startHour),
+      Number.parseInt(startMinute),
+      0,
+      0
+    );
+    endDate.setHours(
+      Number.parseInt(endHour),
+      Number.parseInt(endMinute),
+      0,
+      0
+    );
 
     const currentTime = new Date();
     return currentTime >= startDate && currentTime <= endDate;
@@ -74,8 +92,7 @@ const EventsDetails = () => {
     <section className="min-h-screen bg-gray-50">
       <Nav />
       {details && (
-        <div className="pt-20">
-          {/* Hero Section with Event Poster */}
+        <div>
           <div className="relative h-[50vh] overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10"></div>
             <img
@@ -115,29 +132,28 @@ const EventsDetails = () => {
             </div>
           </div>
 
-          {/* Quick Actions Bar */}
           <div className="bg-white shadow-md py-4 sticky top-16 z-30">
             <div className="container mx-auto px-6">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-6">
-                  <a
-                    href="#details"
+                  <button
+                    onClick={() => scrollToSection("details")}
                     className="text-gray-700 hover:text-purple-600 font-medium"
                   >
                     Details
-                  </a>
-                  <a
-                    href="#tickets"
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("tickets")}
                     className="text-gray-700 hover:text-purple-600 font-medium"
                   >
                     Tickets
-                  </a>
-                  <a
-                    href="#organizer"
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("organizer")}
                     className="text-gray-700 hover:text-purple-600 font-medium"
                   >
                     Organizer
-                  </a>
+                  </button>
                 </div>
                 <div className="flex items-center space-x-4">
                   <button className="flex items-center text-gray-700 hover:text-purple-600">
@@ -153,12 +169,9 @@ const EventsDetails = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="container mx-auto px-6 py-12">
             <div className="flex flex-col lg:flex-row gap-12">
-              {/* Left Column - Event Details */}
               <div className="lg:w-2/3" id="details">
-                {/* Event Description */}
                 <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     About This Event
@@ -167,7 +180,6 @@ const EventsDetails = () => {
                     {details.description}
                   </p>
 
-                  {/* Ticket Sales Progress */}
                   <div className="mt-8">
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-600 font-medium">
@@ -190,7 +202,6 @@ const EventsDetails = () => {
                   </div>
                 </div>
 
-                {/* Event Details */}
                 <div
                   className="bg-white rounded-xl shadow-sm p-8 mb-8"
                   id="organizer"
@@ -200,7 +211,6 @@ const EventsDetails = () => {
                   </h2>
 
                   <div className="grid md:grid-cols-2 gap-8">
-                    {/* Date & Time */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-700 mb-4">
                         Date & Time
@@ -276,7 +286,6 @@ const EventsDetails = () => {
                       )}
                     </div>
 
-                    {/* Location */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-700 mb-4">
                         Location
@@ -289,12 +298,51 @@ const EventsDetails = () => {
                         <div>
                           <p className="font-medium">{details.location}</p>
                           <p className="text-sm text-gray-500">Venue</p>
+                          <button
+                            onClick={() => setShowMap(!showMap)}
+                            className="mt-2 flex items-center text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                          >
+                            {showMap ? (
+                              <>
+                                Hide Map <IoIosArrowUp className="ml-1" />
+                              </>
+                            ) : (
+                              <>
+                                Show Map <IoIosArrowDown className="ml-1" />
+                              </>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div
+                    className={`mt-4 rounded-lg overflow-hidden shadow-md transition-all duration-500 ease-in-out w-full ${
+                      showMap
+                        ? "h-[300px] opacity-100 mb-4 transform scale-100"
+                        : "h-0 opacity-0 transform scale-95"
+                    }`}
+                    style={{
+                      maxHeight: showMap ? "300px" : "0px",
+                      transform: showMap
+                        ? "translateY(0)"
+                        : "translateY(-10px)",
+                      transformOrigin: "top center",
+                    }}
+                  >
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50470.77791667087!2d-122.47606619235352!3d37.77492951404477!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Event Location"
+                      className="rounded-lg"
+                    ></iframe>
+                  </div>
 
-                  {/* Organizer */}
                   <div className="mt-8 pt-8 border-t border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">
                       Organizer
@@ -320,7 +368,6 @@ const EventsDetails = () => {
                 </div>
               </div>
 
-              {/* Right Column - Registration or Management */}
               <div className="lg:w-1/3" id="tickets">
                 {details.organizer._id === localStorage.getItem("user_id") ? (
                   <div className="bg-white rounded-xl shadow-sm p-8 sticky top-32">
@@ -330,7 +377,6 @@ const EventsDetails = () => {
                     </h3>
 
                     <div className="space-y-6">
-                      {/* Ticket Sales Overview */}
                       <div className="bg-gray-50 rounded-lg p-6">
                         <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                           <FaTicketAlt className="mr-2 text-purple-500" />
@@ -366,7 +412,6 @@ const EventsDetails = () => {
                           </div>
                         </div>
 
-                        {/* Progress Bar */}
                         <div className="mt-4">
                           <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div
@@ -380,7 +425,6 @@ const EventsDetails = () => {
                         </div>
                       </div>
 
-                      {/* Financial Overview */}
                       <div className="bg-gray-50 rounded-lg p-6">
                         <h4 className="text-lg font-semibold text-gray-800 mb-4">
                           {defaultTexts.eventDetails.financialOverview}
@@ -403,7 +447,6 @@ const EventsDetails = () => {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex flex-col gap-3 mt-6">
                         <button
                           onClick={() => navigate("/app/edit-Event/" + eventID)}
@@ -413,27 +456,7 @@ const EventsDetails = () => {
                           {defaultTexts.eventDetails.editEventButton}
                         </button>
 
-                        <button
-                          onClick={async () => {
-                            const confirmation = confirm(
-                              "Are you sure you want to delete this event?"
-                            );
-                            if (confirmation) {
-                              const response = await axios.delete(
-                                `${import.meta.env.VITE_API_URL}/event/${
-                                  details._id
-                                }`
-                              );
-                              if (response.data.success === true)
-                                navigate("/app/profile");
-                              else {
-                                console.log(response.data);
-                                alert(response.data.message);
-                              }
-                            }
-                          }}
-                          className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors duration-200"
-                        >
+                        <button className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
                           <FaTrash className="mr-2" />
                           Delete Event
                         </button>
@@ -447,7 +470,6 @@ const EventsDetails = () => {
                         <h3 className="text-2xl font-bold text-gray-800 mb-6">
                           {defaultTexts.eventDetails.viewTicketButton}
                         </h3>
-                        {/* Ticket view content would go here */}
                       </div>
                     ) : (
                       <RegisterForm
