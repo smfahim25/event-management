@@ -6,6 +6,8 @@ import Nav from "../../components/Nav";
 import Ticket from "../../components/ui/Ticket";
 import { useData } from "../../context/DataContext";
 import StripeDashboard from "../../components/StripeDashboard";
+import { FiCalendar, FiCreditCard, FiPlus } from "react-icons/fi";
+import { PiTicket } from "react-icons/pi";
 
 const mockProfile = {
   _id: "user123",
@@ -143,121 +145,159 @@ function ProfilePage() {
   };
 
   return (
-    <div className="container overflow-clip w-screen mx-auto px-4 py-8 pt-[15vh]">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Nav />
-      <div className="flex flex-col md:flex-col md:justify-center items-center md:items-center mb-8">
-        <img
-          src={user.imageUrl}
-          alt={user.fullName}
-          className="w-32 h-32 rounded-full object-cover mb-4"
-        />
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold mb-2">{user.fullName}</h1>
-          <p className="text-gray-600 mb-1">
-            {user.emailAddresses[0].emailAddress}
-          </p>
-          <button
-            onClick={() => {
-              profile && profile.isOrganizer
-                ? setIsCreatingEvent(true)
-                : alert("Please create a seller stripe account");
-            }}
-            className="px-4 py-2 mt-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-          >
-            {profilePage.createEventButton}
-          </button>
 
-          {profile && (
-            <>
-              {profile.isOrganizer === false ? (
-                <>
-                  <button
-                    onClick={handleCreateStripeAccount}
-                    className="px-4 py-2 mt-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                  >
-                    Create Seller stripe account
-                  </button>
-                </>
-              ) : null}
-            </>
-          )}
+      <div className="container mx-auto px-4 py-8 pt-[15vh]">
+        <div className="mb-8 overflow-hidden rounded-xl bg-white p-6 shadow-md relative">
+          <div className="flex flex-col items-center md:flex-row">
+            <div className="flex flex-col items-center md:flex-row md:items-center">
+              <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-purple-100 shadow-md md:h-28 md:w-28">
+                <img
+                  src={user.imageUrl || "/placeholder.svg"}
+                  alt={user.fullName}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <div className="mt-4 text-center md:ml-6 md:text-left">
+                <h1 className="text-2xl font-bold md:text-3xl">
+                  {user.fullName}
+                </h1>
+                <p className="text-gray-500">
+                  {user.emailAddresses[0].emailAddress}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Buttons positioned at bottom right corner */}
+          <div className="absolute bottom-4 right-4 flex flex-col gap-2 sm:flex-row">
+            {profile && !profile.isOrganizer && (
+              <button
+                onClick={handleCreateStripeAccount}
+                className="inline-flex items-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
+              >
+                <FiCreditCard className="mr-2 h-4 w-4" />
+                Create Seller Account
+              </button>
+            )}
+
+            {profile && profile.isOrganizer && (
+              <button
+                onClick={() => setIsCreatingEvent(true)}
+                className="inline-flex items-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-purple-700 hover:to-violet-700"
+              >
+                <FiPlus className="mr-2 h-4 w-4" />
+                {profilePage.createEventButton}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      <Modal isOpen={isCreatingEvent} onClose={() => setIsCreatingEvent(false)}>
-        <CreateEventForm onCancel={() => setIsCreatingEvent(false)} />
-      </Modal>
+        <Modal
+          isOpen={isCreatingEvent}
+          onClose={() => setIsCreatingEvent(false)}
+        >
+          <CreateEventForm onCancel={() => setIsCreatingEvent(false)} />
+        </Modal>
 
-      <div className="flex justify-center space-x-4 mb-8 border-b">
-        <button
-          onClick={() => setActiveTab("events")}
-          className={`px-4 py-2 ${
-            activeTab === "events"
-              ? "border-b-2 border-purple-600 text-purple-600"
-              : "text-gray-600"
-          }`}
-        >
-          {profilePage.tabs.events}
-        </button>
-        <button
-          onClick={() => setActiveTab("tickets")}
-          className={`px-4 py-2 ${
-            activeTab === "tickets"
-              ? "border-b-2 border-purple-600 text-purple-600"
-              : "text-gray-600"
-          }`}
-        >
-          {profilePage.tabs.tickets}
-        </button>
-        <button
-          onClick={() => setActiveTab("dashboard")}
-          className={`px-4 py-2 ${
-            activeTab === "dashboard"
-              ? "border-b-2 border-purple-600 text-purple-600"
-              : "text-gray-600"
-          }`}
-        >
-          {/* {profilePage.tabs.dashboard} */}
-          {defaultTexts.stripeDashboard.title}
-        </button>
-      </div>
-
-      <div>
-        {activeTab === "events" && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              {profilePage.eventsSection.title}
-            </h2>
-            <div className="flex flex-wrap gap-6">
-              {Array.isArray(createdEvents) && createdEvents.length > 0 ? (
-                createdEvents.map((event) => (
-                  <EventCard key={event.id} {...event} />
-                ))
-              ) : (
-                <p>{profilePage.eventsSection.noEvents}</p>
-              )}
-            </div>
+        {/* Tabs */}
+        <div className="overflow-hidden rounded-xl bg-white shadow-md">
+          <div className="grid grid-cols-3 border-b">
+            <button
+              onClick={() => setActiveTab("events")}
+              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+                activeTab === "events"
+                  ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
+                  : "text-gray-600 hover:text-purple-600"
+              }`}
+            >
+              <FiCalendar className="mr-2 h-4 w-4" />
+              {profilePage.tabs.events}
+            </button>
+            <button
+              onClick={() => setActiveTab("tickets")}
+              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+                activeTab === "tickets"
+                  ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
+                  : "text-gray-600 hover:text-purple-600"
+              }`}
+            >
+              <PiTicket className="mr-2 h-4 w-4" />
+              {profilePage.tabs.tickets}
+            </button>
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors ${
+                activeTab === "dashboard"
+                  ? "border-b-2 border-purple-600 bg-purple-50 text-purple-700"
+                  : "text-gray-600 hover:text-purple-600"
+              }`}
+            >
+              <FiCreditCard className="mr-2 h-4 w-4" />
+              {defaultTexts.stripeDashboard.title}
+            </button>
           </div>
-        )}
-        {activeTab === "tickets" && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">
-              {profilePage.ticketsSection.title}
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {boughtTickets ? (
-                boughtTickets.map((ticket) => (
-                  <React.Fragment key={ticket.id}>
-                    <Ticket data={ticket} />
-                  </React.Fragment>
-                ))
-              ) : (
-                <p>{profilePage.ticketsSection.noTickets}</p>
-              )}
-            </div>
+
+          <div className="p-6">
+            {activeTab === "events" && (
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {profilePage.eventsSection.title}
+                  </h2>
+                </div>
+
+                {Array.isArray(createdEvents) && createdEvents.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {createdEvents.map((event) => (
+                      <EventCard key={event.id} {...event} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+                    <p className="text-center text-gray-500">
+                      {profilePage.eventsSection.noEvents}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "tickets" && (
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {profilePage.ticketsSection.title}
+                  </h2>
+                </div>
+
+                {boughtTickets && boughtTickets.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {boughtTickets.map((ticket) => (
+                      <React.Fragment key={ticket.id}>
+                        <Ticket data={ticket} />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+                    <p className="text-center text-gray-500">
+                      {profilePage.ticketsSection.noTickets}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "dashboard" && (
+              <div>
+                <StripeDashboard />
+              </div>
+            )}
           </div>
-        )}
-        {activeTab === "dashboard" && <StripeDashboard />}
+        </div>
       </div>
     </div>
   );

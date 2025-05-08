@@ -1,8 +1,8 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
 import PropTypes from "prop-types";
+import { FiCalendar, FiDownload, FiMapPin, FiUser, FiX } from "react-icons/fi";
 
-// Mock data to replace the data prop
 const mockTicketData = {
   _id: "ticket123456",
   customer: {
@@ -32,18 +32,12 @@ const Ticket = ({ data }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [pdfContent, setPdfContent] = useState(null);
 
-  function truncateText(text, maxLength) {
-    if (!text) return "";
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + "...";
-  }
   const generatePdfContent = (callback) => {
     const doc = new jsPDF();
 
-    // Load poster image
     const loadImage = (url, callback) => {
       const img = new Image();
-      img.crossOrigin = "anonymous"; // Handle CORS for external images
+      img.crossOrigin = "anonymous";
       img.src = url;
       img.onload = () => {
         callback(img);
@@ -51,19 +45,16 @@ const Ticket = ({ data }) => {
     };
 
     loadImage(event.poster, (img) => {
-      // Add poster to PDF
       const aspectRatio = img.width / img.height;
       const imgWidth = 160;
       const imgHeight = imgWidth / aspectRatio;
 
       doc.addImage(img, "JPEG", 25, 20, imgWidth, imgHeight);
 
-      // Add title below the poster
-      const yPosition = 20 + imgHeight + 10; // Adjust based on the image height
+      const yPosition = 20 + imgHeight + 10;
       doc.setFontSize(20);
       doc.text("Event Ticket", 105, yPosition, { align: "center" });
 
-      // Add event details
       doc.setFontSize(14);
       doc.text(`Event Name: ${event.name}`, 20, yPosition + 20);
       doc.text(
@@ -80,18 +71,13 @@ const Ticket = ({ data }) => {
         maxWidth: 170,
       });
 
-      // Add organizer details
       doc.text(`Organizer: ${event.organizer.username}`, 20, yPosition + 70);
-      // doc.text(`Contact: ${event.organizer.contact}`, 20, yPosition + 80);
 
-      // Add customer details
       doc.text(`Customer: ${customer.username}`, 20, yPosition + 100);
 
-      // Add ticket ID
       doc.setFontSize(12);
       doc.text(`Ticket ID: ${_id}`, 20, yPosition + 120);
 
-      // Set the preview PDF content
       callback(doc.output("datauristring"));
     });
   };
@@ -111,89 +97,111 @@ const Ticket = ({ data }) => {
     });
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <div>
-      {/* Ticket Card */}
       <div
-        style={{ cursor: "pointer" }}
         onClick={handlePreview}
-        className="w-[290px] h-[360px] rounded-lg flex flex-col overflow-hidden border border-black m-3 shadow-lg shadow-gray-200 hover:shadow-gray-400 hover:scale-105 transition-all ease-in-out"
+        className="w-[290px] cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-100 group"
       >
-        {/* Poster Section */}
-        <div className="w-full h-[45%] bg-slate-300 overflow-hidden">
+        <div className="relative h-40 w-full overflow-hidden">
           <img
-            src={event?.poster}
+            src={event?.poster || "/placeholder.svg"}
             alt="ticket poster"
-            className="object-cover h-full w-full"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <span className="absolute bottom-3 right-3 rounded-full bg-purple-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
+            ${event?.price}
+          </span>
         </div>
 
-        {/* Content Section */}
-        <div className="p-3 flex flex-col justify-between flex-1">
-          {/* Event Name */}
-          <h1 className="text-xl font-semibold">{event?.name}</h1>
+        <div className="p-4">
+          <div className="mb-2 flex items-start justify-between">
+            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+              {event?.name}
+            </h3>
+          </div>
 
-          {/* Event Date */}
-          <p className="font-semibold text-gray-600">
-            {new Date(event?.date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+          <div className="mb-3 space-y-2">
+            <div className="flex items-center text-sm text-gray-600">
+              <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
+              {formatDate(event?.date)}
+            </div>
+
+            <div className="flex items-center text-sm text-gray-600">
+              <FiMapPin className="mr-2 h-4 w-4 text-purple-500" />
+              {event?.location}
+            </div>
+
+            <div className="flex items-center text-sm text-gray-600">
+              <FiUser className="mr-2 h-4 w-4 text-purple-500" />
+              {customer?.username}
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {event?.description}
           </p>
 
-          {/* Truncated Event Description */}
-          <p className="opacity-70">{truncateText(event?.description, 45)}</p>
-
-          {/* Customer Info */}
-          <p className="font-medium">
-            <br />
-            <span className="text-xl">{customer?.username}</span>
-          </p>
-
-          {/* Bottom Section */}
-          <div className="flex justify-between items-center">
-            {/* Location */}
-            <p className="text-gray-700 font-semibold">
-              Location: <span className="text-md">{event?.location}</span>
-            </p>
-
-            {/* Ticket Price */}
-            <p className="text-2xl font-semibold text-[#E167FF]">
-              ${event?.price}
-            </p>
+          <div className="mt-3 flex justify-end">
+            <button
+              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 text-sm font-medium px-3 py-1.5 rounded-md transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePreview();
+              }}
+            >
+              View Ticket
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Preview Modal */}
       {showPreview && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
           onClick={() => setShowPreview(false)}
         >
           <div
-            className="bg-white p-4 rounded-lg w-[90%] md:w-[70%] relative"
+            className="relative mx-4 w-full max-w-4xl rounded-lg bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-semibold mb-4">Ticket Preview</h2>
-            <iframe
-              src={pdfContent}
-              title="PDF Preview"
-              className="w-full h-[400px] border"
-            ></iframe>
-            <div className="mt-4 flex justify-end space-x-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Ticket Preview
+              </h2>
               <button
+                className="rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                 onClick={() => setShowPreview(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded"
               >
-                Close
+                <FiX className="h-5 w-5" />
+                <span className="sr-only">Close</span>
               </button>
+            </div>
+
+            <div className="rounded-md border bg-gray-50">
+              <iframe
+                src={pdfContent}
+                title="PDF Preview"
+                className="h-[500px] w-full rounded-md"
+              ></iframe>
+            </div>
+
+            <div className="mt-6 flex justify-end">
               <button
                 onClick={downloadPdf}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="inline-flex items-center rounded-md bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-purple-700 hover:to-violet-700 transition-colors"
               >
-                Download
+                <FiDownload className="mr-2 h-4 w-4" />
+                Download Ticket
               </button>
             </div>
           </div>
@@ -202,6 +210,7 @@ const Ticket = ({ data }) => {
     </div>
   );
 };
+
 Ticket.propTypes = {
   data: PropTypes.shape({
     _id: PropTypes.string.isRequired,

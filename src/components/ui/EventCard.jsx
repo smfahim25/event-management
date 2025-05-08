@@ -113,7 +113,7 @@ const EventCard = ({
         <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-auto">
           <div className="flex items-center text-sm">
             <FaUser className="mr-2 text-purple-500 flex-shrink-0" />
-            <span className="text-gray-700 truncate max-w-[150px]">
+            <span className="text-gray-700 truncate">
               {defaultTexts?.eventCard?.organizedBy || "Organized by"}{" "}
               <span className="text-[#E167FF]">{organizer.username}</span>
             </span>
