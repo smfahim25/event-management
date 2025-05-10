@@ -12,11 +12,27 @@ import {
   FaChartBar,
   FaEdit,
   FaTrash,
+  FaTag,
+  FaUsers,
 } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoLocationOutline } from "react-icons/io5";
 import RegisterForm from "./RegisterEvent";
 import { useData } from "../../context/DataContext";
+
+// Event categories mapping
+const EVENT_CATEGORIES = {
+  music: "Music",
+  conference: "Conference",
+  workshop: "Workshop",
+  sports: "Sports",
+  art: "Art & Culture",
+  food: "Food & Drink",
+  business: "Business",
+  health: "Health & Wellness",
+  education: "Education",
+  other: "Other",
+};
 
 const EventsDetails = () => {
   const { eventID } = useParams();
@@ -25,6 +41,7 @@ const EventsDetails = () => {
   const [isBought /*setIsBought*/] = useState(false);
   const { defaultTexts } = useData();
   const [showMap, setShowMap] = useState(false);
+  const [selectedTicketType, setSelectedTicketType] = useState(null);
 
   const scrollToSection = (elementId) => {
     const element = document.getElementById(elementId);
@@ -39,6 +56,7 @@ const EventsDetails = () => {
       "Join us to explore the latest trends in artificial intelligence and machine learning. This premier event brings together industry leaders, researchers, and enthusiasts for a day of insightful presentations, hands-on workshops, and networking opportunities. Learn about cutting-edge AI applications, ethical considerations, and future directions in this rapidly evolving field.",
     poster:
       "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",
+    category: "conference", // Added category field
     organizer: {
       _id: localStorage.getItem("user_id"),
       username: "Tech Community",
@@ -51,8 +69,8 @@ const EventsDetails = () => {
     limit: 100,
     tickets: new Array(37).fill({}), // 37 dummy tickets
     price: [
-      { label: "General Admission", value: 50 },
-      { label: "VIP", value: 100 },
+      { label: "General Admission", value: 50, quantity: 80, sold: 30 },
+      { label: "VIP", value: 100, quantity: 20, sold: 7 },
     ],
   };
 
@@ -88,6 +106,11 @@ const EventsDetails = () => {
     return (details.tickets.length / details.limit) * 100;
   };
 
+  const handleTicketTypeSelect = (ticketType) => {
+    setSelectedTicketType(ticketType);
+    scrollToSection("register-form");
+  };
+
   return (
     <section className="min-h-screen bg-gray-50">
       <Nav />
@@ -103,8 +126,16 @@ const EventsDetails = () => {
             <div className="absolute top-0 left-0 w-full h-full flex items-center z-20">
               <div className="container mx-auto px-6">
                 <div className="max-w-3xl">
+                  {/* Category Badge - New */}
+                  <div className="inline-flex items-center bg-purple-600 text-white px-3 py-1 rounded-full mb-3 shadow-lg">
+                    <FaTag size={14} className="mr-1.5" />
+                    <span className="font-medium text-sm">
+                      {EVENT_CATEGORIES[details.category] || "Event"}
+                    </span>
+                  </div>
+
                   {isEventLive() && (
-                    <div className="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full mb-4 shadow-lg">
+                    <div className="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full mb-4 shadow-lg ml-2">
                       <FaPlayCircle size={18} className="mr-2" />
                       <span className="font-semibold">LIVE NOW</span>
                     </div>
@@ -173,6 +204,19 @@ const EventsDetails = () => {
             <div className="flex flex-col lg:flex-row gap-12">
               <div className="lg:w-2/3" id="details">
                 <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                      <FaTag size={12} className="mr-1.5" />
+                      {EVENT_CATEGORIES[details.category] || "Event"}
+                    </span>
+                    {isEventLive() && (
+                      <span className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                        <FaPlayCircle size={12} className="mr-1.5" />
+                        Live Now
+                      </span>
+                    )}
+                  </div>
+
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     About This Event
                   </h2>
@@ -199,6 +243,70 @@ const EventsDetails = () => {
                     <p className="text-sm text-gray-500 mt-2">
                       {details.tickets.length} tickets sold
                     </p>
+                  </div>
+                </div>
+
+                {/* Ticket Types Section - New */}
+                <div
+                  className="bg-white rounded-xl shadow-sm p-8 mb-8"
+                  id="tickets"
+                >
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    Ticket Types
+                  </h2>
+
+                  <div className="space-y-4">
+                    {details.price.map((ticket, index) => (
+                      <div
+                        key={index}
+                        className={`border rounded-lg p-4 transition-all ${
+                          selectedTicketType === ticket
+                            ? "border-purple-500 bg-purple-50 shadow-md"
+                            : "border-gray-200 hover:border-purple-300 hover:shadow-sm"
+                        }`}
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="mb-3 md:mb-0">
+                            <h3 className="text-lg font-semibold text-gray-800">
+                              {ticket.label}
+                            </h3>
+                            <div className="flex items-center mt-1 text-sm text-gray-600">
+                              <FaUsers
+                                className="mr-1.5 text-gray-400"
+                                size={14}
+                              />
+                              <span>
+                                {ticket.quantity - ticket.sold} remaining (
+                                {ticket.sold} sold)
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between md:justify-end gap-4">
+                            <span className="text-xl font-bold text-purple-600">
+                              ${ticket.value.toFixed(2)}
+                            </span>
+                            <button
+                              onClick={() => handleTicketTypeSelect(ticket)}
+                              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                            >
+                              Select
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div
+                              className="bg-purple-600 h-1.5 rounded-full"
+                              style={{
+                                width: `${
+                                  (ticket.sold / ticket.quantity) * 100
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -368,7 +476,7 @@ const EventsDetails = () => {
                 </div>
               </div>
 
-              <div className="lg:w-1/3" id="tickets">
+              <div className="lg:w-1/3" id="register-form">
                 {details.organizer._id === localStorage.getItem("user_id") ? (
                   <div className="bg-white rounded-xl shadow-sm p-8 sticky top-32">
                     <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -425,6 +533,37 @@ const EventsDetails = () => {
                         </div>
                       </div>
 
+                      {/* Ticket Types Breakdown - New */}
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                          Ticket Types Breakdown
+                        </h4>
+                        <div className="space-y-4">
+                          {details.price.map((ticket, index) => (
+                            <div key={index}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-gray-600">
+                                  {ticket.label}
+                                </span>
+                                <span className="font-semibold">
+                                  {ticket.sold} / {ticket.quantity}
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div
+                                  className="bg-purple-600 h-1.5 rounded-full"
+                                  style={{
+                                    width: `${
+                                      (ticket.sold / ticket.quantity) * 100
+                                    }%`,
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="bg-gray-50 rounded-lg p-6">
                         <h4 className="text-lg font-semibold text-gray-800 mb-4">
                           {defaultTexts.eventDetails.financialOverview}
@@ -436,13 +575,9 @@ const EventsDetails = () => {
                           </span>
                           <span className="font-semibold text-green-600">
                             $
-                            {Array.isArray(details.price)
-                              ? details.price.reduce(
-                                  (total, p) =>
-                                    total + p.value * details.tickets.length,
-                                  0
-                                )
-                              : details.price * details.tickets.length}
+                            {details.price
+                              .reduce((total, p) => total + p.value * p.sold, 0)
+                              .toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -476,6 +611,7 @@ const EventsDetails = () => {
                         details={details}
                         ticketQuantity={ticketQuantity}
                         setTicketQuantity={setTicketQuantity}
+                        selectedTicketType={selectedTicketType}
                       />
                     )}
                   </div>
@@ -485,11 +621,13 @@ const EventsDetails = () => {
           </div>
         </div>
       )}
-      <div className="mt-5">
+
+      <div>
         <RegisterForm
           details={details}
           ticketQuantity={ticketQuantity}
           setTicketQuantity={setTicketQuantity}
+          selectedTicketType={selectedTicketType}
         />
       </div>
     </section>

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,7 +7,24 @@ import {
   FaTicketAlt,
   FaTrash,
   FaPlus,
+  FaTag,
+  FaUsers,
+  FaBox,
 } from "react-icons/fa";
+
+// Event categories
+const EVENT_CATEGORIES = [
+  { id: "music", name: "Music" },
+  { id: "conference", name: "Conference" },
+  { id: "workshop", name: "Workshop" },
+  { id: "sports", name: "Sports" },
+  { id: "art", name: "Art & Culture" },
+  { id: "food", name: "Food & Drink" },
+  { id: "business", name: "Business" },
+  { id: "health", name: "Health & Wellness" },
+  { id: "education", name: "Education" },
+  { id: "other", name: "Other" },
+];
 
 const EditEvent = () => {
   const { eventID } = useParams();
@@ -19,6 +34,7 @@ const EditEvent = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    category: "",
     date: "",
     startTime: "",
     endTime: "",
@@ -37,7 +53,7 @@ const EditEvent = () => {
   const handleAddPrice = () => {
     setFormData((prev) => ({
       ...prev,
-      price: [...prev.price, { label: "", value: "" }],
+      price: [...prev.price, { label: "", value: "", quantity: "" }],
     }));
   };
 
@@ -67,13 +83,14 @@ const EditEvent = () => {
         name: "AI Summit 2025",
         description:
           "Join us to explore the latest trends in artificial intelligence and machine learning.",
+        category: "conference",
         date: new Date().toISOString().split("T")[0],
         startTime: "10:00",
         endTime: "15:00",
         location: "Tech Park, San Francisco",
         price: [
-          { label: "Regular", value: "50" },
-          { label: "VIP", value: "100" },
+          { label: "Regular", value: "50", quantity: "80" },
+          { label: "VIP", value: "100", quantity: "20" },
         ],
         limit: "100",
       };
@@ -81,6 +98,7 @@ const EditEvent = () => {
       setFormData({
         name: mockEvent.name,
         description: mockEvent.description,
+        category: mockEvent.category,
         date: mockEvent.date,
         startTime: mockEvent.startTime,
         endTime: mockEvent.endTime,
@@ -132,8 +150,26 @@ const EditEvent = () => {
       newErrors.description = "Description is required";
     if (!formData.date) newErrors.date = "Date is required";
     if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.category) newErrors.category = "Category is required";
     if (!formData.limit || formData.limit <= 0)
       newErrors.limit = "Valid ticket limit is required";
+
+    // Validate ticket types
+    if (formData.price.length === 0) {
+      newErrors.price = "At least one ticket type is required";
+    } else {
+      formData.price.forEach((price, index) => {
+        if (!price.label) {
+          newErrors[`price_${index}_label`] = "Ticket name is required";
+        }
+        if (!price.value) {
+          newErrors[`price_${index}_value`] = "Price is required";
+        }
+        if (!price.quantity) {
+          newErrors[`price_${index}_quantity`] = "Quantity is required";
+        }
+      });
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -189,7 +225,7 @@ const EditEvent = () => {
                   : "text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
-              Pricing
+              Pricing & Inventory
               {activeSection === "pricing" && (
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#b81bdf]"></span>
               )}
@@ -246,6 +282,34 @@ const EditEvent = () => {
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Category - New Field */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="flex items-center">
+                    <FaTag className="mr-2 text-gray-500" />
+                    Category
+                  </div>
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className={`block w-full px-4 py-3 rounded-lg border ${
+                    errors.category ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
+                >
+                  <option value="">Select a category</option>
+                  {EVENT_CATEGORIES.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.category && (
+                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
                 )}
               </div>
 
@@ -347,6 +411,34 @@ const EditEvent = () => {
                   />
                 </div>
               </div>
+
+              {/* Total Capacity */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="flex items-center">
+                    <FaUsers className="mr-2 text-gray-500" />
+                    Total Event Capacity
+                  </div>
+                </label>
+                <input
+                  type="number"
+                  name="limit"
+                  value={formData.limit}
+                  onChange={handleInputChange}
+                  min="1"
+                  className={`block w-full px-4 py-3 rounded-lg border ${
+                    errors.limit ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
+                  placeholder="Maximum number of attendees"
+                />
+                {errors.limit && (
+                  <p className="text-red-500 text-sm mt-1">{errors.limit}</p>
+                )}
+                <p className="text-sm text-gray-500 mt-2">
+                  This is the maximum number of people who can attend your event
+                  across all ticket types.
+                </p>
+              </div>
             </div>
 
             {/* Pricing Section */}
@@ -356,7 +448,7 @@ const EditEvent = () => {
                   <label className="block text-lg font-medium text-gray-800">
                     <div className="flex items-center">
                       <FaTicketAlt className="mr-2 text-[#E167FF]" />
-                      Ticket Pricing
+                      Ticket Pricing & Inventory
                     </div>
                   </label>
                   <button
@@ -368,6 +460,12 @@ const EditEvent = () => {
                     Add Ticket Type
                   </button>
                 </div>
+
+                {errors.price && (
+                  <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+                    {errors.price}
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   {formData.price.length === 0 ? (
@@ -383,7 +481,7 @@ const EditEvent = () => {
                         key={index}
                         className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#E167FF] transition-colors"
                       >
-                        <div className="w-full md:w-2/5">
+                        <div className="w-full md:w-1/3">
                           <label className="block text-xs font-medium text-gray-500 mb-1">
                             Ticket Name
                           </label>
@@ -394,10 +492,19 @@ const EditEvent = () => {
                             onChange={(e) =>
                               handlePriceChange(index, "label", e.target.value)
                             }
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                            className={`w-full px-3 py-2 rounded-md border ${
+                              errors[`price_${index}_label`]
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent`}
                           />
+                          {errors[`price_${index}_label`] && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors[`price_${index}_label`]}
+                            </p>
+                          )}
                         </div>
-                        <div className="w-full md:w-2/5">
+                        <div className="w-full md:w-1/3">
                           <label className="block text-xs font-medium text-gray-500 mb-1">
                             Price ($)
                           </label>
@@ -409,10 +516,51 @@ const EditEvent = () => {
                               handlePriceChange(index, "value", e.target.value)
                             }
                             min="0"
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                            className={`w-full px-3 py-2 rounded-md border ${
+                              errors[`price_${index}_value`]
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent`}
                           />
+                          {errors[`price_${index}_value`] && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors[`price_${index}_value`]}
+                            </p>
+                          )}
                         </div>
-                        <div className="w-full md:w-1/5 md:self-end">
+                        <div className="w-full md:w-1/4">
+                          <label className="block text-xs font-medium text-gray-500 mb-1">
+                            Quantity
+                          </label>
+                          <div className="flex items-center">
+                            <div className="flex-1">
+                              <input
+                                type="number"
+                                placeholder="Available tickets"
+                                value={priceItem.quantity}
+                                onChange={(e) =>
+                                  handlePriceChange(
+                                    index,
+                                    "quantity",
+                                    e.target.value
+                                  )
+                                }
+                                min="1"
+                                className={`w-full px-3 py-2 rounded-md border ${
+                                  errors[`price_${index}_quantity`]
+                                    ? "border-red-300 bg-red-50"
+                                    : "border-gray-300"
+                                } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent`}
+                              />
+                              {errors[`price_${index}_quantity`] && (
+                                <p className="text-red-500 text-xs mt-1">
+                                  {errors[`price_${index}_quantity`]}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="w-full md:w-auto md:self-end">
                           <button
                             type="button"
                             onClick={() => handleRemovePrice(index)}
@@ -425,33 +573,43 @@ const EditEvent = () => {
                       </div>
                     ))
                   )}
+
+                  {formData.price.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleAddPrice}
+                      className="flex items-center justify-center w-full py-3 px-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-[#E167FF] hover:bg-gray-100 transition-colors"
+                    >
+                      <FaPlus className="mr-2" size={12} />
+                      Add Another Ticket Type
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ticket Limit
-                </label>
-                <div className="flex items-center">
-                  <input
-                    type="number"
-                    name="limit"
-                    value={formData.limit}
-                    onChange={handleInputChange}
-                    min="1"
-                    className={`block w-full px-4 py-3 rounded-lg border ${
-                      errors.limit ? "border-red-500" : "border-gray-300"
-                    } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                    placeholder="Maximum number of tickets available"
-                  />
+              <div className="mt-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                  <FaBox className="mr-2 text-[#E167FF]" />
+                  Inventory Summary
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Event Capacity:</span>
+                    <span className="font-semibold">{formData.limit || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      Total Tickets Available:
+                    </span>
+                    <span className="font-semibold">
+                      {formData.price.reduce(
+                        (sum, item) =>
+                          sum + (Number.parseInt(item.quantity) || 0),
+                        0
+                      )}
+                    </span>
+                  </div>
                 </div>
-                {errors.limit && (
-                  <p className="text-red-500 text-sm mt-1">{errors.limit}</p>
-                )}
-                <p className="text-sm text-gray-500 mt-2">
-                  Set the maximum number of tickets that can be sold for this
-                  event.
-                </p>
               </div>
             </div>
 
