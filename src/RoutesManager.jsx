@@ -16,10 +16,10 @@ import RegisterEvent from "./pages/private/RegisterEvent";
 import SuccessSplit from "./pages/payment/SuccessSplit";
 import ContactPage from "./pages/public/ContactPage";
 import EditEvent from "./components/EditEvent";
-import AdminRouteGuard from "./pages/private/AdminRouteGuard";
-import AdminPanel from "./pages/private/AdminPanel";
+// import AdminRouteGuard from "./pages/private/AdminRouteGuard";
 import OrganizerDashboard from "./pages/private/OrganizationDashboard";
 import CreateEventForm from "./components/CreateEventForm";
+import AdminDashboard from "./pages/private/AdminPanel";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -51,9 +51,9 @@ function RoutesManager() {
       <Route
         path="/admin"
         element={
-          <AdminRouteGuard>
-            <AdminPanel />
-          </AdminRouteGuard>
+          // <AdminRouteGuard>
+          <AdminDashboard />
+          // </AdminRouteGuard>
         }
       />
       <Route path="/dashboard" element={<OrganizerDashboard />} />
