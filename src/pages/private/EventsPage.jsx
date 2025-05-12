@@ -187,7 +187,7 @@ function EventsPage() {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               {defaultTexts.eventCard.searchResults}
             </h2>
-            <div className="flex flex-row flex-wrap gap-5">
+            <div className="flex flex-col md:flex-row flex-wrap gap-5">
               {searchResults.map((event) => (
                 <EventCard key={event.id} {...event} />
               ))}
@@ -205,7 +205,7 @@ function EventsPage() {
               ? "All Events"
               : "Events"}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="flex flex-col md:flex-row flex-wrap gap-5">
             {sortedEvents.map((event) => (
               <EventCard key={event.id} {...event} />
             ))}

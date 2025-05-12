@@ -11,15 +11,11 @@ const EarningsSummary = ({ eventId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("all");
 
-  // Platform commission rate
-  const platformCommissionRate = 0.1; // 10%
-
   useEffect(() => {
-    // Simulate fetching earnings data
     setTimeout(() => {
       const mockData = {
         totalGross: 5250.0,
-        platformFee: 525.0, // 10% of gross
+        platformFee: 525.0,
         netEarnings: 4725.0,
         ticketsSold: 105,
         averageTicketPrice: 50.0,
@@ -44,8 +40,8 @@ const EarningsSummary = ({ eventId }) => {
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-6">
-        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="h-8 bg-gray-200 rounded w-full sm:w-1/3"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="h-32 bg-gray-200 rounded"></div>
           <div className="h-32 bg-gray-200 rounded"></div>
           <div className="h-32 bg-gray-200 rounded"></div>
@@ -57,7 +53,7 @@ const EarningsSummary = ({ eventId }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
         <h3 className="text-lg font-medium text-gray-900">Earnings Summary</h3>
         <div>
           <select
@@ -74,24 +70,24 @@ const EarningsSummary = ({ eventId }) => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {/* Gross Earnings */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 mr-4">
-              <FiDollarSign className="h-6 w-6 text-green-600" />
+            <div className="p-2 sm:p-3 rounded-full bg-green-100 mr-3 sm:mr-4">
+              <FiDollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">
                 Gross Earnings
               </p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 ${earningsData.totalGross.toFixed(2)}
               </p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center text-sm">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">Platform Fee (10%)</span>
               <span className="font-medium text-gray-700">
                 -${earningsData.platformFee.toFixed(2)}
@@ -101,20 +97,22 @@ const EarningsSummary = ({ eventId }) => {
         </div>
 
         {/* Net Earnings */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 mr-4">
-              <FiTrendingUp className="h-6 w-6 text-purple-600" />
+            <div className="p-2 sm:p-3 rounded-full bg-purple-100 mr-3 sm:mr-4">
+              <FiTrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Net Earnings</p>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">
+                Net Earnings
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-purple-600">
                 ${earningsData.netEarnings.toFixed(2)}
               </p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center text-sm">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">After platform fees</span>
               <span className="font-medium text-gray-700">
                 {(
@@ -128,20 +126,22 @@ const EarningsSummary = ({ eventId }) => {
         </div>
 
         {/* Tickets Sold */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 mr-4">
-              <FiCalendar className="h-6 w-6 text-blue-600" />
+            <div className="p-2 sm:p-3 rounded-full bg-blue-100 mr-3 sm:mr-4">
+              <FiCalendar className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Tickets Sold</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">
+                Tickets Sold
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {earningsData.ticketsSold}
               </p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center text-sm">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">Avg. Ticket Price</span>
               <span className="font-medium text-gray-700">
                 ${earningsData.averageTicketPrice.toFixed(2)}
@@ -154,11 +154,11 @@ const EarningsSummary = ({ eventId }) => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Earnings Over Time */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-          <h4 className="text-md font-medium text-gray-700 mb-4">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+          <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
             Earnings Over Time
           </h4>
-          <div className="h-64">
+          <div className="h-48 sm:h-64">
             <div className="relative h-full">
               {/* Y-axis labels */}
               <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-xs text-gray-500 py-2">
@@ -180,7 +180,7 @@ const EarningsSummary = ({ eventId }) => {
               </div>
 
               {/* Chart area */}
-              <div className="absolute inset-0 ml-12">
+              <div className="absolute inset-0 ml-8 sm:ml-12">
                 {/* Horizontal grid lines */}
                 <div className="absolute inset-0 flex flex-col justify-between">
                   <div className="border-t border-gray-200 h-0"></div>
@@ -199,19 +199,19 @@ const EarningsSummary = ({ eventId }) => {
 
                     return (
                       <div key={index} className="flex flex-col items-center">
-                        <div className="relative w-12 flex items-end">
+                        <div className="relative w-6 sm:w-12 flex items-end">
                           {/* Gross bar (background) */}
                           <div
-                            className="absolute w-8 bg-purple-200 rounded-t"
+                            className="absolute w-4 sm:w-8 bg-purple-200 rounded-t"
                             style={{ height: `${grossHeight}%` }}
                           ></div>
                           {/* Net bar (foreground) */}
                           <div
-                            className="absolute w-8 bg-purple-600 rounded-t"
+                            className="absolute w-4 sm:w-8 bg-purple-600 rounded-t"
                             style={{ height: `${netHeight}%` }}
                           ></div>
                         </div>
-                        <span className="mt-1 text-xs text-gray-500">
+                        <span className="mt-1 text-xs text-gray-500 text-center">
                           {new Date(day.date).toLocaleDateString(undefined, {
                             month: "short",
                             day: "numeric",
@@ -224,7 +224,7 @@ const EarningsSummary = ({ eventId }) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center space-x-6">
+          <div className="mt-4 flex items-center justify-center space-x-4 sm:space-x-6 flex-wrap">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-purple-600 rounded-sm mr-2"></div>
               <span className="text-xs text-gray-600">Net Earnings</span>
@@ -237,14 +237,19 @@ const EarningsSummary = ({ eventId }) => {
         </div>
 
         {/* Ticket Type Distribution */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-          <h4 className="text-md font-medium text-gray-700 mb-4">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+          <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
             Earnings by Ticket Type
           </h4>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Pie Chart */}
-            <div className="relative h-64 flex items-center justify-center">
-              <svg width="180" height="180" viewBox="0 0 100 100">
+            <div className="relative h-48 sm:h-64 flex items-center justify-center">
+              <svg
+                width="160"
+                height="160"
+                viewBox="0 0 100 100"
+                className="sm:w-[180px] sm:h-[180px]"
+              >
                 {/* Create pie chart segments */}
                 {earningsData.ticketTypes.map((ticket, index, array) => {
                   // Calculate start and end angles for pie segments
@@ -292,7 +297,7 @@ const EarningsSummary = ({ eventId }) => {
             </div>
 
             {/* Legend and Stats */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {earningsData.ticketTypes.map((ticket, index) => {
                 const totalRevenue = earningsData.ticketTypes.reduce(
                   (sum, t) => sum + t.revenue,
@@ -321,12 +326,12 @@ const EarningsSummary = ({ eventId }) => {
                           ][index % 5],
                         }}
                       ></div>
-                      <span className="text-sm text-gray-700">
+                      <span className="text-xs sm:text-sm text-gray-700">
                         {ticket.name}
                       </span>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs sm:text-sm font-medium text-gray-900">
                         ${ticket.revenue.toFixed(2)}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -342,7 +347,7 @@ const EarningsSummary = ({ eventId }) => {
       </div>
 
       {/* Platform Fee Explanation */}
-      <div className="bg-purple-50 rounded-xl p-6 border border-purple-100">
+      <div className="bg-purple-50 rounded-xl p-4 sm:p-6 border border-purple-100">
         <div className="flex items-start">
           <div className="flex-shrink-0">
             <FiPieChart className="h-5 w-5 text-purple-600" />
@@ -351,7 +356,7 @@ const EarningsSummary = ({ eventId }) => {
             <h3 className="text-sm font-medium text-purple-800">
               Platform Fee Explanation
             </h3>
-            <p className="mt-2 text-sm text-purple-700">
+            <p className="mt-2 text-xs sm:text-sm text-purple-700">
               A 10% platform fee is deducted from all ticket sales. This fee
               covers payment processing, platform maintenance, and customer
               support. Your net earnings are automatically transferred to your

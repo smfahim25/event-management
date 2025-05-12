@@ -19,6 +19,7 @@ import EditEvent from "./components/EditEvent";
 import AdminRouteGuard from "./pages/private/AdminRouteGuard";
 import AdminPanel from "./pages/private/AdminPanel";
 import OrganizerDashboard from "./pages/private/OrganizationDashboard";
+import CreateEventForm from "./components/CreateEventForm";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -44,6 +45,7 @@ function RoutesManager() {
 
       <Route path="/app/eventDetails/:eventID" element={<EventsDetails />} />
       <Route path="/app/edit-Event/:eventID" element={<EditEvent />} />
+      <Route path="/app/create-event" element={<CreateEventForm />} />
 
       {/* Admin Panel Routes */}
       <Route

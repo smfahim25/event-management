@@ -10,7 +10,9 @@ import {
   FaTag,
   FaUsers,
   FaBox,
+  FaExchangeAlt,
 } from "react-icons/fa";
+import RefundPolicyManager from "./organization/RefundPolicy";
 
 // Event categories
 const EVENT_CATEGORIES = [
@@ -48,7 +50,9 @@ const EditEvent = () => {
     "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg"
   );
   const [errors, setErrors] = useState({});
-  const [activeSection, setActiveSection] = useState("basic"); // basic, pricing
+  const [activeSection, setActiveSection] = useState("basic"); // basic, pricing, refund
+  const [refundPolicies, setRefundPolicies] = useState([]);
+  const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(true);
 
   const handleAddPrice = () => {
     setFormData((prev) => ({
@@ -71,6 +75,11 @@ const EditEvent = () => {
       );
       return { ...prev, price: updatedPrices };
     });
+  };
+
+  const handleSaveRefundPolicies = (policies) => {
+    setRefundPolicies(policies);
+    console.log("Refund policies saved:", policies);
   };
 
   // Mock fetch event details
@@ -184,7 +193,12 @@ const EditEvent = () => {
 
     // Simulate processing
     setTimeout(() => {
-      console.log("Event updated with data:", formData);
+      const finalFormData = {
+        ...formData,
+        refundPolicies: refundPoliciesEnabled ? refundPolicies : [],
+      };
+
+      console.log("Event updated with data:", finalFormData);
       alert("Event updated successfully!");
       navigate(`/app/eventDetails/${eventID}`);
       setLoading(false);
@@ -201,7 +215,7 @@ const EditEvent = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 overflow-x-auto">
             <button
               type="button"
               onClick={() => setActiveSection("basic")}
@@ -227,6 +241,20 @@ const EditEvent = () => {
             >
               Pricing & Inventory
               {activeSection === "pricing" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#b81bdf]"></span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSection("refund")}
+              className={`px-6 py-4 text-sm font-medium transition-colors relative ${
+                activeSection === "refund"
+                  ? "text-[#b81bdf] border-b-2 border-[#b81bdf]"
+                  : "text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Refund Policies
+              {activeSection === "refund" && (
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#b81bdf]"></span>
               )}
             </button>
@@ -609,6 +637,58 @@ const EditEvent = () => {
                       )}
                     </span>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Refund Policy Section */}
+            <div className={activeSection === "refund" ? "block" : "hidden"}>
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="block text-lg font-medium text-gray-800">
+                    <div className="flex items-center">
+                      <FaExchangeAlt className="mr-2 text-[#E167FF]" />
+                      Refund Policies
+                    </div>
+                  </label>
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-600 mr-3">
+                      {refundPoliciesEnabled ? "Enabled" : "Disabled"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRefundPoliciesEnabled(!refundPoliciesEnabled)
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:ring-offset-2 ${
+                        refundPoliciesEnabled ? "bg-[#E167FF]" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          refundPoliciesEnabled
+                            ? "translate-x-6"
+                            : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg">
+                  {refundPoliciesEnabled ? (
+                    <RefundPolicyManager
+                      eventId={eventID}
+                      onSave={handleSaveRefundPolicies}
+                    />
+                  ) : (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <p className="text-gray-500">
+                        Refund policies are currently disabled. Enable them to
+                        configure refund options for your attendees.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
