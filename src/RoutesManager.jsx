@@ -18,6 +18,7 @@ import ContactPage from "./pages/public/ContactPage";
 import EditEvent from "./components/EditEvent";
 import AdminRouteGuard from "./pages/private/AdminRouteGuard";
 import AdminPanel from "./pages/private/AdminPanel";
+import OrganizerDashboard from "./pages/private/OrganizationDashboard";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -53,6 +54,7 @@ function RoutesManager() {
           </AdminRouteGuard>
         }
       />
+      <Route path="/dashboard" element={<OrganizerDashboard />} />
 
       {/* Catch-all Route */}
       <Route path="/success" element={<SuccessPage />} />

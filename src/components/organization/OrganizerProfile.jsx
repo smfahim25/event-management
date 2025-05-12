@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { FiCalendar, FiCreditCard, FiPlus, FiSave, FiX } from "react-icons/fi";
-import EventCard from "./ui/EventCard";
-import { useData } from "../context/DataContext";
-import Modal from "./ui/Modal";
-import CreateEventForm from "./CreateEventForm";
+import { useData } from "../../context/DataContext";
+import CreateEventForm from "../CreateEventForm";
+import Modal from "../ui/Modal";
 import StripeDashboard from "./StripeDashboard";
+import EventCard from "../ui/EventCard";
 
-export default function OrganizerProfileComponent({ profile: initialProfile }) {
+const OrganizerProfile = ({ profile: initialProfile }) => {
   const { defaultTexts, setLoading } = useData();
   const { profilePage } = defaultTexts;
 
@@ -421,4 +421,6 @@ export default function OrganizerProfileComponent({ profile: initialProfile }) {
       </div>
     </>
   );
-}
+};
+
+export default OrganizerProfile;

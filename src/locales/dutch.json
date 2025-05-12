@@ -1,7 +1,13 @@
 {
   "nav": {
     "logo": "Les sorties de Diane",
-    "menuItems": ["Home", "Evenementen", "Contact", "Word een Organisator"],
+    "menuItems": [
+      "Home",
+      "Evenementen",
+      "Contact",
+      "Word een Organisator",
+      "Dashboard"
+    ],
     "events": {
       "title": "Evenementen",
       "items": [

@@ -145,11 +145,20 @@ const Nav = () => {
           >
             {defaultTexts.nav.menuItems[2]}
           </li>
+          <li
+            className="cursor-pointer"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/dashboard");
+            }}
+          >
+            {defaultTexts.nav.menuItems[4]}
+          </li>
         </ul>
       </div>
 
       {/* Desktop Menu */}
-      <ul className="hidden lg:flex gap-4 lg:gap-6 xl:gap-10 font-semibold text-lg md:ml-8 lg:ml-16 xl:ml-36">
+      <ul className="hidden lg:flex justify-center gap-4 lg:gap-6 xl:gap-10 font-semibold text-lg">
         <li
           style={{
             cursor: "pointer",
@@ -195,6 +204,15 @@ const Nav = () => {
           }}
         >
           {defaultTexts.nav.menuItems[2]}
+        </li>
+        <li
+          className="cursor-pointer"
+          onClick={() => {
+            setIsMenuOpen(false);
+            navigate("/dashboard");
+          }}
+        >
+          {defaultTexts.nav.menuItems[4]}
         </li>
       </ul>
 

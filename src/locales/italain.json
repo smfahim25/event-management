@@ -1,7 +1,13 @@
 {
   "nav": {
     "logo": "Les sorties de Diane",
-    "menuItems": ["Home", "Eventi", "Contatto", "Diventa un Organizzatore"],
+    "menuItems": [
+      "Home",
+      "Eventi",
+      "Contatto",
+      "Diventa un Organizzatore",
+      "pannello di controllo"
+    ],
     "events": {
       "title": "Eventi",
       "items": ["Tutti gli Eventi", "Prossimi Eventi", "Eventi in Evidenza"]

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useData } from "../../context/DataContext";
 import Nav from "../../components/Nav";
-import OrganizerProfileComponent from "../../components/OrganizerProfile";
 import UserProfileComponent from "../../components/UserProfile";
+import OrganizerProfile from "../../components/organization/OrganizerProfile";
 
 export default function ProfileManager() {
   const { setLoading } = useData();
@@ -51,7 +51,7 @@ export default function ProfileManager() {
       <Nav />
       <div className="px-4 py-8 pt-[15vh] max-w-7xl mx-auto">
         {profile.isOrganizer ? (
-          <OrganizerProfileComponent profile={profile} />
+          <OrganizerProfile profile={profile} />
         ) : (
           <UserProfileComponent profile={profile} />
         )}
