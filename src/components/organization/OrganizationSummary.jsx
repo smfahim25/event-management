@@ -5,6 +5,7 @@ import {
   FiCalendar,
   FiPieChart,
 } from "react-icons/fi";
+import PropTypes from "prop-types";
 
 const EarningsSummary = ({ eventId }) => {
   const [earningsData, setEarningsData] = useState(null);
@@ -367,6 +368,9 @@ const EarningsSummary = ({ eventId }) => {
       </div>
     </div>
   );
+};
+EarningsSummary.propTypes = {
+  eventId: PropTypes.string.isRequired,
 };
 
 export default EarningsSummary;

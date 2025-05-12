@@ -6,6 +6,7 @@ import StripeDashboard from "./StripeDashboard";
 import EventCard from "../ui/EventCard";
 import { useNavigate } from "react-router-dom";
 import CreateEventForm from "../CreateEventForm";
+import PropTypes from "prop-types";
 
 const OrganizerProfile = ({ profile: initialProfile }) => {
   const { defaultTexts, setLoading } = useData();
@@ -423,6 +424,16 @@ const OrganizerProfile = ({ profile: initialProfile }) => {
       </div>
     </>
   );
+};
+OrganizerProfile.propTypes = {
+  profile: PropTypes.shape({
+    fullName: PropTypes.string,
+    email: PropTypes.string,
+    phone: PropTypes.string,
+    organization: PropTypes.string,
+    bio: PropTypes.string,
+    imageUrl: PropTypes.string,
+  }),
 };
 
 export default OrganizerProfile;

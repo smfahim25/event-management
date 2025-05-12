@@ -7,6 +7,7 @@ import {
   FiInfo,
   FiCheck,
 } from "react-icons/fi";
+import PropTypes from "prop-types";
 
 const RefundPolicyManager = ({ eventId, onSave }) => {
   const [policies, setPolicies] = useState([]);
@@ -305,6 +306,10 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
       </div>
     </div>
   );
+};
+RefundPolicyManager.propTypes = {
+  eventId: PropTypes.string.isRequired,
+  onSave: PropTypes.func.isRequired,
 };
 
 export default RefundPolicyManager;
