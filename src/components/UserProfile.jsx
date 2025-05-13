@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { FiCreditCard, FiSave, FiX } from "react-icons/fi";
+import { FiCreditCard, FiMail } from "react-icons/fi";
 import { PiTicket } from "react-icons/pi";
 import { useData } from "../context/DataContext";
 import Modal from "./ui/Modal";
 import UserTicket from "./ui/UserTicket";
+import { FaEdit, FaSave } from "react-icons/fa";
+import { FileText, MapPin, Phone, User, X } from "phosphor-react";
+import { FaUserCheck } from "react-icons/fa6";
 
 // Mock data for testing
 const mockOrders = [
@@ -318,24 +321,60 @@ export default function UserProfileComponent({ profile: initialProfile }) {
 
         {/* Profile Tab Content */}
         <div className={activeTab === "profile" ? "block" : "hidden"}>
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">
-                Personal Information
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                View and update your account details
-              </p>
+          <div className="rounded-xl border border-gray-200 bg-white text-gray-900 shadow-sm overflow-hidden">
+            <div className="flex flex-col md:flex-row justify-between space-y-1.5 p-6">
+              {" "}
+              {/* Header */}
+              <div className="p-6 text-black">
+                <h3 className="text-xl font-semibold leading-none tracking-tight">
+                  Personal Information
+                </h3>
+                <p className="text-sm text-black mt-1.5">
+                  View and update your account details
+                </p>
+              </div>
+              {/* Footer with action buttons */}
+              <div className="flex items-center justify-end p-6">
+                {editMode ? (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancelEdit}
+                      className="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 h-10 px-4 py-2 shadow-sm"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveProfile}
+                      className="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-purple-600 hover:bg-purple-700 text-white h-10 px-4 py-2 shadow-sm"
+                    >
+                      <FaSave className="mr-2 h-4 w-4" />
+                      Save Changes
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setEditMode(true)}
+                    className="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-purple-600 hover:bg-purple-700 text-white h-10 px-4 py-2 shadow-sm"
+                  >
+                    <FaEdit className="mr-2 h-4 w-4" />
+                    Edit Profile
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="p-6 pt-0 space-y-4">
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
               {editMode ? (
                 // Edit Mode - Show Form
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
                     <label
                       htmlFor="fullName"
-                      className="text-sm font-medium block mb-1"
+                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
                     >
+                      <User size={16} className="text-purple-500" />
                       Full Name
                     </label>
                     <input
@@ -344,14 +383,15 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
                     />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <label
                       htmlFor="email"
-                      className="text-sm font-medium block mb-1"
+                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
                     >
+                      <FiMail size={16} className="text-purple-500" />
                       Email
                     </label>
                     <input
@@ -360,14 +400,15 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
                     />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <label
                       htmlFor="phone"
-                      className="text-sm font-medium block mb-1"
+                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
                     >
+                      <Phone size={16} className="text-purple-500" />
                       Phone Number
                     </label>
                     <input
@@ -376,14 +417,15 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
                     />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <label
                       htmlFor="address"
-                      className="text-sm font-medium block mb-1"
+                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
                     >
+                      <MapPin size={16} className="text-purple-500" />
                       Address
                     </label>
                     <input
@@ -392,61 +434,107 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
                     />
+                  </div>
+
+                  <div className="md:col-span-2 space-y-2">
+                    <label
+                      htmlFor="bio"
+                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
+                    >
+                      <FileText size={16} className="text-purple-500" />
+                      Bio
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm resize-none"
+                      placeholder="Tell us about yourself..."
+                    ></textarea>
+                    <p className="text-xs text-gray-500 mt-1 flex items-start gap-1.5">
+                      Write a short bio that describes you or your organization.
+                    </p>
                   </div>
                 </div>
               ) : (
                 // View Mode - Show Information
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Full Name</label>
-                    <p className="mt-1">{profile.fullName}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                      <User size={16} className="text-purple-500" />
+                      <span>Full Name</span>
+                    </div>
+                    <p className="text-base font-medium text-gray-800">
+                      {profile.fullName}
+                    </p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="mt-1">{profile.email}</p>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                      <FiMail size={16} className="text-purple-500" />
+                      <span>Email</span>
+                    </div>
+                    <p className="text-base text-gray-800">{profile.email}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Phone Number</label>
-                    <p className="mt-1">{profile.phone || "Not provided"}</p>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                      <Phone size={16} className="text-purple-500" />
+                      <span>Phone Number</span>
+                    </div>
+                    <p className="text-base text-gray-800">
+                      {profile.phone || (
+                        <span className="text-gray-400 italic">
+                          Not provided
+                        </span>
+                      )}
+                    </p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Address</label>
-                    <p className="mt-1">{profile.address || "Not provided"}</p>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                      <MapPin size={16} className="text-purple-500" />
+                      <span>Address</span>
+                    </div>
+                    <p className="text-base text-gray-800">
+                      {profile.address || (
+                        <span className="text-gray-400 italic">
+                          Not provided
+                        </span>
+                      )}
+                    </p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Account Type</label>
-                    <p className="mt-1">User</p>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                      <FaUserCheck size={16} className="text-purple-500" />
+                      <span>Account Type</span>
+                    </div>
+                    <p className="text-base text-gray-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                        {profile.accountType || "User"}
+                      </span>
+                    </p>
                   </div>
+
+                  {profile.bio && (
+                    <div className="md:col-span-2 bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                        <FileText size={16} className="text-purple-500" />
+                        <span>Bio</span>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-100">
+                        <p className="text-base text-gray-800 whitespace-pre-line">
+                          {profile.bio}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="flex items-center p-6 pt-0">
-              {editMode ? (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveProfile}
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-green-600 hover:bg-green-700 text-white h-10 px-4 py-2"
-                  >
-                    <FiSave className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={handleCancelEdit}
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                  >
-                    <FiX className="mr-2 h-4 w-4" />
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                >
-                  Edit Profile
-                </button>
               )}
             </div>
           </div>
@@ -551,7 +639,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
               ) : (
                 <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
                   <p className="text-center text-gray-500">
-                    You don't have any orders yet.
+                    You don&#39;t have any orders yet.
                   </p>
                 </div>
               )}

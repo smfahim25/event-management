@@ -16,7 +16,7 @@ export default function ProfileManager() {
       setTimeout(() => {
         setProfile({
           _id: "user123",
-          isOrganizer: true, // Change to true to test organizer view
+          isOrganizer: false, // Change to true to test organizer view
           fullName: "Jane Doe",
           imageUrl: "https://randomuser.me/api/portraits/women/12.jpg",
           email: "jane.doe@example.com",

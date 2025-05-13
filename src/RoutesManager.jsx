@@ -20,6 +20,13 @@ import EditEvent from "./components/EditEvent";
 import OrganizerDashboard from "./pages/private/OrganizationDashboard";
 import CreateEventForm from "./components/CreateEventForm";
 import AdminDashboard from "./pages/private/AdminPanel";
+import Dashboard from "./components/AdminDashboard/Dashboard";
+import UserManagement from "./components/AdminDashboard/UserManagement";
+import OrganizerApprovals from "./components/AdminDashboard/OrganizerApproval";
+import EventApprovals from "./components/AdminDashboard/EventApprovals";
+import CommissionSettings from "./components/AdminDashboard/CommissionSettings";
+import RefundResolution from "./components/AdminDashboard/RefundResulation";
+import ContentManagement from "./components/AdminDashboard/ContentManagement";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -47,15 +54,16 @@ function RoutesManager() {
       <Route path="/app/edit-Event/:eventID" element={<EditEvent />} />
       <Route path="/app/create-event" element={<CreateEventForm />} />
 
-      {/* Admin Panel Routes */}
-      <Route
-        path="/admin"
-        element={
-          // <AdminRouteGuard>
-          <AdminDashboard />
-          // </AdminRouteGuard>
-        }
-      />
+      <Route path="/admin" element={<AdminDashboard />}>
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="organizers" element={<OrganizerApprovals />} />
+        <Route path="events" element={<EventApprovals />} />
+        <Route path="commission" element={<CommissionSettings />} />
+        <Route path="refunds" element={<RefundResolution />} />
+        <Route path="content" element={<ContentManagement />} />
+      </Route>
       <Route path="/dashboard" element={<OrganizerDashboard />} />
 
       {/* Catch-all Route */}

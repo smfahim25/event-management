@@ -7,10 +7,12 @@ import {
   FiDownload,
   FiMenu,
   FiX,
+  FiPlus,
 } from "react-icons/fi";
 import RefundPolicyManager from "../../components/organization/RefundPolicy";
 import StripeDashboard from "../../components/organization/StripeDashboard";
 import EarningsSummary from "../../components/organization/OrganizationSummary";
+import EventCard from "../../components/ui/EventCard";
 
 const OrganizerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -20,6 +22,54 @@ const OrganizerDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [events, setEvents] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [createdEvents, setCreatedEvents] = useState([]);
+
+  const fetchCreatedEvents = async () => {
+    try {
+      // setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setCreatedEvents([
+          {
+            id: "event1",
+            title: "Tech Conference 2025",
+            date: "2025-06-15",
+            location: "San Francisco, CA",
+            imageUrl: "/images/event1.jpg",
+            description:
+              "Annual technology conference featuring the latest innovations",
+            price: 99.99,
+          },
+          {
+            id: "event2",
+            title: "Music Festival",
+            date: "2025-07-22",
+            location: "Austin, TX",
+            imageUrl: "/images/event2.jpg",
+            description: "Three-day music festival with top artists",
+            price: 149.99,
+          },
+          {
+            id: "event3",
+            title: "Art Exhibition",
+            date: "2025-05-30",
+            location: "New York, NY",
+            imageUrl: "/images/event3.jpg",
+            description: "Contemporary art exhibition featuring local artists",
+            price: 25.0,
+          },
+        ]);
+        // setLoading(false);
+      }, 500);
+    } catch (error) {
+      console.error("Error fetching created events:", error);
+      // setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCreatedEvents();
+  }, []);
 
   // Fetch dashboard data
   useEffect(() => {
@@ -309,6 +359,16 @@ const OrganizerDashboard = () => {
             >
               Refund Policies
             </button>
+            <button
+              onClick={() => handleTabChange("mytickets")}
+              className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                activeTab === "mytickets"
+                  ? "border-purple-500 text-purple-600"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`}
+            >
+              My Tickets
+            </button>
           </div>
         </div>
       </div>
@@ -488,6 +548,32 @@ const OrganizerDashboard = () => {
                   onSave={handleSaveRefundPolicies}
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "mytickets" && (
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <p className="text-sm text-muted-foreground">
+                Events you have created
+              </p>
+            </div>
+            <div className="p-6 pt-0">
+              {createdEvents.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                  {createdEvents.map((event) => (
+                    <EventCard key={event.id} {...event} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+                  <p className="text-center text-gray-500">
+                    {profilePage.eventsSection?.noEvents ||
+                      "You haven't created any events yet."}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
