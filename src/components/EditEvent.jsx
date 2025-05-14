@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -40,10 +42,25 @@ const EditEvent = () => {
     date: "",
     startTime: "",
     endTime: "",
-    location: "",
+    venue: {
+      name: "",
+      address: {
+        street: "",
+        city: "",
+        state: "",
+        country: "",
+        zipCode: "",
+      },
+      coordinates: {
+        latitude: "",
+        longitude: "",
+      },
+      mapUrl: "",
+    },
     price: [],
     limit: "",
     poster: null,
+    tags: [],
   });
 
   const [previewImage, setPreviewImage] = useState(
@@ -57,7 +74,10 @@ const EditEvent = () => {
   const handleAddPrice = () => {
     setFormData((prev) => ({
       ...prev,
-      price: [...prev.price, { label: "", value: "", quantity: "" }],
+      price: [
+        ...prev.price,
+        { label: "", value: "", quantity: "", maxPerOrder: "" },
+      ],
     }));
   };
 
@@ -96,12 +116,27 @@ const EditEvent = () => {
         date: new Date().toISOString().split("T")[0],
         startTime: "10:00",
         endTime: "15:00",
-        location: "Tech Park, San Francisco",
+        venue: {
+          name: "Tech Park",
+          address: {
+            street: "123 Innovation Ave",
+            city: "San Francisco",
+            state: "CA",
+            country: "USA",
+            zipCode: "94103",
+          },
+          coordinates: {
+            latitude: "37.7749",
+            longitude: "-122.4194",
+          },
+          mapUrl: "https://maps.google.com/...",
+        },
         price: [
           { label: "Regular", value: "50", quantity: "80" },
-          { label: "VIP", value: "100", quantity: "20" },
+          { label: "VIP", value: "100", quantity: "20", maxPerOrder: "2" },
         ],
         limit: "100",
+        tags: ["technology", "ai", "conference"],
       };
 
       setFormData({
@@ -111,10 +146,11 @@ const EditEvent = () => {
         date: mockEvent.date,
         startTime: mockEvent.startTime,
         endTime: mockEvent.endTime,
-        location: mockEvent.location,
+        venue: mockEvent.venue,
         price: mockEvent.price,
         limit: mockEvent.limit,
         poster: null,
+        tags: mockEvent.tags,
       });
 
       setLoading(false);
@@ -158,7 +194,18 @@ const EditEvent = () => {
     if (!formData.description.trim())
       newErrors.description = "Description is required";
     if (!formData.date) newErrors.date = "Date is required";
-    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.venue.name.trim())
+      newErrors.venueName = "Venue name is required";
+    if (!formData.venue.address.street.trim())
+      newErrors.street = "Street is required";
+    if (!formData.venue.address.city.trim())
+      newErrors.city = "City is required";
+    if (!formData.venue.address.state.trim())
+      newErrors.state = "State is required";
+    if (!formData.venue.address.country.trim())
+      newErrors.country = "Country is required";
+    if (!formData.venue.address.zipCode.trim())
+      newErrors.zipCode = "Zip code is required";
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.limit || formData.limit <= 0)
       newErrors.limit = "Valid ticket limit is required";
@@ -207,7 +254,7 @@ const EditEvent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-[#b81bdf] px-6 py-6">
@@ -386,55 +433,242 @@ const EditEvent = () => {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    <div className="flex items-center">
-                      <FaMapMarkerAlt className="mr-2 text-gray-500" />
-                      Location
-                    </div>
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    className={`block w-full px-4 py-3 rounded-lg border ${
-                      errors.location ? "border-red-500" : "border-gray-300"
-                    } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                    placeholder="Enter venue or address"
-                  />
-                  {errors.location && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.location}
-                    </p>
-                  )}
+                {/* Venue */}
+                {/* Time */}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      name="startTime"
+                      value={formData.startTime}
+                      onChange={handleInputChange}
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      name="endTime"
+                      value={formData.endTime}
+                      onChange={handleInputChange}
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Time */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-6">
-                <div>
+              {/* Venue */}
+              <div className="mb-6 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <h3 className="text-md font-medium text-gray-800 mb-3 flex items-center">
+                  <FaMapMarkerAlt className="mr-2 text-[#E167FF]" />
+                  Venue Details
+                </h3>
+
+                {/* Venue Name */}
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Time
+                    Venue Name
                   </label>
                   <input
-                    type="time"
-                    name="startTime"
-                    value={formData.startTime}
-                    onChange={handleInputChange}
+                    type="text"
+                    value={formData.venue.name}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        venue: {
+                          ...prev.venue,
+                          name: e.target.value,
+                        },
+                      }));
+                    }}
                     className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                    placeholder="Enter venue name"
                   />
                 </div>
 
+                {/* Address */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Street"
+                        value={formData.venue.address.street}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              address: {
+                                ...prev.venue.address,
+                                street: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="City"
+                        value={formData.venue.address.city}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              address: {
+                                ...prev.venue.address,
+                                city: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="State/Province"
+                        value={formData.venue.address.state}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              address: {
+                                ...prev.venue.address,
+                                state: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Zip/Postal Code"
+                        value={formData.venue.address.zipCode}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              address: {
+                                ...prev.venue.address,
+                                zipCode: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <input
+                        type="text"
+                        placeholder="Country"
+                        value={formData.venue.address.country}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              address: {
+                                ...prev.venue.address,
+                                country: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Coordinates */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Coordinates (Optional)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Latitude"
+                        value={formData.venue.coordinates.latitude}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              coordinates: {
+                                ...prev.venue.coordinates,
+                                latitude: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Longitude"
+                        value={formData.venue.coordinates.longitude}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              coordinates: {
+                                ...prev.venue.coordinates,
+                                longitude: e.target.value,
+                              },
+                            },
+                          }));
+                        }}
+                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Map URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Time
+                    Map URL (Optional)
                   </label>
                   <input
-                    type="time"
-                    name="endTime"
-                    value={formData.endTime}
-                    onChange={handleInputChange}
+                    type="text"
+                    placeholder="Google Maps or other map service URL"
+                    value={formData.venue.mapUrl}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        venue: {
+                          ...prev.venue,
+                          mapUrl: e.target.value,
+                        },
+                      }));
+                    }}
                     className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
                   />
                 </div>
@@ -466,6 +700,72 @@ const EditEvent = () => {
                   This is the maximum number of people who can attend your event
                   across all ticket types.
                 </p>
+              </div>
+
+              {/* Tags */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="flex items-center">
+                    <FaTag className="mr-2 text-gray-500" />
+                    Tags
+                  </div>
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.tags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            tags: prev.tags.filter((_, i) => i !== index),
+                          }));
+                        }}
+                        className="ml-2 text-purple-600 hover:text-purple-800"
+                      >
+                        <FaTrash className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex">
+                  <input
+                    type="text"
+                    id="tagInput"
+                    placeholder="Add tags (e.g., music, festival)"
+                    className="flex-grow rounded-l-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.target.value.trim()) {
+                        e.preventDefault();
+                        setFormData((prev) => ({
+                          ...prev,
+                          tags: [...prev.tags, e.target.value.trim()],
+                        }));
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById("tagInput");
+                      if (input.value.trim()) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          tags: [...prev.tags, input.value.trim()],
+                        }));
+                        input.value = "";
+                      }
+                    }}
+                    className="rounded-r-lg bg-[#E167FF] px-4 py-3 text-white hover:bg-[#C840E9]"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -507,7 +807,7 @@ const EditEvent = () => {
                     formData.price.map((priceItem, index) => (
                       <div
                         key={index}
-                        className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#E167FF] transition-colors"
+                        className="flex flex-col md:flex-row items-start md:items-center md:flex-wrap xl:flex-nowrap gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#E167FF] transition-colors"
                       >
                         <div className="w-full md:w-1/3">
                           <label className="block text-xs font-medium text-gray-500 mb-1">
@@ -588,7 +888,29 @@ const EditEvent = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="w-full md:w-auto md:self-end">
+                        <div className="w-full md:w-1/4 xl:mt-5">
+                          <label className="block text-xs font-medium text-gray-500 mb-1">
+                            Max Per Order
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="Leave blank for no limit"
+                            value={priceItem.maxPerOrder || ""}
+                            onChange={(e) =>
+                              handlePriceChange(
+                                index,
+                                "maxPerOrder",
+                                e.target.value
+                              )
+                            }
+                            min="1"
+                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                          />
+                          <p className="text-xs text-gray-500">
+                            Optional. Limit per customer.
+                          </p>
+                        </div>
+                        <div className="w-full md:w-auto xl:mt-5">
                           <button
                             type="button"
                             onClick={() => handleRemovePrice(index)}

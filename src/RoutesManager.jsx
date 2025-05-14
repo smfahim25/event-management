@@ -27,6 +27,8 @@ import EventApprovals from "./components/AdminDashboard/EventApprovals";
 import CommissionSettings from "./components/AdminDashboard/CommissionSettings";
 import RefundResolution from "./components/AdminDashboard/RefundResulation";
 import ContentManagement from "./components/AdminDashboard/ContentManagement";
+import OrganizerRegistrationForm from "./components/organization/OrganizerRegister";
+import SettingsPage from "./components/AdminDashboard/Settings";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -53,6 +55,10 @@ function RoutesManager() {
       <Route path="/app/eventDetails/:eventID" element={<EventsDetails />} />
       <Route path="/app/edit-Event/:eventID" element={<EditEvent />} />
       <Route path="/app/create-event" element={<CreateEventForm />} />
+      <Route
+        path="/app/create-organizer"
+        element={<OrganizerRegistrationForm />}
+      />
 
       <Route path="/admin" element={<AdminDashboard />}>
         <Route index element={<Dashboard />} />
@@ -63,6 +69,7 @@ function RoutesManager() {
         <Route path="commission" element={<CommissionSettings />} />
         <Route path="refunds" element={<RefundResolution />} />
         <Route path="content" element={<ContentManagement />} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="/dashboard" element={<OrganizerDashboard />} />
 

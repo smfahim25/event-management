@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -45,8 +47,23 @@ function CreateEventPage() {
     startTime: "",
     endTime: "",
     limit: "",
-    location: "",
+    venue: {
+      name: "",
+      address: {
+        street: "",
+        city: "",
+        state: "",
+        country: "",
+        zipCode: "",
+      },
+      coordinates: {
+        latitude: "",
+        longitude: "",
+      },
+      mapUrl: "",
+    },
     price: [],
+    tags: [],
     organizer: localStorage.getItem("user_id")?.toString() || "",
   });
 
@@ -85,7 +102,10 @@ function CreateEventPage() {
   const handleAddPrice = () => {
     setFormData((prev) => ({
       ...prev,
-      price: [...prev.price, { label: "", value: "", quantity: "" }],
+      price: [
+        ...prev.price,
+        { label: "", value: "", quantity: "", maxPerOrder: "" },
+      ],
     }));
   };
 
@@ -117,7 +137,15 @@ function CreateEventPage() {
       if (!formData.name) newErrors.name = "Event name is required";
       if (!formData.description)
         newErrors.description = "Description is required";
-      if (!formData.location) newErrors.location = "Location is required";
+      if (!formData.venue.name) newErrors.venueName = "Venue name is required";
+      if (!formData.venue.address.street)
+        newErrors.street = "Street is required";
+      if (!formData.venue.address.city) newErrors.city = "City is required";
+      if (!formData.venue.address.state) newErrors.state = "State is required";
+      if (!formData.venue.address.country)
+        newErrors.country = "Country is required";
+      if (!formData.venue.address.zipCode)
+        newErrors.zipCode = "Zip code is required";
       if (!formData.category) newErrors.category = "Category is required";
     } else if (section === "datetime") {
       if (!formData.date) newErrors.date = "Date is required";
@@ -407,34 +435,294 @@ function CreateEventPage() {
                     )}
                   </div>
 
-                  {/* Location */}
-                  <div>
+                  {/* Venue */}
+                  <div className="rounded-lg border border-purple-100 bg-purple-50 p-4 mb-5">
+                    <h3 className="mb-3 text-md font-semibold text-purple-800">
+                      Venue Details
+                    </h3>
+
+                    {/* Venue Name */}
+                    <div className="mb-4">
+                      <label
+                        htmlFor="venueName"
+                        className="mb-2 flex items-center text-sm font-medium text-gray-700"
+                      >
+                        <FiMapPin className="mr-2 h-4 w-4 text-purple-500" />
+                        Venue Name
+                      </label>
+                      <input
+                        type="text"
+                        id="venueName"
+                        name="venueName"
+                        value={formData.venue.name}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              name: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="Enter venue name"
+                        className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                      />
+                    </div>
+
+                    {/* Address */}
+                    <div className="mb-4">
+                      <label className="mb-2 block text-sm font-medium text-gray-700">
+                        Address
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Street"
+                            value={formData.venue.address.street}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  address: {
+                                    ...prev.venue.address,
+                                    street: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="City"
+                            value={formData.venue.address.city}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  address: {
+                                    ...prev.venue.address,
+                                    city: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="State/Province"
+                            value={formData.venue.address.state}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  address: {
+                                    ...prev.venue.address,
+                                    state: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Zip/Postal Code"
+                            value={formData.venue.address.zipCode}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  address: {
+                                    ...prev.venue.address,
+                                    zipCode: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <input
+                            type="text"
+                            placeholder="Country"
+                            value={formData.venue.address.country}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  address: {
+                                    ...prev.venue.address,
+                                    country: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Coordinates */}
+                    <div className="mb-4">
+                      <label className="mb-2 block text-sm font-medium text-gray-700">
+                        Coordinates (Optional)
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Latitude"
+                            value={formData.venue.coordinates.latitude}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  coordinates: {
+                                    ...prev.venue.coordinates,
+                                    latitude: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Longitude"
+                            value={formData.venue.coordinates.longitude}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                venue: {
+                                  ...prev.venue,
+                                  coordinates: {
+                                    ...prev.venue.coordinates,
+                                    longitude: e.target.value,
+                                  },
+                                },
+                              }));
+                            }}
+                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Map URL */}
+                    <div>
+                      <label
+                        htmlFor="mapUrl"
+                        className="mb-2 flex items-center text-sm font-medium text-gray-700"
+                      >
+                        Map URL (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        id="mapUrl"
+                        name="mapUrl"
+                        value={formData.venue.mapUrl}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            venue: {
+                              ...prev.venue,
+                              mapUrl: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="Google Maps or other map service URL"
+                        className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="mb-5">
                     <label
-                      htmlFor="location"
+                      htmlFor="tags"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
-                      <FiMapPin className="mr-2 h-4 w-4 text-purple-500" />
-                      Location
+                      <FiTag className="mr-2 h-4 w-4 text-purple-500" />
+                      Tags
                     </label>
-                    <input
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      placeholder="Where will your event take place?"
-                      className={`w-full rounded-lg border ${
-                        errors.location
-                          ? "border-red-300 bg-red-50"
-                          : "border-purple-200 bg-white"
-                      } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
-                    />
-                    {errors.location && (
-                      <div className="mt-1 flex items-center text-sm text-red-600">
-                        <FiAlertCircle className="mr-1 h-4 w-4" />
-                        {errors.location}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {formData.tags.map((tag, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
+                        >
+                          <span>{tag}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                tags: prev.tags.filter((_, i) => i !== index),
+                              }));
+                            }}
+                            className="ml-2 text-purple-600 hover:text-purple-800"
+                          >
+                            <FiX className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        id="tagInput"
+                        placeholder="Add tags (e.g., music, festival)"
+                        className="flex-grow rounded-l-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && e.target.value.trim()) {
+                            e.preventDefault();
+                            setFormData((prev) => ({
+                              ...prev,
+                              tags: [...prev.tags, e.target.value.trim()],
+                            }));
+                            e.target.value = "";
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const input = document.getElementById("tagInput");
+                          if (input.value.trim()) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              tags: [...prev.tags, input.value.trim()],
+                            }));
+                            input.value = "";
+                          }
+                        }}
+                        className="rounded-r-lg bg-purple-600 px-4 py-3 text-white hover:bg-purple-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      Press Enter or click Add to add a tag
+                    </p>
                   </div>
                 </div>
 
@@ -829,6 +1117,29 @@ function CreateEventPage() {
                                 )}
                               </div>
                             </div>
+                            <div className="md:col-span-3">
+                              <label className="mb-1 block text-xs font-medium text-gray-500">
+                                Max Per Order (Optional)
+                              </label>
+                              <input
+                                type="number"
+                                placeholder="Leave blank for no limit"
+                                value={priceItem.maxPerOrder || ""}
+                                onChange={(e) =>
+                                  handlePriceChange(
+                                    index,
+                                    "maxPerOrder",
+                                    e.target.value
+                                  )
+                                }
+                                min="1"
+                                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                              />
+                              <p className="mt-1 text-xs text-gray-500">
+                                Limit how many tickets of this type a single
+                                customer can purchase. Leave blank for no limit.
+                              </p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -913,6 +1224,19 @@ function CreateEventPage() {
                     <RefundPolicyManager
                       eventId="new_event"
                       onSave={handleSaveRefundPolicies}
+                      initialPolicies={[
+                        {
+                          type: "time-based",
+                          rules: [
+                            {
+                              daysBeforeEvent: 7,
+                              refundPercentage: 50,
+                              description:
+                                "50% refund up to 7 days before the event",
+                            },
+                          ],
+                        },
+                      ]}
                     />
                   ) : (
                     <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
@@ -981,10 +1305,17 @@ function CreateEventPage() {
                       <FiMapPin className="mr-2 mt-0.5 h-4 w-4 text-green-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-700">
-                          Location
+                          Venue
                         </p>
                         <p className="text-sm text-gray-600">
-                          {formData.location || "Not specified"}
+                          {formData.venue.name || "Not specified"}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {formData.venue.address.street},{" "}
+                          {formData.venue.address.city},{" "}
+                          {formData.venue.address.state},{" "}
+                          {formData.venue.address.zipCode},{" "}
+                          {formData.venue.address.country}
                         </p>
                       </div>
                     </div>
@@ -1088,6 +1419,31 @@ function CreateEventPage() {
                         <p className="text-sm text-gray-600">
                           {posterPreview ? "Uploaded" : "Not uploaded"}
                         </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <FiTag className="mr-2 mt-0.5 h-4 w-4 text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Tags
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {formData.tags.length > 0 ? (
+                            formData.tags.map((tag, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-600">
+                              No tags added
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

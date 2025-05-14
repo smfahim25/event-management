@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { CiSettings } from "react-icons/ci";
 
 export default function Sidebar({
   pendingApprovals,
@@ -161,6 +162,13 @@ export default function Sidebar({
           />
         </svg>
       ),
+      badge: null,
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      path: "/admin/settings",
+      icon: <CiSettings size={25} />,
       badge: null,
     },
   ];
