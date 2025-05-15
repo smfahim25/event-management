@@ -7,11 +7,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
+import { useAuthStore } from "../store/AuthStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Nav = () => {
-  const isSignedIn = false;
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const navRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -91,7 +92,7 @@ const Nav = () => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           {/* Profile Icon */}
           <div className="profile h-10 w-10 rounded-full bg-black/40 flex items-center justify-center">
-            {isSignedIn ? <CustomUserButton /> : <FaUserAlt />}
+            {user ? <CustomUserButton /> : <FaUserAlt />}
           </div>
 
           {/* Close Icon */}
@@ -121,7 +122,7 @@ const Nav = () => {
             {defaultTexts.nav.menuItems[1]}
           </li>
 
-          {!isOrganizer && (
+          {!isOrganizer && user?.role === "user" && (
             <>
               <li
                 style={{
@@ -180,7 +181,7 @@ const Nav = () => {
           {defaultTexts.nav.menuItems[1]}
         </li>
 
-        {!isOrganizer && (
+        {!isOrganizer && user?.role === "user" && (
           <>
             <li
               style={{
@@ -230,7 +231,7 @@ const Nav = () => {
         </button>
         {/* Profile Icon for Desktop */}
         <div className="profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-black/40 hidden lg:flex items-center justify-center">
-          {isSignedIn ? (
+          {user ? (
             <CustomUserButton />
           ) : (
             <a href="/login">

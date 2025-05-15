@@ -1,4 +1,66 @@
+import { useState } from "react";
+import { useOrganizerStore } from "../../store/OrganizerStore";
+import { useNavigate } from "react-router-dom";
+
 export default function OrganizerRegistrationForm() {
+  const { createOrganizer, loading, error, success } = useOrganizerStore();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    organizationName: "",
+    description: "",
+    logo: null,
+    website: "",
+    socialMedia: {
+      facebook: "",
+      twitter: "",
+      instagram: "",
+      linkedin: "",
+    },
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    },
+    commissionRate: "",
+    payoutSchedule: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: value,
+        },
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({
+      ...formData,
+      logo: e.target.files[0],
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createOrganizer(formData);
+    navigate("/app/profile");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
@@ -11,7 +73,56 @@ export default function OrganizerRegistrationForm() {
           </p>
         </div>
 
-        <form className="py-8 px-8 space-y-8">
+        {success && (
+          <div className="bg-green-50 border-l-4 border-green-400 p-4 m-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-green-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-green-700">
+                  Registration successful! Your organizer account is now pending
+                  approval.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 m-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <form className="py-8 px-8 space-y-8" onSubmit={handleSubmit}>
           {/* Basic Information */}
           <div>
             <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
@@ -32,6 +143,8 @@ export default function OrganizerRegistrationForm() {
                   required
                   placeholder="Creative Events Co."
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.organizationName}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -49,6 +162,8 @@ export default function OrganizerRegistrationForm() {
                   required
                   placeholder="We organize music, art, and technology events across the country."
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.description}
+                  onChange={handleInputChange}
                 ></textarea>
               </div>
 
@@ -66,6 +181,7 @@ export default function OrganizerRegistrationForm() {
                   required
                   accept="image/*"
                   className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  onChange={handleFileChange}
                 />
               </div>
 
@@ -77,12 +193,14 @@ export default function OrganizerRegistrationForm() {
                   Website*
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   name="website"
                   id="website"
                   required
                   placeholder="https://creativeevents.com"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.website}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -96,65 +214,73 @@ export default function OrganizerRegistrationForm() {
             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
               <div>
                 <label
-                  htmlFor="facebook"
+                  htmlFor="socialMedia.facebook"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Facebook
                 </label>
                 <input
-                  type="url"
-                  name="facebook"
-                  id="facebook"
+                  type="text"
+                  name="socialMedia.facebook"
+                  id="socialMedia.facebook"
                   placeholder="https://facebook.com/creativeevents"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.socialMedia.facebook}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="twitter"
+                  htmlFor="socialMedia.twitter"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Twitter
                 </label>
                 <input
-                  type="url"
-                  name="twitter"
-                  id="twitter"
+                  type="text"
+                  name="socialMedia.twitter"
+                  id="socialMedia.twitter"
                   placeholder="https://twitter.com/creativeevents"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.socialMedia.twitter}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="instagram"
+                  htmlFor="socialMedia.instagram"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Instagram
                 </label>
                 <input
-                  type="url"
-                  name="instagram"
-                  id="instagram"
+                  type="text"
+                  name="socialMedia.instagram"
+                  id="socialMedia.instagram"
                   placeholder="https://instagram.com/creativeevents"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.socialMedia.instagram}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="linkedin"
+                  htmlFor="socialMedia.linkedin"
                   className="block text-sm font-medium text-gray-700"
                 >
                   LinkedIn
                 </label>
                 <input
-                  type="url"
-                  name="linkedin"
-                  id="linkedin"
+                  type="text"
+                  name="socialMedia.linkedin"
+                  id="socialMedia.linkedin"
                   placeholder="https://linkedin.com/company/creativeevents"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.socialMedia.linkedin}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -168,84 +294,94 @@ export default function OrganizerRegistrationForm() {
             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
               <div className="sm:col-span-6">
                 <label
-                  htmlFor="street"
+                  htmlFor="address.street"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Street Address*
                 </label>
                 <input
                   type="text"
-                  name="street"
-                  id="street"
+                  name="address.street"
+                  id="address.street"
                   required
                   placeholder="123 Event Lane"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.address.street}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="city"
+                  htmlFor="address.city"
                   className="block text-sm font-medium text-gray-700"
                 >
                   City*
                 </label>
                 <input
                   type="text"
-                  name="city"
-                  id="city"
+                  name="address.city"
+                  id="address.city"
                   required
                   placeholder="New York"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.address.city}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="state"
+                  htmlFor="address.state"
                   className="block text-sm font-medium text-gray-700"
                 >
                   State/Province*
                 </label>
                 <input
                   type="text"
-                  name="state"
-                  id="state"
+                  name="address.state"
+                  id="address.state"
                   required
                   placeholder="NY"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.address.state}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="zipCode"
+                  htmlFor="address.zipCode"
                   className="block text-sm font-medium text-gray-700"
                 >
                   ZIP / Postal Code*
                 </label>
                 <input
                   type="text"
-                  name="zipCode"
-                  id="zipCode"
+                  name="address.zipCode"
+                  id="address.zipCode"
                   required
                   placeholder="10001"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.address.zipCode}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="sm:col-span-3">
                 <label
-                  htmlFor="country"
+                  htmlFor="address.country"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Country*
                 </label>
                 <select
-                  id="country"
-                  name="country"
+                  id="address.country"
+                  name="address.country"
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.address.country}
+                  onChange={handleInputChange}
                 >
                   <option value="">Select a country</option>
                   <option value="USA">United States</option>
@@ -256,73 +392,6 @@ export default function OrganizerRegistrationForm() {
                   <option value="FRA">France</option>
                   {/* Add more countries as needed */}
                 </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Verification Documents */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
-              Verification Documents
-            </h2>
-            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
-              <div>
-                <label
-                  htmlFor="businessLicense"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Business License*
-                </label>
-                <input
-                  type="file"
-                  name="businessLicense"
-                  id="businessLicense"
-                  required
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Upload PDF, JPG, or PNG (max 5MB)
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="taxId"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Tax ID*
-                </label>
-                <input
-                  type="file"
-                  name="taxId"
-                  id="taxId"
-                  required
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Upload PDF, JPG, or PNG (max 5MB)
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="additionalDocument"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Additional Document (Optional)
-                </label>
-                <input
-                  type="file"
-                  name="additionalDocument"
-                  id="additionalDocument"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Upload PDF, JPG, or PNG (max 5MB)
-                </p>
               </div>
             </div>
           </div>
@@ -350,6 +419,8 @@ export default function OrganizerRegistrationForm() {
                   step="0.1"
                   placeholder="7.5"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.commissionRate}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -365,6 +436,8 @@ export default function OrganizerRegistrationForm() {
                   name="payoutSchedule"
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  value={formData.payoutSchedule}
+                  onChange={handleInputChange}
                 >
                   <option value="">Select a schedule</option>
                   <option value="daily">Daily</option>
@@ -415,9 +488,37 @@ export default function OrganizerRegistrationForm() {
               </button>
               <button
                 type="submit"
-                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={loading}
+                className={`ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+                  loading
+                    ? "bg-purple-400"
+                    : "bg-purple-600 hover:bg-purple-700"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
               >
-                Register
+                {loading ? (
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Register"
+                )}
               </button>
             </div>
           </div>

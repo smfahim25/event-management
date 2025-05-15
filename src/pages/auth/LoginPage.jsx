@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../../store/AuthStore";
 
 function LoginPage() {
+  const { login, loading: isAuthLoading, error: authError } = useAuthStore();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -50,18 +53,18 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log("Login successful", formData);
-
-      // navigate("/dashboard")
+      await login(formData.email, formData.password);
+      console.log("Login successful");
+      window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
-      setErrors({ form: "Invalid email or password" });
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show auth error from the store if present
+  const formError = authError || errors.form;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-purple-50 to-white flex flex-col justify-center items-center p-4">
@@ -80,9 +83,9 @@ function LoginPage() {
               </p>
             </div>
 
-            {errors.form && (
+            {formError && (
               <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
-                {errors.form}
+                {formError}
               </div>
             )}
 
@@ -170,10 +173,10 @@ function LoginPage() {
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || isAuthLoading}
                   className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 font-medium"
                 >
-                  {isLoading ? (
+                  {isLoading || isAuthLoading ? (
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +211,7 @@ function LoginPage() {
           {/* Footer */}
           <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-center">
             <p className="text-sm text-gray-600">
-              Don&apos;t have an account?
+              Don&apos;t have an account?{" "}
               <Link
                 to="/signup"
                 className="font-medium text-purple-600 hover:text-purple-500"

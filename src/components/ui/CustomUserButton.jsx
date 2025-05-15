@@ -1,18 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuthStore } from "../../store/AuthStore";
 
 function CustomUserButton() {
   const pfp = "https://placehold.co/100x100";
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
-
+  const { logout } = useAuthStore();
   const handleProfileRedirect = () => {
     navigate("/app/profile");
     setIsOpen(false);
   };
 
   const handleSignOut = () => {
+    logout();
     navigate("/");
   };
 

@@ -1,80 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useOrganizerStore } from "../../store/OrganizerStore";
 
 export default function OrganizerApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [businessFilter, setBusinessFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  const [documentFilter, setDocumentFilter] = useState("");
+  // Document filter removed
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [selectedOrganizer, setSelectedOrganizer] = useState(null);
 
-  const organizers = [
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@techevents.com",
-      business: "Tech Events Inc.",
-      date: "May 10, 2025",
-      documents: 3,
-      image:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@musicfest.com",
-      business: "Music Festival Productions",
-      date: "May 11, 2025",
-      documents: 2,
-      image:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-    },
-    {
-      id: 3,
-      name: "Robert Chen",
-      email: "robert@artgallery.com",
-      business: "Modern Art Gallery",
-      date: "May 12, 2025",
-      documents: 4,
-      image:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-    },
+  const {
+    getOrganizers,
+    organizers,
+    loading,
+    error,
+    approveOrganizer,
+    rejectOrganizer,
+  } = useOrganizerStore();
+
+  useEffect(() => {
+    getOrganizers();
+  }, []);
+
+  const handleApprove = async (organizerId) => {
+    await approveOrganizer(organizerId);
+    await getOrganizers();
+  };
+
+  const openRejectModal = (organizer) => {
+    setSelectedOrganizer(organizer);
+    setRejectionReason("");
+    setIsRejectModalOpen(true);
+  };
+
+  const handleReject = async () => {
+    if (selectedOrganizer && rejectionReason.trim()) {
+      await rejectOrganizer(selectedOrganizer.userId?._id, rejectionReason);
+      setIsRejectModalOpen(false);
+      await getOrganizers();
+      setSelectedOrganizer(null);
+      setRejectionReason("");
+    }
+  };
+
+  const closeRejectModal = () => {
+    setIsRejectModalOpen(false);
+    setSelectedOrganizer(null);
+    setRejectionReason("");
+  };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Get unique verification statuses for filter
+  const verificationStatuses = [
+    ...new Set(organizers.map((org) => org.verificationStatus)),
   ];
 
-  // Get unique business types for filter
-  const businessTypes = [...new Set(organizers.map((org) => org.business))];
+  // Get unique dates for filter (using only the date part)
+  const dates = [
+    ...new Set(
+      organizers.map((org) => {
+        const date = new Date(org.createdAt);
+        return date.toISOString().split("T")[0];
+      })
+    ),
+  ];
 
-  // Get unique dates for filter
-  const dates = [...new Set(organizers.map((org) => org.date))];
-
-  // Get unique document counts for filter
-  const documentCounts = [...new Set(organizers.map((org) => org.documents))];
+  // Format date for display
 
   // Filter organizers based on search and filters
   const filteredOrganizers = organizers.filter((organizer) => {
     const matchesSearch =
       searchTerm === "" ||
-      organizer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      organizer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      organizer.business.toLowerCase().includes(searchTerm.toLowerCase());
+      organizer.organizationName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      organizer.userId?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      organizer.userId?.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesBusiness =
-      businessFilter === "" || organizer.business === businessFilter;
-    const matchesDate = dateFilter === "" || organizer.date === dateFilter;
-    const matchesDocuments =
-      documentFilter === "" ||
-      organizer.documents.toString() === documentFilter;
+    const matchesStatus =
+      statusFilter === "" || organizer.verificationStatus === statusFilter;
 
-    return matchesSearch && matchesBusiness && matchesDate && matchesDocuments;
+    const orgDate = new Date(organizer.createdAt).toISOString().split("T")[0];
+    const matchesDate = dateFilter === "" || orgDate === dateFilter;
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   const clearFilters = () => {
     setSearchTerm("");
-    setBusinessFilter("");
+    setStatusFilter("");
     setDateFilter("");
-    setDocumentFilter("");
   };
 
-  const hasActiveFilters =
-    searchTerm || businessFilter || dateFilter || documentFilter;
+  const hasActiveFilters = searchTerm || statusFilter || dateFilter;
 
   return (
     <div>
@@ -125,14 +153,14 @@ export default function OrganizerApprovals() {
             <div className="flex flex-wrap gap-2 items-center">
               <div className="w-full md:w-auto">
                 <select
-                  value={businessFilter}
-                  onChange={(e) => setBusinessFilter(e.target.value)}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
-                  <option value="">All Business Types</option>
-                  {businessTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
+                  <option value="">All Statuses</option>
+                  {verificationStatuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
                     </option>
                   ))}
                 </select>
@@ -147,22 +175,7 @@ export default function OrganizerApprovals() {
                   <option value="">All Dates</option>
                   {dates.map((date) => (
                     <option key={date} value={date}>
-                      {date}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="w-full md:w-auto">
-                <select
-                  value={documentFilter}
-                  onChange={(e) => setDocumentFilter(e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="">All Documents</option>
-                  {documentCounts.map((count) => (
-                    <option key={count} value={count}>
-                      {count} Documents
+                      {new Date(date).toLocaleDateString()}
                     </option>
                   ))}
                 </select>
@@ -220,14 +233,15 @@ export default function OrganizerApprovals() {
                   </button>
                 </span>
               )}
-              {businessFilter && (
+              {statusFilter && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  Business: {businessFilter}
+                  Status:{" "}
+                  {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                   <button
-                    onClick={() => setBusinessFilter("")}
+                    onClick={() => setStatusFilter("")}
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
-                    <span className="sr-only">Remove business filter</span>
+                    <span className="sr-only">Remove status filter</span>
                     <svg
                       className="h-2 w-2"
                       stroke="currentColor"
@@ -245,7 +259,7 @@ export default function OrganizerApprovals() {
               )}
               {dateFilter && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  Date: {dateFilter}
+                  Date: {new Date(dateFilter).toLocaleDateString()}
                   <button
                     onClick={() => setDateFilter("")}
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
@@ -266,131 +280,201 @@ export default function OrganizerApprovals() {
                   </button>
                 </span>
               )}
-              {documentFilter && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  Documents: {documentFilter}
-                  <button
-                    onClick={() => setDocumentFilter("")}
-                    className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
-                  >
-                    <span className="sr-only">Remove document filter</span>
-                    <svg
-                      className="h-2 w-2"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 8 8"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeWidth="1.5"
-                        d="M1 1l6 6m0-6L1 7"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              )}
             </div>
           )}
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Organizer
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Business Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Application Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Documents
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrganizers.length > 0 ? (
-                filteredOrganizers.map((organizer) => (
-                  <tr
-                    key={organizer.id}
-                    className="hover:bg-gray-50 transition-colors duration-150"
+        {loading ? (
+          <div className="p-6 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-indigo-500 border-r-indigo-500 border-b-transparent border-l-transparent"></div>
+            <p className="mt-2 text-sm text-gray-500">Loading organizers...</p>
+          </div>
+        ) : error ? (
+          <div className="p-6 text-center text-red-500">
+            <p>Error loading organizers: {error}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <img
-                            className="h-10 w-10 rounded-full"
-                            src={organizer.image || "/placeholder.svg"}
-                            alt=""
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {organizer.name}
+                    Organizer
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Organization Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Application Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th scope="col" className="relative px-6 py-3">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredOrganizers.length > 0 ? (
+                  filteredOrganizers.map((organizer) => (
+                    <tr
+                      key={organizer._id}
+                      className="hover:bg-gray-50 transition-colors duration-150"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img
+                              className="h-10 w-10 rounded-full object-cover"
+                              src={organizer.logo || "/placeholder.svg"}
+                              alt=""
+                            />
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {organizer.email}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {organizer.userId?.name || "N/A"}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {organizer.userId?.email || "N/A"}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {organizer.business}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {organizer.date}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        View {organizer.documents} documents
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-green-200 transition-colors duration-150">
-                        Approve
-                      </button>
-                      <button className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150">
-                        Reject
-                      </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {organizer.organizationName}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {organizer.website}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          {formatDate(organizer.createdAt)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            organizer.verificationStatus === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : organizer.verificationStatus === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {organizer.verificationStatus
+                            .charAt(0)
+                            .toUpperCase() +
+                            organizer.verificationStatus.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {organizer.verificationStatus === "pending" && (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleApprove(organizer.userId?._id)
+                              }
+                              className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-green-200 transition-colors duration-150"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => openRejectModal(organizer)}
+                              className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {organizer.verificationStatus === "rejected" &&
+                          organizer.rejectionReason && (
+                            <div className="text-xs text-gray-500">
+                              Reason: {organizer.rejectionReason}
+                            </div>
+                          )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No organizers found matching your filters.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No organizers found matching your filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+
+      {/* Rejection Reason Modal */}
+      {isRejectModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-md w-full">
+            <div className="bg-red-50 px-4 py-5 sm:p-6">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Reject Organization
+              </h3>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  Please provide a reason for rejecting{" "}
+                  {selectedOrganizer?.organizationName}. This reason will be
+                  shared with the organizer.
+                </p>
+                <div className="mt-4">
+                  <textarea
+                    rows="4"
+                    className="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    placeholder="Enter rejection reason..."
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                onClick={handleReject}
+                disabled={!rejectionReason.trim()}
+                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm ${
+                  rejectionReason.trim()
+                    ? "bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    : "bg-red-300 cursor-not-allowed"
+                }`}
+              >
+                Confirm Rejection
+              </button>
+              <button
+                type="button"
+                onClick={closeRejectModal}
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

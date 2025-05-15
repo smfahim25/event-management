@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function EventPreferences() {
   const [selectedEvents, setSelectedEvents] = useState({
@@ -11,6 +12,8 @@ export default function EventPreferences() {
     food: false,
     outdoor: false,
   });
+
+  const navigate = useNavigate();
 
   // Handler for checkbox changes
   const handleCheckboxChange = (event) => {
@@ -153,7 +156,7 @@ export default function EventPreferences() {
           className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
           onClick={() => {
             // Handle skip logic here
-            alert("Preferences skipped");
+            navigate("/");
             setSelectedEvents({
               concerts: false,
               sports: false,

@@ -9,8 +9,12 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/AuthStore";
 
 function SignupPage() {
+  const navigate = useNavigate();
+  const { register, loading: isAuthLoading, error: authError } = useAuthStore();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,7 +24,6 @@ function SignupPage() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,14 +74,11 @@ function SignupPage() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      await register(formData.name, formData.email, formData.password);
       console.log("Signup successful", formData);
-
       navigate("/event-prefer");
     } catch (error) {
       console.error("Signup failed", error);
-      setErrors({ form: "Failed to create account. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +111,8 @@ function SignupPage() {
 
   const passwordStrength = getPasswordStrength();
 
+  const formError = authError || errors.form;
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-purple-50 to-white flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md">
@@ -128,9 +130,9 @@ function SignupPage() {
               </p>
             </div>
 
-            {errors.form && (
+            {formError && (
               <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
-                {errors.form}
+                {formError}
               </div>
             )}
 
@@ -296,10 +298,10 @@ function SignupPage() {
               <div className="flex justify-center">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || isAuthLoading}
                   className="flex items-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 font-medium w-full justify-center"
                 >
-                  {isLoading ? (
+                  {isLoading || isAuthLoading ? (
                     <>
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -347,8 +349,6 @@ function SignupPage() {
             </p>
           </div>
         </div>
-
-        {/* Decorative elements */}
       </div>
     </div>
   );
