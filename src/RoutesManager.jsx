@@ -29,6 +29,7 @@ import RefundResolution from "./components/AdminDashboard/RefundResulation";
 import ContentManagement from "./components/AdminDashboard/ContentManagement";
 import OrganizerRegistrationForm from "./components/organization/OrganizerRegister";
 import SettingsPage from "./components/AdminDashboard/Settings";
+import EventPreferences from "./pages/private/EventPreference";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -45,6 +46,7 @@ function RoutesManager() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/event-prefer" element={<EventPreferences />} />
       <Route path="/contact-us" element={<ContactPage />} />
 
       {/* Protected Routes */}

@@ -1,150 +1,185 @@
 import { useState } from "react";
 
-export default function UserEditModal({ user, onClose }) {
-  const [userData, setUserData] = useState({
-    name: user.name,
-    email: user.email,
-    status: user.status,
-    role: user.role,
+export default function UserEditModal({ user, isNewUser = false, onClose }) {
+  const [formData, setFormData] = useState({
+    name: user.name || "",
+    email: user.email || "",
+    status: user.status || "active",
+    role: user.role || "User",
+    image: user.image || "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value,
-    }));
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, this would save the changes to the backend
-    console.log("Saving user data:", userData);
+    // Here you would typically send the data to your backend
+    console.log("Saving user data:", formData);
+
+    // For demo purposes, we'll just show an alert and close the modal
+    alert(
+      isNewUser ? "User added successfully!" : "User updated successfully!"
+    );
     onClose();
   };
 
   return (
-    <div className="fixed inset-10 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border max-w-xl shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-medium text-gray-900">
+            {isNewUser ? "Add New User" : "Edit User"}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
-        {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div className="sm:flex sm:items-start">
-              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Edit User
-                </h3>
-                <div className="mt-4">
-                  <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                      <div className="sm:col-span-3">
-                        <label
-                          htmlFor="name"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Name
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            value={userData.name}
-                            onChange={handleChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-indigo-500 border-2 px-2 h-[40px] rounded-md"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-3">
-                        <label
-                          htmlFor="email"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Email
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            value={userData.email}
-                            onChange={handleChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-indigo-500 border-2 px-2 h-[40px] rounded-md"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-3">
-                        <label
-                          htmlFor="role"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Role
-                        </label>
-                        <div className="mt-1">
-                          <select
-                            id="role"
-                            name="role"
-                            value={userData.role}
-                            onChange={handleChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-indigo-500 border-2 h-[40px] rounded-md"
-                          >
-                            <option value="User">User</option>
-                            <option value="Organizer">Organizer</option>
-                            <option value="Admin">Admin</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-3">
-                        <label
-                          htmlFor="status"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Status
-                        </label>
-                        <div className="mt-1">
-                          <select
-                            id="status"
-                            name="status"
-                            value={userData.status}
-                            onChange={handleChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-indigo-500 border-2 h-[40px] rounded-md"
-                          >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="blocked">Blocked</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
             >
-              Save Changes
-            </button>
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="mt-1 h-[40px] focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md px-2"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 h-[40px] rounded-md px-2"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Role
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="mt-1 block w-full py-2 px-3 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="User">User</option>
+              <option value="Organizer">Organizer</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="mt-1 block w-full py-2 px-3 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="image"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Profile Image URL
+            </label>
+            <input
+              type="text"
+              id="image"
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 h-[40px] rounded-md px-2"
+              placeholder="https://example.com/profile.jpg"
+            />
+            {formData.image && (
+              <div className="mt-2">
+                <img
+                  src={formData.image}
+                  alt="Profile Preview"
+                  className="h-20 w-20 rounded-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/placeholder.svg";
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
+            <button
+              type="submit"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {isNewUser ? "Add User" : "Save Changes"}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

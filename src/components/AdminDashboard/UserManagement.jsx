@@ -60,6 +60,7 @@ export default function UserManagement() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [editingUser, setEditingUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
   // Filter users based on search term and filters
   const filteredUsers = users.filter((user) => {
@@ -79,14 +80,43 @@ export default function UserManagement() {
     setIsEditModalOpen(true);
   };
 
+  const handleAddUser = () => {
+    setEditingUser(null);
+    setIsAddUserModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsEditModalOpen(false);
+    setIsAddUserModalOpen(false);
     setEditingUser(null);
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-900">User Management</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          User Management
+        </h1>
+        <button
+          onClick={handleAddUser}
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <svg
+            className="-ml-1 mr-2 h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Add User
+        </button>
+      </div>
       <div className="mt-6 bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -330,6 +360,27 @@ export default function UserManagement() {
       {/* Edit User Modal */}
       {isEditModalOpen && editingUser && (
         <UserEditModal user={editingUser} onClose={handleCloseModal} />
+      )}
+
+      {/* Add User Modal */}
+      {isAddUserModalOpen && (
+        <UserEditModal
+          user={{
+            id: null,
+            name: "",
+            email: "",
+            status: "active",
+            role: "User",
+            joined: new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            image: "",
+          }}
+          isNewUser={true}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );

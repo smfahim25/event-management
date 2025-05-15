@@ -8,7 +8,7 @@ import {
   FiEyeOff,
   FiArrowRight,
 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignupPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ function SignupPage() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +75,7 @@ function SignupPage() {
 
       console.log("Signup successful", formData);
 
-      // navigate("/login")
+      navigate("/event-prefer");
     } catch (error) {
       console.error("Signup failed", error);
       setErrors({ form: "Failed to create account. Please try again." });
