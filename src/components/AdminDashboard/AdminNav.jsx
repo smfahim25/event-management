@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useAuthStore } from "../../store/AuthStore";
 
 export default function Navbar({
   mobileMenuOpen,
@@ -9,6 +10,7 @@ export default function Navbar({
 }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { user, logout } = useAuthStore();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -137,7 +139,7 @@ export default function Navbar({
                       alt="Admin profile"
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 hidden md:block">
-                      Admin User
+                      {user?.name || "Admin"}
                     </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -160,19 +162,14 @@ export default function Navbar({
                 {userDropdownOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
                     <a
-                      href="#"
+                      href="/app/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Your Profile
                     </a>
                     <a
                       href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Settings
-                    </a>
-                    <a
-                      href="#"
+                      onClick={logout}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Sign out

@@ -1,12 +1,17 @@
 import { useState } from "react";
+import { useAuthStore } from "../../store/AuthStore";
 
 export default function UserEditModal({ user, isNewUser = false, onClose }) {
+  const { createUser, getAllUsers, updateUserById } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: user.name || "",
     email: user.email || "",
-    status: user.status || "active",
+    status: user.isVerified ? "true" : "false",
     role: user.role || "User",
     image: user.image || "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -17,16 +22,35 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log("Saving user data:", formData);
+    setLoading(true);
 
-    // For demo purposes, we'll just show an alert and close the modal
-    alert(
-      isNewUser ? "User added successfully!" : "User updated successfully!"
-    );
-    onClose();
+    const finalData = {
+      ...formData,
+      isVerified: formData.status === "true",
+    };
+    if (!isNewUser) {
+      delete finalData.password;
+    }
+    try {
+      if (isNewUser) {
+        await createUser(finalData);
+      } else {
+        await updateUserById(user._id, finalData);
+      }
+
+      await getAllUsers();
+      alert(
+        isNewUser ? "User added successfully!" : "User updated successfully!"
+      );
+    } catch (err) {
+      console.error("Error saving user:", err);
+      alert("Something went wrong!");
+    } finally {
+      setLoading(false);
+      onClose();
+    }
   };
 
   return (
@@ -55,7 +79,11 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
             </svg>
           </button>
         </div>
-
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -70,6 +98,7 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               name="name"
               value={formData.name}
               onChange={handleChange}
+              disabled={loading}
               required
               className="mt-1 h-[40px] focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md px-2"
             />
@@ -88,6 +117,7 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              disabled={loading}
               required
               className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 h-[40px] rounded-md px-2"
             />
@@ -105,11 +135,12 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="mt-1 block w-full py-2 px-3 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={loading}
+              className="mt-1 block w-full py-2 px-1 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="User">User</option>
-              <option value="Organizer">Organizer</option>
-              <option value="Admin">Admin</option>
+              <option value="user">User</option>
+              <option value="organizer">Organizer</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -125,14 +156,33 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="mt-1 block w-full py-2 px-3 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={loading}
+              className="mt-1 block w-full py-2 px-1 border-purple-300 border-2 h-[40px] bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="blocked">Blocked</option>
+              <option value="true">Verified</option>
+              <option value="false">Unverified</option>
             </select>
           </div>
-
+          {isNewUser && (
+            <div className="mb-4">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                disabled={loading}
+                required
+                className="mt-1 h-[40px] px-2 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          )}
           <div className="mb-4">
             <label
               htmlFor="image"
@@ -146,6 +196,7 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               name="image"
               value={formData.image}
               onChange={handleChange}
+              disabled={loading}
               className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 h-[40px] rounded-md px-2"
               placeholder="https://example.com/profile.jpg"
             />

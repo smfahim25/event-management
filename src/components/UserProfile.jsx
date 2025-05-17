@@ -8,8 +8,8 @@ import { FaEdit, FaSave } from "react-icons/fa";
 import { FileText, MapPin, Phone, User, X } from "phosphor-react";
 import { FaUserCheck } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/AuthStore";
 
-// Mock data for testing
 const mockOrders = [
   {
     id: "order1",
@@ -49,11 +49,12 @@ const mockRefundPolicies = {
   },
 };
 
-export default function UserProfileComponent({ profile: initialProfile }) {
-  const { defaultTexts, setLoading } = useData();
+export default function UserProfileComponent() {
+  const { defaultTexts } = useData();
   const { profilePage } = defaultTexts;
+  const { user, updateUser, fetchUser: getUser } = useAuthStore();
 
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -66,25 +67,55 @@ export default function UserProfileComponent({ profile: initialProfile }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [dataFetched, setDataFetched] = useState(false);
   const navigate = useNavigate();
 
-  // Initialize form data when profile changes or edit mode is activated
   useEffect(() => {
-    if (profile) {
-      setFormData({
-        fullName: profile.fullName || "",
-        email: profile.email || "",
-        phone: profile.phone || "",
-        address: profile.address || "",
-      });
-    }
-  }, [profile, editMode]);
+    const loadInitialData = async () => {
+      if (!user.name) return;
 
-  // Fetch tickets purchased by user
+      try {
+        setLoading(true);
+
+        if (user) {
+          setProfile({
+            fullName: user.name || user.fullName,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            role: user.role,
+          });
+
+          setFormData({
+            fullName: user.name || user.fullName || "",
+            email: user.email || "",
+            phone: user.phone || "",
+            address: user.address || "",
+          });
+          setDataFetched(true);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, [user, getUser]);
+
+  useEffect(() => {
+    if (!dataFetched && user) {
+      fetchBoughtTickets();
+      fetchOrders();
+    }
+  }, [dataFetched, user]);
+
   const fetchBoughtTickets = async () => {
     try {
       setLoading(true);
-      // Simulate API call
+
       setTimeout(() => {
         setBoughtTickets([
           {
@@ -116,11 +147,10 @@ export default function UserProfileComponent({ profile: initialProfile }) {
     }
   };
 
-  // Fetch order history
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      // Simulate API call
+
       setTimeout(() => {
         setOrders(mockOrders);
         setLoading(false);
@@ -131,18 +161,12 @@ export default function UserProfileComponent({ profile: initialProfile }) {
     }
   };
 
-  useEffect(() => {
-    fetchBoughtTickets();
-    fetchOrders();
-  }, []);
-
   const handleRequestRefund = (ticket) => {
     setSelectedTicket(ticket);
     setIsRefundModalOpen(true);
   };
 
   const submitRefundRequest = () => {
-    // Simulate refund request submission
     alert(`Refund request submitted for ${selectedTicket.eventName}`);
     setIsRefundModalOpen(false);
     setSelectedTicket(null);
@@ -172,22 +196,29 @@ export default function UserProfileComponent({ profile: initialProfile }) {
   };
 
   const handleSaveProfile = async () => {
-    setLoading(true);
-    // Simulate API call to update profile
-    setTimeout(() => {
-      setProfile({
-        ...profile,
-        ...formData,
-      });
+    const updateData = {
+      name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+    };
+
+    try {
+      setLoading(true);
+      await updateUser(updateData);
+      await getUser();
+
       setEditMode(false);
       setLoading(false);
-      alert("Profile updated successfully!");
-    }, 800);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
     setEditMode(false);
-    // Reset form data to current profile values
+
     setFormData({
       fullName: profile.fullName || "",
       email: profile.email || "",
@@ -198,7 +229,6 @@ export default function UserProfileComponent({ profile: initialProfile }) {
 
   return (
     <>
-      {/* Profile Card */}
       <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm">
         <div className="p-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full">
@@ -206,7 +236,8 @@ export default function UserProfileComponent({ profile: initialProfile }) {
               <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
                   src={
-                    profile.imageUrl || "/placeholder.svg?height=112&width=112"
+                    profile.imageUrl ||
+                    "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
                   }
                   alt={profile.fullName}
                   className="h-full w-full object-cover"
@@ -221,12 +252,11 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                   {profile.email}
                 </p>
                 <span className="mt-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                  User
+                  {profile.role || "User"}
                 </span>
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
               <button
                 onClick={() => navigate("/app/create-organizer")}
@@ -240,7 +270,6 @@ export default function UserProfileComponent({ profile: initialProfile }) {
         </div>
       </div>
 
-      {/* Refund Request Modal */}
       <Modal
         isOpen={isRefundModalOpen}
         onClose={() => setIsRefundModalOpen(false)}
@@ -275,7 +304,6 @@ export default function UserProfileComponent({ profile: initialProfile }) {
         </div>
       </Modal>
 
-      {/* Main Content Tabs */}
       <div className="w-full">
         <div className="flex space-x-1 rounded-md bg-muted p-1 mb-4">
           <button
@@ -312,12 +340,9 @@ export default function UserProfileComponent({ profile: initialProfile }) {
           </button>
         </div>
 
-        {/* Profile Tab Content */}
         <div className={activeTab === "profile" ? "block" : "hidden"}>
           <div className="rounded-xl border border-gray-200 bg-white text-gray-900 shadow-sm overflow-hidden">
             <div className="flex flex-col md:flex-row justify-between space-y-1.5 p-6">
-              {" "}
-              {/* Header */}
               <div className="p-6 text-black">
                 <h3 className="text-xl font-semibold leading-none tracking-tight">
                   Personal Information
@@ -326,7 +351,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                   View and update your account details
                 </p>
               </div>
-              {/* Footer with action buttons */}
+
               <div className="flex items-center justify-end p-6">
                 {editMode ? (
                   <div className="flex gap-3">
@@ -339,10 +364,11 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                     </button>
                     <button
                       onClick={handleSaveProfile}
+                      disabled={loading}
                       className="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-purple-600 hover:bg-purple-700 text-white h-10 px-4 py-2 shadow-sm"
                     >
                       <FaSave className="mr-2 h-4 w-4" />
-                      Save Changes
+                      {loading ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 ) : (
@@ -357,10 +383,8 @@ export default function UserProfileComponent({ profile: initialProfile }) {
               </div>
             </div>
 
-            {/* Content */}
             <div className="p-6 space-y-6">
               {editMode ? (
-                // Edit Mode - Show Form
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label
@@ -374,6 +398,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       type="text"
                       id="fullName"
                       name="fullName"
+                      disabled={loading}
                       value={formData.fullName}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
@@ -391,6 +416,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       type="email"
                       id="email"
                       name="email"
+                      disabled={loading}
                       value={formData.email}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
@@ -408,6 +434,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       type="tel"
                       id="phone"
                       name="phone"
+                      disabled={loading}
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
@@ -425,36 +452,14 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                       type="text"
                       id="address"
                       name="address"
+                      disabled={loading}
                       value={formData.address}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm"
                     />
                   </div>
-
-                  <div className="md:col-span-2 space-y-2">
-                    <label
-                      htmlFor="bio"
-                      className="text-sm font-medium flex items-center gap-2 text-gray-700"
-                    >
-                      <FileText size={16} className="text-purple-500" />
-                      Bio
-                    </label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      value={formData.bio}
-                      onChange={handleInputChange}
-                      rows={4}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 shadow-sm resize-none"
-                      placeholder="Tell us about yourself..."
-                    ></textarea>
-                    <p className="text-xs text-gray-500 mt-1 flex items-start gap-1.5">
-                      Write a short bio that describes you or your organization.
-                    </p>
-                  </div>
                 </div>
               ) : (
-                // View Mode - Show Information
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
@@ -509,7 +514,7 @@ export default function UserProfileComponent({ profile: initialProfile }) {
                     </div>
                     <p className="text-base text-gray-800">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                        {profile.accountType || "User"}
+                        {profile.role || "User"}
                       </span>
                     </p>
                   </div>
@@ -533,7 +538,6 @@ export default function UserProfileComponent({ profile: initialProfile }) {
           </div>
         </div>
 
-        {/* Tickets Tab Content */}
         <div className={activeTab === "tickets" ? "block" : "hidden"}>
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="flex flex-col space-y-1.5 p-6">
@@ -570,7 +574,6 @@ export default function UserProfileComponent({ profile: initialProfile }) {
           </div>
         </div>
 
-        {/* Order History Tab Content */}
         <div className={activeTab === "orders" ? "block" : "hidden"}>
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="flex flex-col space-y-1.5 p-6">

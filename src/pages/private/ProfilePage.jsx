@@ -1,59 +1,24 @@
-import { useState, useEffect } from "react";
-import { useData } from "../../context/DataContext";
 import Nav from "../../components/Nav";
 import UserProfileComponent from "../../components/UserProfile";
 import OrganizerProfile from "../../components/organization/OrganizerProfile";
+import { useAuthStore } from "../../store/AuthStore";
 
 export default function ProfileManager() {
-  const { setLoading } = useData();
-  const [profile, setProfile] = useState(null);
-
-  // Fetch user profile data
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setProfile({
-          _id: "user123",
-          isOrganizer: false, // Change to true to test organizer view
-          fullName: "Jane Doe",
-          imageUrl: "https://randomuser.me/api/portraits/women/12.jpg",
-          email: "jane.doe@example.com",
-        });
-        setLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-        <Nav />
-        <div className="px-4 py-8 pt-[15vh] max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <p className="text-gray-500">Loading profile...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { user, loading: authLoading } = useAuthStore();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Nav />
+      {authLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="w-16 h-16 border-4 rounded-full animate-spin bg-purple-500"></div>
+        </div>
+      )}
       <div className="px-4 py-8 pt-[15vh] max-w-7xl mx-auto">
-        {profile.isOrganizer ? (
-          <OrganizerProfile profile={profile} />
+        {user.role === "organizer" ? (
+          <OrganizerProfile />
         ) : (
-          <UserProfileComponent profile={profile} />
+          <UserProfileComponent />
         )}
       </div>
     </div>
