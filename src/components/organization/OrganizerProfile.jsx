@@ -4,8 +4,6 @@ import {
   FiCalendar,
   FiCreditCard,
   FiEdit2,
-  FiFileText,
-  FiMail,
   FiPlus,
 } from "react-icons/fi";
 import { useData } from "../../context/DataContext";
@@ -15,16 +13,21 @@ import EventCard from "../ui/EventCard";
 import { useNavigate } from "react-router-dom";
 import CreateEventForm from "../CreateEventForm";
 import PropTypes from "prop-types";
-import { FaAward, FaBuilding } from "react-icons/fa6";
 import { Buildings, FileText, Phone, User, X } from "phosphor-react";
 import { IoMail } from "react-icons/io5";
 import { FaSave } from "react-icons/fa";
+import { useOrganizerStore } from "../../store/OrganizerStore";
 
-const OrganizerProfile = ({ profile: initialProfile }) => {
+const OrganizerProfile = () => {
   const { defaultTexts, setLoading } = useData();
   const { profilePage } = defaultTexts;
+  const {
+    organizer: organizerProfile,
+    getOrganizerProfile,
+    updateOrganizerProfile,
+  } = useOrganizerStore();
 
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -37,6 +40,30 @@ const OrganizerProfile = ({ profile: initialProfile }) => {
   const [createdEvents, setCreatedEvents] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
+
+  // Fetch organizer profile when component mounts
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      try {
+        await getOrganizerProfile();
+        setProfile(organizerProfile);
+        setFormData({
+          fullName: organizerProfile.fullName || "",
+          email: organizerProfile.email || "",
+          phone: organizerProfile.phone || "",
+          organization: organizerProfile.organization || "",
+          bio: organizerProfile.bio || "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch organizer profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [getOrganizerProfile, setLoading]);
 
   // Initialize form data when profile changes or edit mode is activated
   useEffect(() => {
@@ -55,7 +82,7 @@ const OrganizerProfile = ({ profile: initialProfile }) => {
   const fetchCreatedEvents = async () => {
     try {
       setLoading(true);
-      // Simulate API call
+      // Simulate API call - replace with actual API call
       setTimeout(() => {
         setCreatedEvents([
           {
@@ -108,17 +135,18 @@ const OrganizerProfile = ({ profile: initialProfile }) => {
   };
 
   const handleSaveProfile = async () => {
-    setLoading(true);
-    // Simulate API call to update profile
-    setTimeout(() => {
-      setProfile({
-        ...profile,
-        ...formData,
-      });
+    try {
+      setLoading(true);
+      const updatedProfile = await updateOrganizerProfile(formData);
+      setProfile(updatedProfile);
       setEditMode(false);
-      setLoading(false);
       alert("Organizer profile updated successfully!");
-    }, 800);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -143,7 +171,7 @@ const OrganizerProfile = ({ profile: initialProfile }) => {
               <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
                   src={
-                    profile.imageUrl || "/placeholder.svg?height=112&width=112"
+                    profile?.imageUrl || "/placeholder.svg?height=112&width=112"
                   }
                   alt={profile.fullName}
                   className="h-full w-full object-cover"

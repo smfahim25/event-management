@@ -9,6 +9,7 @@ export const useOrganizerStore = create((set) => ({
   error: null,
   success: false,
   organizers: [],
+  organizer: null,
 
   createOrganizer: async (formDataObj) => {
     set({ loading: true, error: null, success: false });
@@ -78,7 +79,63 @@ export const useOrganizerStore = create((set) => ({
     }
   },
 
-  // ✅ Approve organizer
+  getOrganizerProfile: async () => {
+    set({ loading: true, error: null });
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch organizer profile.");
+      }
+
+      set({ organizer: data.data });
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateOrganizerProfile: async (formDataObj) => {
+    set({ loading: true, error: null, success: false });
+
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formDataObj),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to update organizer.");
+      }
+
+      set({ success: true, organizer: data.data });
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   approveOrganizer: async (organizerId) => {
     set({ loading: true, error: null, success: false });
     try {
@@ -106,7 +163,6 @@ export const useOrganizerStore = create((set) => ({
     }
   },
 
-  // ✅ Reject organizer
   rejectOrganizer: async (organizerId, reason) => {
     set({ loading: true, error: null, success: false });
     try {
