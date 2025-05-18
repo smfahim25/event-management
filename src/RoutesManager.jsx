@@ -30,6 +30,7 @@ import ContentManagement from "./components/AdminDashboard/ContentManagement";
 import OrganizerRegistrationForm from "./components/organization/OrganizerRegister";
 import SettingsPage from "./components/AdminDashboard/Settings";
 import EventPreferences from "./pages/private/EventPreference";
+import CategoryManagement from "./components/AdminDashboard/CategoryManagement";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -69,6 +70,7 @@ function RoutesManager() {
         <Route path="organizers" element={<OrganizerApprovals />} />
         <Route path="events" element={<EventApprovals />} />
         <Route path="commission" element={<CommissionSettings />} />
+        <Route path="category" element={<CategoryManagement />} />
         <Route path="refunds" element={<RefundResolution />} />
         <Route path="content" element={<ContentManagement />} />
         <Route path="settings" element={<SettingsPage />} />

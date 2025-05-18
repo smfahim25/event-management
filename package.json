@@ -22,6 +22,7 @@
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.2",
     "keep-react": "^1.6.1",
+    "lucide-react": "^0.511.0",
     "phosphor-react": "^1.4.1",
     "react": "^18.3.1",
     "react-datepicker": "^7.5.0",

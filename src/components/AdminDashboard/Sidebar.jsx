@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { CiSettings } from "react-icons/ci";
+import { TbCategory } from "react-icons/tb";
 
 export default function Sidebar({
   pendingApprovals,
@@ -141,6 +142,13 @@ export default function Sidebar({
         </svg>
       ),
       badge: pendingApprovals?.refunds,
+    },
+    {
+      id: "categories",
+      name: "Category Management",
+      path: "/admin/category",
+      icon: <TbCategory size={25} />,
+      badge: null,
     },
     {
       id: "content",

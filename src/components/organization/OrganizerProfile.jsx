@@ -17,71 +17,92 @@ import { Buildings, FileText, Phone, User, X } from "phosphor-react";
 import { IoMail } from "react-icons/io5";
 import { FaSave } from "react-icons/fa";
 import { useOrganizerStore } from "../../store/OrganizerStore";
+import { useAuthStore } from "../../store/AuthStore";
 
 const OrganizerProfile = () => {
-  const { defaultTexts, setLoading } = useData();
+  const { defaultTexts } = useData();
   const { profilePage } = defaultTexts;
   const {
     organizer: organizerProfile,
     getOrganizerProfile,
     updateOrganizerProfile,
+    loading: organizerLoading,
   } = useOrganizerStore();
+  const {
+    user,
+    updateUser,
+    fetchUser: getUser,
+    loading: userLoading,
+  } = useAuthStore();
 
   const [profile, setProfile] = useState({});
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
+  const [organizerDetails, setOrganizerDetails] = useState({});
+  const [editMode, setEditMode] = useState({
+    user: false,
+    organizer: false,
+  });
+  const [userFormData, setUserFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
-    organization: "",
-    bio: "",
+    address: "",
+  });
+  const [organizerFormData, setOrganizerFormData] = useState({
+    organizationName: "",
+    description: "",
+    website: "",
   });
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [createdEvents, setCreatedEvents] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
+  const [activeProfileTab, setActiveProfileTab] = useState("user");
   const navigate = useNavigate();
 
-  // Fetch organizer profile when component mounts
   useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
+    const loadInitialData = async () => {
       try {
+        await getUser();
         await getOrganizerProfile();
-        setProfile(organizerProfile);
-        setFormData({
-          fullName: organizerProfile.fullName || "",
-          email: organizerProfile.email || "",
-          phone: organizerProfile.phone || "",
-          organization: organizerProfile.organization || "",
-          bio: organizerProfile.bio || "",
-        });
       } catch (error) {
-        console.error("Failed to fetch organizer profile:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchProfile();
-  }, [getOrganizerProfile, setLoading]);
+    loadInitialData();
+  }, [getUser, getOrganizerProfile]);
 
-  // Initialize form data when profile changes or edit mode is activated
+  // Initialize form data when user or organizer profile changes
   useEffect(() => {
-    if (profile) {
-      setFormData({
-        fullName: profile.fullName || "",
-        email: profile.email || "",
-        phone: profile.phone || "",
-        organization: profile.organization || "",
-        bio: profile.bio || "",
+    if (user) {
+      setProfile({
+        fullName: user.name || user.fullName,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role,
+      });
+
+      setUserFormData({
+        fullName: user.name || user.fullName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
       });
     }
-  }, [profile, editMode]);
+
+    if (organizerProfile) {
+      setOrganizerDetails(organizerProfile);
+      setOrganizerFormData({
+        organizationName: organizerProfile.organizationName || "",
+        description: organizerProfile.description || "",
+        website: organizerProfile.website || "",
+      });
+    }
+  }, [user, organizerProfile]);
 
   // Fetch events created by organizer
   const fetchCreatedEvents = async () => {
     try {
-      setLoading(true);
       // Simulate API call - replace with actual API call
       setTimeout(() => {
         setCreatedEvents([
@@ -114,11 +135,9 @@ const OrganizerProfile = () => {
             price: 25.0,
           },
         ]);
-        setLoading(false);
       }, 500);
     } catch (error) {
       console.error("Error fetching created events:", error);
-      setLoading(false);
     }
   };
 
@@ -126,39 +145,63 @@ const OrganizerProfile = () => {
     fetchCreatedEvents();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleUserInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setUserFormData({
+      ...userFormData,
       [name]: value,
     });
   };
 
-  const handleSaveProfile = async () => {
+  const handleOrganizerInputChange = (e) => {
+    const { name, value } = e.target;
+    setOrganizerFormData({
+      ...organizerFormData,
+      [name]: value,
+    });
+  };
+
+  const handleSaveUserProfile = async () => {
     try {
-      setLoading(true);
-      const updatedProfile = await updateOrganizerProfile(formData);
-      setProfile(updatedProfile);
-      setEditMode(false);
-      alert("Organizer profile updated successfully!");
+      await updateUser(userFormData);
+      await getUser();
+      setEditMode({ ...editMode, user: false });
+      alert("User profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
       alert("Failed to update profile. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditMode(false);
-    // Reset form data to current profile values
-    setFormData({
-      fullName: profile.fullName || "",
-      email: profile.email || "",
-      phone: profile.phone || "",
-      organization: profile.organization || "",
-      bio: profile.bio || "",
-    });
+  const handleSaveOrganizerProfile = async () => {
+    try {
+      await updateOrganizerProfile(organizerFormData);
+      await getOrganizerProfile();
+      setOrganizerDetails(organizerProfile);
+      setEditMode({ ...editMode, organizer: false });
+      alert("Organizer profile updated successfully!");
+    } catch (error) {
+      console.error("Failed to update organizer profile:", error);
+      alert("Failed to update organizer profile. Please try again.");
+    }
+  };
+
+  const handleCancelEdit = (type) => {
+    setEditMode({ ...editMode, [type]: false });
+    if (type === "user") {
+      setUserFormData({
+        fullName: profile.fullName || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: profile.address || "",
+      });
+    } else {
+      setOrganizerFormData({
+        organizationName: organizerDetails.organizationName || "",
+        description: organizerDetails.description || "",
+        website: organizerDetails.website || "",
+      });
+    }
   };
 
   return (
@@ -171,16 +214,17 @@ const OrganizerProfile = () => {
               <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
                   src={
-                    profile?.imageUrl || "/placeholder.svg?height=112&width=112"
+                    organizerDetails?.logo ||
+                    "/placeholder.svg?height=112&width=112"
                   }
-                  alt={profile.fullName}
+                  alt={organizerDetails?.organizationName}
                   className="h-full w-full object-cover"
                 />
               </div>
 
               <div className="mt-4 sm:mt-0 text-center sm:text-left sm:ml-6">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
-                  {profile.fullName}
+                  {organizerDetails.organizationName || profile.fullName}
                 </h1>
                 <p className="text-gray-500 text-sm sm:text-base truncate max-w-[250px] sm:max-w-none">
                   {profile.email}
@@ -249,244 +293,442 @@ const OrganizerProfile = () => {
 
         {/* Profile Tab Content */}
         <div className={activeTab === "profile" ? "block" : "hidden"}>
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              {/* Header with action buttons */}
-              <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-                {/* Header with action buttons */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Organizer Information
-                  </h2>
-                  <div>
-                    {editMode ? (
-                      <div className="flex gap-3">
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm mb-4">
+            <div className="flex space-x-1 rounded-md bg-muted p-1">
+              <button
+                className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                  activeProfileTab === "user"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
+                }`}
+                onClick={() => setActiveProfileTab("user")}
+              >
+                User Details
+              </button>
+              <button
+                className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                  activeProfileTab === "organizer"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
+                }`}
+                onClick={() => setActiveProfileTab("organizer")}
+              >
+                Organizer Details
+              </button>
+            </div>
+          </div>
+
+          {/* User Profile Content */}
+          <div className={activeProfileTab === "user" ? "block" : "hidden"}>
+            <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                  <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      User Information
+                    </h2>
+                    <div>
+                      {editMode.user ? (
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleCancelEdit("user")}
+                            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                          >
+                            <X size={16} />
+                            <span>Cancel</span>
+                          </button>
+                          <button
+                            onClick={handleSaveUserProfile}
+                            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
+                          >
+                            <FaSave size={16} />
+                            <span>Save Changes</span>
+                          </button>
+                        </div>
+                      ) : (
                         <button
-                          onClick={handleCancelEdit}
-                          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                          onClick={() =>
+                            setEditMode({ ...editMode, user: true })
+                          }
+                          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
                         >
-                          <X size={16} />
-                          <span>Cancel</span>
+                          <FiEdit2 size={16} />
+                          <span>Edit Profile</span>
                         </button>
-                        <button
-                          onClick={handleSaveProfile}
-                          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
-                        >
-                          <FaSave size={16} />
-                          <span>Save Changes</span>
-                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-8 space-y-8">
+                    {editMode.user ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="fullName"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <User size={16} className="text-purple-500" />
+                            Full Name
+                          </label>
+                          <input
+                            type="text"
+                            id="fullName"
+                            name="fullName"
+                            value={userFormData.fullName}
+                            onChange={handleUserInputChange}
+                            disabled={userLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="email"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <IoMail size={16} className="text-purple-500" />
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={userFormData.email}
+                            onChange={handleUserInputChange}
+                            disabled={userLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter your email address"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="phone"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <Phone size={16} className="text-purple-500" />
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value={userFormData.phone}
+                            onChange={handleUserInputChange}
+                            disabled={userLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter your phone number"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="address"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <Buildings size={16} className="text-purple-500" />
+                            Address
+                          </label>
+                          <input
+                            type="text"
+                            id="address"
+                            name="address"
+                            value={userFormData.address}
+                            onChange={handleUserInputChange}
+                            disabled={userLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter your address"
+                          />
+                        </div>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => setEditMode(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
-                      >
-                        <FiEdit2 size={16} />
-                        <span>Edit Profile</span>
-                      </button>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <User size={16} className="text-purple-500" />
+                            <span>Full Name</span>
+                          </div>
+                          <p className="text-base font-medium text-gray-800">
+                            {profile.fullName}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <IoMail size={16} className="text-purple-500" />
+                            <span>Email Address</span>
+                          </div>
+                          <p className="text-base text-gray-800">
+                            {profile.email}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <Phone size={16} className="text-purple-500" />
+                            <span>Phone Number</span>
+                          </div>
+                          <p className="text-base text-gray-800">
+                            {profile.phone || (
+                              <span className="text-gray-400 italic">
+                                Not provided
+                              </span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <Buildings size={16} className="text-purple-500" />
+                            <span>Address</span>
+                          </div>
+                          <p className="text-base text-gray-800">
+                            {profile.address || (
+                              <span className="text-gray-400 italic">
+                                Not provided
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                {/* Profile content */}
-                <div className="p-8 space-y-8">
-                  {editMode ? (
-                    // Edit Mode - Show Form
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="fullName"
-                          className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                        >
-                          <User size={16} className="text-purple-500" />
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          id="fullName"
-                          name="fullName"
-                          value={formData.fullName}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="email"
-                          className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                        >
-                          <IoMail size={16} className="text-purple-500" />
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          id="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
-                          placeholder="Enter your email address"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="phone"
-                          className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                        >
-                          <Phone size={16} className="text-purple-500" />
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
-                          placeholder="Enter your phone number"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="organization"
-                          className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                        >
-                          <Buildings size={16} className="text-purple-500" />
-                          Organization
-                        </label>
-                        <input
-                          type="text"
-                          id="organization"
-                          name="organization"
-                          value={formData.organization}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
-                          placeholder="Enter your organization name"
-                        />
-                      </div>
-
-                      <div className="md:col-span-2 space-y-2">
-                        <label
-                          htmlFor="bio"
-                          className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                        >
-                          <FileText size={16} className="text-purple-500" />
-                          Bio
-                        </label>
-                        <textarea
-                          id="bio"
-                          name="bio"
-                          value={formData.bio}
-                          onChange={handleInputChange}
-                          rows={5}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none shadow-sm"
-                          placeholder="Tell attendees about yourself or your organization..."
-                        ></textarea>
-                        <p className="text-xs text-gray-500 mt-1 flex items-start gap-1.5">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5"
+          {/* Organizer Profile Content */}
+          <div
+            className={activeProfileTab === "organizer" ? "block" : "hidden"}
+          >
+            <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                  <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Organizer Information
+                    </h2>
+                    <div>
+                      {editMode.organizer ? (
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleCancelEdit("organizer")}
+                            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
                           >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          Write a short bio that describes you or your
-                          organization to event attendees. This will be visible
-                          on your public profile.
-                        </p>
-                      </div>
+                            <X size={16} />
+                            <span>Cancel</span>
+                          </button>
+                          <button
+                            onClick={handleSaveOrganizerProfile}
+                            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
+                          >
+                            <FaSave size={16} />
+                            <span>Save Changes</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            setEditMode({ ...editMode, organizer: true })
+                          }
+                          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
+                        >
+                          <FiEdit2 size={16} />
+                          <span>Edit Profile</span>
+                        </button>
+                      )}
                     </div>
-                  ) : (
-                    // View Mode - Show Information
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                          <User size={16} className="text-purple-500" />
-                          <span>Full Name</span>
-                        </div>
-                        <p className="text-base font-medium text-gray-800">
-                          {profile.fullName}
-                        </p>
-                      </div>
+                  </div>
 
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                          <IoMail size={16} className="text-purple-500" />
-                          <span>Email Address</span>
+                  <div className="p-8 space-y-8">
+                    {editMode.organizer ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="organizationName"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <Buildings size={16} className="text-purple-500" />
+                            Organization Name
+                          </label>
+                          <input
+                            type="text"
+                            id="organizationName"
+                            name="organizationName"
+                            value={organizerFormData.organizationName}
+                            onChange={handleOrganizerInputChange}
+                            disabled={organizerLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter organization name"
+                          />
                         </div>
-                        <p className="text-base text-gray-800">
-                          {profile.email}
-                        </p>
-                      </div>
 
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                          <Phone size={16} className="text-purple-500" />
-                          <span>Phone Number</span>
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="website"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <IoMail size={16} className="text-purple-500" />
+                            Website
+                          </label>
+                          <input
+                            type="url"
+                            id="website"
+                            name="website"
+                            value={organizerFormData.website}
+                            onChange={handleOrganizerInputChange}
+                            disabled={organizerLoading}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                            placeholder="Enter website URL"
+                          />
                         </div>
-                        <p className="text-base text-gray-800">
-                          {profile.phone || (
-                            <span className="text-gray-400 italic">
-                              Not provided
+
+                        <div className="md:col-span-2 space-y-2">
+                          <label
+                            htmlFor="description"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <FileText size={16} className="text-purple-500" />
+                            Description
+                          </label>
+                          <textarea
+                            id="description"
+                            name="description"
+                            value={organizerFormData.description}
+                            onChange={handleOrganizerInputChange}
+                            disabled={organizerLoading}
+                            rows={5}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none shadow-sm"
+                            placeholder="Tell attendees about your organization..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <Buildings size={16} className="text-purple-500" />
+                            <span>Organization Name</span>
+                          </div>
+                          <p className="text-base font-medium text-gray-800">
+                            {organizerDetails.organizationName || (
+                              <span className="text-gray-400 italic">
+                                Not provided
+                              </span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <IoMail size={16} className="text-purple-500" />
+                            <span>Website</span>
+                          </div>
+                          <p className="text-base text-gray-800">
+                            {organizerDetails.website ? (
+                              <a
+                                href={organizerDetails.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-600 hover:underline"
+                              >
+                                {organizerDetails.website}
+                              </a>
+                            ) : (
+                              <span className="text-gray-400 italic">
+                                Not provided
+                              </span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-5 border border-gray-100 shadow-sm md:col-span-2">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-3">
+                            <FileText size={16} className="text-purple-500" />
+                            <span>Description</span>
+                          </div>
+                          <div className="rounded-lg p-4">
+                            {organizerDetails.description ? (
+                              <p className="text-base text-gray-800 whitespace-pre-line leading-relaxed">
+                                {organizerDetails.description}
+                              </p>
+                            ) : (
+                              <p className="text-gray-400 italic">
+                                No description provided
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                            <FiAward size={16} className="text-purple-500" />
+                            <span>Verification Status</span>
+                          </div>
+                          <p className="text-base text-gray-800">
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                organizerDetails.verificationStatus ===
+                                "approved"
+                                  ? "bg-green-100 text-green-800 border border-green-200"
+                                  : organizerDetails.verificationStatus ===
+                                    "pending"
+                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                                  : "bg-red-100 text-red-800 border border-red-200"
+                              }`}
+                            >
+                              {organizerDetails.verificationStatus ||
+                                "Not verified"}
                             </span>
-                          )}
-                        </p>
-                      </div>
+                          </p>
+                        </div>
 
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                          <Buildings size={16} className="text-purple-500" />
-                          <span>Organization</span>
-                        </div>
-                        <p className="text-base text-gray-800">
-                          {profile.organization || (
-                            <span className="text-gray-400 italic">
-                              Not provided
-                            </span>
-                          )}
-                        </p>
+                        {organizerDetails.logo && (
+                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                              <FiAward size={16} className="text-purple-500" />
+                              <span>Organization Logo</span>
+                            </div>
+                            <div className="mt-2">
+                              <img
+                                src={organizerDetails.logo}
+                                alt="Organization logo"
+                                className="object-contain"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        {organizerDetails?.commissionRate && (
+                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                              <FiAward size={16} className="text-purple-500" />
+                              <span>Commission rate</span>
+                            </div>
+                            <div className="mt-2">
+                              <p className="text-base text-gray-800">
+                                {organizerDetails.commissionRate}%
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {organizerDetails?.payoutSchedule && (
+                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
+                              <FiAward size={16} className="text-purple-500" />
+                              <span>Payout Schedule</span>
+                            </div>
+                            <div className="mt-2">
+                              <p className="text-base text-gray-800">
+                                {organizerDetails.payoutSchedule}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-
-                      <div className=" bg-gray-50 rounded-lg p-5 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-3">
-                          <FileText size={16} className="text-purple-500" />
-                          <span>Bio</span>
-                        </div>
-                        <div className="bg-white rounded-lg p-4 border border-gray-100">
-                          {profile.bio ? (
-                            <p className="text-base text-gray-800 whitespace-pre-line leading-relaxed">
-                              {profile.bio}
-                            </p>
-                          ) : (
-                            <p className="text-gray-400 italic">
-                              No bio provided
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                          <FiAward size={16} className="text-purple-500" />
-                          <span>Account Type</span>
-                        </div>
-                        <p className="text-base text-gray-800">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                            Event Organizer
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -544,7 +786,11 @@ const OrganizerProfile = () => {
               </p>
             </div>
             <div className="p-6 pt-0">
-              <StripeDashboard />
+              <StripeDashboard
+                earnings={organizerDetails.earnings}
+                commissionRate={organizerDetails.commissionRate}
+                payoutSchedule={organizerDetails.payoutSchedule}
+              />
             </div>
           </div>
         </div>
@@ -552,6 +798,7 @@ const OrganizerProfile = () => {
     </>
   );
 };
+
 OrganizerProfile.propTypes = {
   profile: PropTypes.shape({
     fullName: PropTypes.string,
