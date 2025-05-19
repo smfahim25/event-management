@@ -79,9 +79,7 @@ export default function UserManagement() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          User Management
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-900">User</h1>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRefresh}

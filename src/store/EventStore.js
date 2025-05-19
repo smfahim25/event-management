@@ -76,7 +76,6 @@ export const useEventStore = create((set, get) => ({
       const res = await axios.post(API_BASE, eventData, {
         headers: {
           ...get().getAuthHeaders(),
-          "Content-Type": "application/json",
         },
       });
       set({ loading: false });

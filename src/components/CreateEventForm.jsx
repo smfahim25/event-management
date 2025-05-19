@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -64,14 +62,13 @@ function CreateEventPage() {
     },
     price: [],
     tags: [],
-    organizer: localStorage.getItem("user_id")?.toString() || "",
   });
 
   const [refundPolicies, setRefundPolicies] = useState([]);
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(false);
 
   const [errors, setErrors] = useState({});
-  const [posterPreview, setPosterPreview] = useState(null);
+  const [eventImages, setEventImages] = useState([]);
   const [activeSection, setActiveSection] = useState("basic"); // basic, datetime, pricing, refund, summary
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -88,15 +85,30 @@ function CreateEventPage() {
     }
   };
 
-  const handlePosterChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPosterPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const newImages = [];
+
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newImages.push({
+            file,
+            preview: reader.result,
+            path: `store/images/${file.name}`, // This would be the path after upload
+          });
+          if (newImages.length === files.length) {
+            setEventImages((prev) => [...prev, ...newImages]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const handleRemoveImage = (index) => {
+    setEventImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleAddPrice = () => {
@@ -191,13 +203,112 @@ function CreateEventPage() {
     setIsSubmitting(true);
 
     try {
-      // Create the final form data to submit
-      const finalFormData = {
-        ...formData,
-        refundPolicies: refundPoliciesEnabled ? refundPolicies : [],
-      };
+      // Create the final form data to submit according to the expected API format
+      const apiFormData = new FormData();
 
-      console.log("Form submitted with data:", finalFormData);
+      // Basic info
+      apiFormData.append("eventName", formData.name);
+      apiFormData.append(
+        "slug",
+        formData.name.toLowerCase().replace(/\s+/g, "-")
+      ); // Generate slug from name
+      apiFormData.append("description", formData.description);
+      apiFormData.append("eventCategory", formData.category);
+
+      // Images
+      eventImages.forEach((image, index) => {
+        apiFormData.append(`eventImages[${index}]`, image.file);
+      });
+
+      // Date & Time
+      apiFormData.append("eventDate", formData.date);
+      apiFormData.append("startTime", formData.startTime);
+      apiFormData.append("endTime", formData.endTime);
+
+      // Venue
+      apiFormData.append("venue[name]", formData.venue.name);
+      apiFormData.append(
+        "venue[address][street]",
+        formData.venue.address.street
+      );
+      apiFormData.append("venue[address][city]", formData.venue.address.city);
+      apiFormData.append("venue[address][state]", formData.venue.address.state);
+      apiFormData.append(
+        "venue[address][country]",
+        formData.venue.address.country
+      );
+      apiFormData.append(
+        "venue[address][zipCode]",
+        formData.venue.address.zipCode
+      );
+
+      if (
+        formData.venue.coordinates.latitude &&
+        formData.venue.coordinates.longitude
+      ) {
+        apiFormData.append(
+          "venue[coordinates][latitude]",
+          formData.venue.coordinates.latitude
+        );
+        apiFormData.append(
+          "venue[coordinates][longitude]",
+          formData.venue.coordinates.longitude
+        );
+      }
+
+      if (formData.venue.mapUrl) {
+        apiFormData.append("venue[mapUrl]", formData.venue.mapUrl);
+      }
+
+      // Capacity
+      apiFormData.append("totalCapacity", formData.limit);
+
+      // Ticket tiers
+      formData.price.forEach((price, index) => {
+        apiFormData.append(`ticketTiers[${index}][name]`, price.label);
+        apiFormData.append(`ticketTiers[${index}][price]`, price.value);
+        apiFormData.append(
+          `ticketTiers[${index}][availableQuantity]`,
+          price.quantity
+        );
+        if (price.maxPerOrder) {
+          apiFormData.append(
+            `ticketTiers[${index}][maxPerOrder]`,
+            price.maxPerOrder
+          );
+        }
+      });
+
+      // Refund policy
+      if (refundPoliciesEnabled && refundPolicies.length > 0) {
+        apiFormData.append("refundPolicy[type]", "time-based");
+
+        refundPolicies.forEach((policy) => {
+          if (policy.rules && policy.rules.length > 0) {
+            policy.rules.forEach((rule, ruleIndex) => {
+              apiFormData.append(
+                `refundPolicy[rules][${ruleIndex}][daysBeforeEvent]`,
+                rule.daysBeforeEvent
+              );
+              apiFormData.append(
+                `refundPolicy[rules][${ruleIndex}][refundPercentage]`,
+                rule.refundPercentage
+              );
+              apiFormData.append(
+                `refundPolicy[rules][${ruleIndex}][description]`,
+                rule.description
+              );
+            });
+          }
+        });
+      }
+
+      // Tags
+      formData.tags.forEach((tag, index) => {
+        apiFormData.append(`tags[${index}]`, tag);
+      });
+
+      console.log("Form submitted with data:", apiFormData);
 
       // Simulate API call
       setTimeout(() => {
@@ -726,47 +837,59 @@ function CreateEventPage() {
                   </div>
                 </div>
 
-                {/* Event Poster */}
+                {/* Event Images */}
                 <div className="rounded-lg border border-purple-100 bg-purple-50 p-4">
                   <h2 className="mb-4 text-lg font-semibold text-purple-800">
-                    Event Media
+                    Event Images
                   </h2>
 
                   <div className="overflow-hidden rounded-lg border-2 border-dashed border-purple-200 bg-white">
                     <div className="relative">
                       <input
                         type="file"
-                        id="poster"
-                        name="poster"
+                        id="eventImages"
+                        name="eventImages"
                         className="absolute inset-0 cursor-pointer opacity-0 z-10"
                         accept="image/*"
-                        onChange={handlePosterChange}
+                        onChange={handleImagesChange}
+                        multiple
                       />
 
-                      {posterPreview ? (
-                        <div className="relative aspect-video w-full">
-                          <img
-                            src={posterPreview || "/placeholder.svg"}
-                            alt="Event poster preview"
-                            className="h-full w-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPosterPreview(null);
-                            }}
-                            className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70"
-                          >
-                            <FiX className="h-4 w-4" />
-                          </button>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                            <p className="text-sm font-medium">
-                              Poster uploaded successfully
-                            </p>
-                            <p className="text-xs opacity-80">
-                              Click to change image
-                            </p>
+                      {eventImages.length > 0 ? (
+                        <div className="p-4">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {eventImages.map((image, index) => (
+                              <div
+                                key={index}
+                                className="relative aspect-video rounded-lg overflow-hidden"
+                              >
+                                <img
+                                  src={image.preview || "/placeholder.svg"}
+                                  alt={`Event image ${index + 1}`}
+                                  className="h-full w-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveImage(index)}
+                                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white transition-all hover:bg-black/70"
+                                >
+                                  <FiX className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                            <div
+                              className="aspect-video rounded-lg border-2 border-dashed border-purple-200 flex items-center justify-center cursor-pointer hover:bg-purple-50"
+                              onClick={() =>
+                                document.getElementById("eventImages").click()
+                              }
+                            >
+                              <div className="text-center">
+                                <FiPlus className="h-8 w-8 mx-auto text-purple-500" />
+                                <p className="text-sm text-purple-600 mt-1">
+                                  Add more
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ) : (
@@ -775,13 +898,13 @@ function CreateEventPage() {
                             <FiImage className="h-8 w-8 text-purple-600" />
                           </div>
                           <p className="mb-1 text-base font-medium text-gray-700">
-                            Drag and drop your event poster here
+                            Drag and drop your event images here
                           </p>
                           <p className="mb-4 text-sm text-gray-500">
                             or click to browse files
                           </p>
                           <p className="text-xs text-gray-400">
-                            Recommended size: 1200 x 630 pixels (16:9)
+                            You can upload multiple images
                           </p>
                         </div>
                       )}
@@ -1414,10 +1537,12 @@ function CreateEventPage() {
                       <FiImage className="mr-2 mt-0.5 h-4 w-4 text-green-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-700">
-                          Event Image
+                          Event Images
                         </p>
                         <p className="text-sm text-gray-600">
-                          {posterPreview ? "Uploaded" : "Not uploaded"}
+                          {eventImages.length > 0
+                            ? `${eventImages.length} images uploaded`
+                            : "No images uploaded"}
                         </p>
                       </div>
                     </div>

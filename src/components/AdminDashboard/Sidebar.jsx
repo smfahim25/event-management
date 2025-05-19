@@ -236,10 +236,10 @@ export default function Sidebar({
             onClick={() => setMobileMenuOpen(false)}
           ></div>
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white transition-transform duration-300 ease-in-out transform">
-            <div className="absolute top-0 right-0 -mr-12 pt-2">
+            <div className="absolute top-0 right-0 mr-2 pt-3">
               <button
                 type="button"
-                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white bg-black"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="sr-only">Close sidebar</span>
