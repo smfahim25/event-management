@@ -158,7 +158,7 @@ function EventsPage() {
       </div>
 
       <div className="px-4 py-8 -mt-6 relative z-20">
-        <div className="bg-white rounded-xl shadow-lg p-4 mb-8 w-1/3 mt-3">
+        <div className="bg-white rounded-xl shadow-lg p-4 mb-8 md:w-1/2 lg:w-1/3 mt-3">
           <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
             <div className="relative flex-grow">
               <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
