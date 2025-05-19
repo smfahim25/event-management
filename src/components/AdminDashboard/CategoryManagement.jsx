@@ -51,6 +51,7 @@ export default function CategoryManagement() {
   const handleEditCategory = async (category) => {
     try {
       const categoryDetails = await fetchCategory(category._id);
+      setModalOpen(true);
       setCurrentCategory(categoryDetails.data);
       setFormData({
         name: categoryDetails.data.name,
@@ -58,7 +59,6 @@ export default function CategoryManagement() {
         icon: null,
       });
       setIconPreview(categoryDetails.data.icon);
-      setModalOpen(true);
     } catch (error) {
       console.error("Error fetching category details:", error);
     }
@@ -320,7 +320,7 @@ export default function CategoryManagement() {
                     {iconPreview && (
                       <img
                         src={iconPreview}
-                        alt="Category Icon"
+                        alt="Icon"
                         className="h-16 w-16 rounded-md object-cover"
                       />
                     )}

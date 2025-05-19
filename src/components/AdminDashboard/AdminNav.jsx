@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../../store/AuthStore";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar({
   mobileMenuOpen,
@@ -11,6 +12,7 @@ export default function Navbar({
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user, logout } = useAuthStore();
+  const navogate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -25,6 +27,11 @@ export default function Navbar({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navogate("/");
+  };
 
   const totalNotifications =
     pendingApprovals.organizers +
@@ -169,7 +176,7 @@ export default function Navbar({
                     </a>
                     <a
                       href="#"
-                      onClick={() => logout()}
+                      onClick={handleLogout}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Sign out

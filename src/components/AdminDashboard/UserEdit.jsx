@@ -41,12 +41,8 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
       }
 
       await getAllUsers();
-      alert(
-        isNewUser ? "User added successfully!" : "User updated successfully!"
-      );
     } catch (err) {
       console.error("Error saving user:", err);
-      alert("Something went wrong!");
     } finally {
       setLoading(false);
       onClose();

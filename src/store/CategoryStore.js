@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const API_URL =
   "https://event-management-backend-0401.onrender.com/api/v1/categories";
@@ -22,10 +23,12 @@ export const useCategoryStore = create((set, get) => ({
       set({ categories: data.data || [], loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
+      toast.error(error.message || "Failed to fetch categories");
     }
   },
 
   fetchCategory: async (id) => {
+    set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       const res = await fetch(`${API_URL}/${id}`, {
@@ -33,6 +36,7 @@ export const useCategoryStore = create((set, get) => ({
           Authorization: `Bearer ${token}`,
         },
       });
+      set({ loading: false });
       return await res.json();
     } catch (error) {
       console.error("Fetch category failed:", error);
@@ -41,6 +45,7 @@ export const useCategoryStore = create((set, get) => ({
   },
 
   createCategory: async (formData) => {
+    set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       const res = await fetch(API_URL, {
@@ -52,13 +57,17 @@ export const useCategoryStore = create((set, get) => ({
       });
       const data = await res.json();
       get().fetchCategories();
+      toast.success("Category created successfully");
+      set({ loading: false });
       return data;
     } catch (error) {
       console.error("Create failed:", error);
+      toast.error(error.message || "Failed to create category");
     }
   },
 
   updateCategory: async (id, formData) => {
+    set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       const res = await fetch(`${API_URL}/${id}`, {
@@ -70,13 +79,17 @@ export const useCategoryStore = create((set, get) => ({
       });
       const data = await res.json();
       get().fetchCategories();
+      toast.success("Category updated successfully");
+      set({ loading: false });
       return data;
     } catch (error) {
       console.error("Update failed:", error);
+      toast.error(error.message || "Failed to update category");
     }
   },
 
   approveCategory: async (id) => {
+    set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       const res = await fetch(`${API_URL}/${id}/approve`, {
@@ -87,13 +100,17 @@ export const useCategoryStore = create((set, get) => ({
       });
       const data = await res.json();
       get().fetchCategories();
+      toast.success("Category approved successfully");
+      set({ loading: false });
       return data;
     } catch (error) {
       console.error("Approve failed:", error);
+      toast.error(error.message || "Failed to approve category");
     }
   },
 
   deleteCategory: async (id) => {
+    set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       const res = await fetch(`${API_URL}/${id}`, {
@@ -104,9 +121,12 @@ export const useCategoryStore = create((set, get) => ({
       });
       const data = await res.json();
       get().fetchCategories();
+      toast.success("Category deleted successfully");
+      set({ loading: false });
       return data;
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error(error.message || "Failed to delete category");
     }
   },
 }));

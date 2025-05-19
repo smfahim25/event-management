@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const getUserFromLocalStorage = () => {
   try {
@@ -28,19 +29,21 @@ export const useAuthStore = create((set) => ({
   error: null,
   users: [],
 
-  register: async (name, email, password) => {
+  register: async (name, email, phone, password) => {
     set({ loading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, phone, password }),
       });
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        toast.error(data.message || "Registration failed");
         throw new Error(data.message || "Registration failed");
       }
+      toast.success("Registration successful");
     } catch (err) {
       set({ error: err.message });
     } finally {
@@ -69,10 +72,16 @@ export const useAuthStore = create((set) => ({
       Cookies.set("role", role, { expires: 7 });
 
       localStorage.setItem("authUser", JSON.stringify(userData));
-
+      toast.success("Login successful");
+      if (role === "admin" || role === "superAdmin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
       set({ user: userData, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -102,6 +111,7 @@ export const useAuthStore = create((set) => ({
       set({ user: result.data, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -126,9 +136,11 @@ export const useAuthStore = create((set) => ({
       }
 
       localStorage.setItem("authUser", JSON.stringify(result.data));
+      toast.success("Profile updated successfully");
       set({ user: result.data, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -148,6 +160,7 @@ export const useAuthStore = create((set) => ({
       set({ users: data.data, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -171,9 +184,11 @@ export const useAuthStore = create((set) => ({
       }
 
       set({ loading: false });
-      return data.data; // returning created user
+      toast.success("User created successfully");
+      return data.data;
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -197,9 +212,11 @@ export const useAuthStore = create((set) => ({
       }
 
       set({ loading: false });
+      toast.success("User updated successfully");
       return data.data;
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 
@@ -219,10 +236,11 @@ export const useAuthStore = create((set) => ({
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to delete user");
       }
-
+      toast.success("User deleted successfully");
       set({ loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
     }
   },
 }));

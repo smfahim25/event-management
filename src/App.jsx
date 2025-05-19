@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 import RoutesManager from "./RoutesManager";
 
@@ -10,6 +11,7 @@ function App() {
         <InfoSecond />
         <Events /> */}
         <RoutesManager />
+        <Toaster position="top-right" />
       </div>
     </>
   );

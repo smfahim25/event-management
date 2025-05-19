@@ -54,8 +54,6 @@ function LoginPage() {
 
     try {
       await login(formData.email, formData.password);
-      console.log("Login successful");
-      window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
     } finally {

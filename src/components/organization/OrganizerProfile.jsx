@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FiAward,
   FiCalendar,
   FiCreditCard,
   FiEdit2,
+  FiImage,
   FiPlus,
+  FiUpload,
 } from "react-icons/fi";
 import { useData } from "../../context/DataContext";
 import Modal from "../ui/Modal";
@@ -42,7 +44,7 @@ const OrganizerProfile = () => {
     organizer: false,
   });
   const [userFormData, setUserFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
     phone: "",
     address: "",
@@ -52,6 +54,10 @@ const OrganizerProfile = () => {
     description: "",
     website: "",
   });
+
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
+  const fileInputRef = useRef(null);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [createdEvents, setCreatedEvents] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
@@ -71,11 +77,10 @@ const OrganizerProfile = () => {
     loadInitialData();
   }, [getUser, getOrganizerProfile]);
 
-  // Initialize form data when user or organizer profile changes
   useEffect(() => {
     if (user) {
       setProfile({
-        fullName: user.name || user.fullName,
+        name: user.name,
         email: user.email,
         phone: user.phone,
         address: user.address,
@@ -83,7 +88,7 @@ const OrganizerProfile = () => {
       });
 
       setUserFormData({
-        fullName: user.name || user.fullName || "",
+        name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
         address: user.address || "",
@@ -97,13 +102,15 @@ const OrganizerProfile = () => {
         description: organizerProfile.description || "",
         website: organizerProfile.website || "",
       });
+      if (organizerProfile.logo) {
+        setLogoPreview(organizerProfile.logo);
+      }
     }
   }, [user, organizerProfile]);
 
   // Fetch events created by organizer
   const fetchCreatedEvents = async () => {
     try {
-      // Simulate API call - replace with actual API call
       setTimeout(() => {
         setCreatedEvents([
           {
@@ -161,28 +168,51 @@ const OrganizerProfile = () => {
     });
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerLogoUpload = () => {
+    fileInputRef.current.click();
+  };
+
   const handleSaveUserProfile = async () => {
     try {
       await updateUser(userFormData);
       await getUser();
       setEditMode({ ...editMode, user: false });
-      alert("User profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert("Failed to update profile. Please try again.");
     }
   };
 
   const handleSaveOrganizerProfile = async () => {
     try {
-      await updateOrganizerProfile(organizerFormData);
+      const formData = new FormData();
+      formData.append("organizationName", organizerFormData.organizationName);
+      formData.append("description", organizerFormData.description);
+      formData.append("website", organizerFormData.website);
+
+      if (logoFile) {
+        formData.append("logo", logoFile);
+      }
+
+      await updateOrganizerProfile(formData);
       await getOrganizerProfile();
       setOrganizerDetails(organizerProfile);
       setEditMode({ ...editMode, organizer: false });
-      alert("Organizer profile updated successfully!");
+
+      setLogoFile(null);
     } catch (error) {
       console.error("Failed to update organizer profile:", error);
-      alert("Failed to update organizer profile. Please try again.");
     }
   };
 
@@ -190,7 +220,7 @@ const OrganizerProfile = () => {
     setEditMode({ ...editMode, [type]: false });
     if (type === "user") {
       setUserFormData({
-        fullName: profile.fullName || "",
+        name: profile.name || "",
         email: profile.email || "",
         phone: profile.phone || "",
         address: profile.address || "",
@@ -201,6 +231,9 @@ const OrganizerProfile = () => {
         description: organizerDetails.description || "",
         website: organizerDetails.website || "",
       });
+
+      setLogoPreview(organizerDetails.logo || null);
+      setLogoFile(null);
     }
   };
 
@@ -213,10 +246,7 @@ const OrganizerProfile = () => {
             <div className="flex flex-col items-center sm:flex-row sm:items-center">
               <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
-                  src={
-                    organizerDetails?.logo ||
-                    "/placeholder.svg?height=112&width=112"
-                  }
+                  src={organizerDetails?.logo}
                   alt={organizerDetails?.organizationName}
                   className="h-full w-full object-cover"
                 />
@@ -224,12 +254,12 @@ const OrganizerProfile = () => {
 
               <div className="mt-4 sm:mt-0 text-center sm:text-left sm:ml-6">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
-                  {organizerDetails.organizationName || profile.fullName}
+                  {organizerDetails.organizationName || profile.name}
                 </h1>
                 <p className="text-gray-500 text-sm sm:text-base truncate max-w-[250px] sm:max-w-none">
                   {profile.email}
                 </p>
-                <span className="mt-2 inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
+                <span className="mt-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                   Event Organizer
                 </span>
               </div>
@@ -373,8 +403,8 @@ const OrganizerProfile = () => {
                           <input
                             type="text"
                             id="fullName"
-                            name="fullName"
-                            value={userFormData.fullName}
+                            name="fullname"
+                            value={userFormData.name}
                             onChange={handleUserInputChange}
                             disabled={userLoading}
                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
@@ -450,7 +480,7 @@ const OrganizerProfile = () => {
                             <span>Full Name</span>
                           </div>
                           <p className="text-base font-medium text-gray-800">
-                            {profile.fullName}
+                            {profile.name}
                           </p>
                         </div>
 
@@ -506,7 +536,7 @@ const OrganizerProfile = () => {
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-                  <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-5 p-6 border-b border-gray-100 bg-gray-50">
                     <h2 className="text-xl font-semibold text-gray-800">
                       Organizer Information
                     </h2>
@@ -600,9 +630,49 @@ const OrganizerProfile = () => {
                             onChange={handleOrganizerInputChange}
                             disabled={organizerLoading}
                             rows={5}
-                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none shadow-sm"
+                            className="w-full px-4 py-1 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none shadow-sm"
                             placeholder="Tell attendees about your organization..."
                           ></textarea>
+                        </div>
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="logoUpload"
+                            className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                          >
+                            <FiImage size={16} className="text-purple-500" />
+                            Organization Logo
+                          </label>
+                          <div className="flex flex-col md:flex-row gap-5 items-center space-y-4">
+                            <input
+                              type="file"
+                              id="logoUpload"
+                              ref={fileInputRef}
+                              accept="image/*"
+                              onChange={handleLogoChange}
+                              className="hidden"
+                            />
+                            {logoPreview ? (
+                              <div className="relative rounded-lg overflow-hidden border-2 border-dashed border-purple-300 p-1">
+                                <img
+                                  src={logoPreview}
+                                  alt="Organization logo preview"
+                                  className="w-40 h-40 object-cover rounded-lg"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-40 h-40 flex items-center justify-center rounded-lg bg-gray-50 border-2 border-dashed border-purple-300">
+                                <FiImage className="h-12 w-12 text-gray-300" />
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={triggerLogoUpload}
+                              className="lg:w-1/4 h-[40px] flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
+                            >
+                              <FiUpload size={16} />
+                              {logoPreview ? "Change Logo" : "Upload Logo"}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -644,12 +714,12 @@ const OrganizerProfile = () => {
                           </p>
                         </div>
 
-                        <div className="bg-gray-50 rounded-lg p-5 border border-gray-100 shadow-sm md:col-span-2">
+                        <div className="bg-gray-50 rounded-lg p-5 border border-gray-100 shadow-sm">
                           <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-3">
                             <FileText size={16} className="text-purple-500" />
                             <span>Description</span>
                           </div>
-                          <div className="rounded-lg p-4">
+                          <div className="rounded-lg p-2">
                             {organizerDetails.description ? (
                               <p className="text-base text-gray-800 whitespace-pre-line leading-relaxed">
                                 {organizerDetails.description}
@@ -685,21 +755,6 @@ const OrganizerProfile = () => {
                           </p>
                         </div>
 
-                        {organizerDetails.logo && (
-                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                              <FiAward size={16} className="text-purple-500" />
-                              <span>Organization Logo</span>
-                            </div>
-                            <div className="mt-2">
-                              <img
-                                src={organizerDetails.logo}
-                                alt="Organization logo"
-                                className="object-contain"
-                              />
-                            </div>
-                          </div>
-                        )}
                         {organizerDetails?.commissionRate && (
                           <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
                             <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
@@ -801,7 +856,7 @@ const OrganizerProfile = () => {
 
 OrganizerProfile.propTypes = {
   profile: PropTypes.shape({
-    fullName: PropTypes.string,
+    name: PropTypes.string,
     email: PropTypes.string,
     phone: PropTypes.string,
     organization: PropTypes.string,

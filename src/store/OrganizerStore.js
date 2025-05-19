@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const API_BASE =
   "https://event-management-backend-0401.onrender.com/api/v1/organizers";
@@ -43,10 +44,11 @@ export const useOrganizerStore = create((set) => ({
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to create organizer.");
       }
-
+      toast.success("Organizer created successfully");
       set({ success: true });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
@@ -74,6 +76,7 @@ export const useOrganizerStore = create((set) => ({
       set({ organizers: data.data });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
@@ -101,6 +104,7 @@ export const useOrganizerStore = create((set) => ({
       set({ organizer: data.data });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
@@ -116,21 +120,21 @@ export const useOrganizerStore = create((set) => ({
       const res = await fetch(`${API_BASE}/me`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formDataObj),
+        body: formDataObj,
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data.success) {
+      if (!res.ok) {
         throw new Error(data.message || "Failed to update organizer.");
       }
-
+      toast.success("Organizer profile updated successfully");
       set({ success: true, organizer: data.data });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
@@ -154,10 +158,11 @@ export const useOrganizerStore = create((set) => ({
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to approve organizer.");
       }
-
+      toast.success("Organizer approved successfully");
       set({ success: true });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
@@ -183,10 +188,11 @@ export const useOrganizerStore = create((set) => ({
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to reject organizer.");
       }
-
+      toast.success("Organizer rejected successfully");
       set({ success: true });
     } catch (err) {
       set({ error: err.message });
+      toast.error(err.message);
     } finally {
       set({ loading: false });
     }
