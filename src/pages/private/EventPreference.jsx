@@ -139,13 +139,7 @@ export default function EventPreferences() {
           onClick={() => {
             if (hasSelections) {
               // Handle submit logic here
-              alert(
-                "Preferences submitted: " +
-                  Object.entries(selectedEvents)
-                    .filter(([, isSelected]) => isSelected)
-                    .map(([eventType]) => eventType)
-                    .join(", ")
-              );
+              window.location.href = "/";
             }
           }}
           disabled={!hasSelections}

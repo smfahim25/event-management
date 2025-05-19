@@ -50,7 +50,7 @@ function CustomUserButton() {
       </div>
 
       <div
-        className={`absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-10 transform origin-top-right transition-all duration-200 ${
+        className={`absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-[99999] transform origin-top-right transition-all duration-200 ${
           isOpen
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"

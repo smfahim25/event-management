@@ -12,7 +12,7 @@ import { useAuthStore } from "../store/AuthStore";
 gsap.registerPlugin(ScrollTrigger);
 
 const Nav = () => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const navRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,20 +79,26 @@ const Nav = () => {
       {isMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40"
-          onClick={toggleMenu} // close menu when clicking outside the sidebar
+          onClick={toggleMenu}
         ></div>
       )}
 
       {/* Sidebar Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-[#0c0311] text-white transform ${
+        className={`fixed top-0 right-0 h-full w-64 bg-[#0c0311]/30 text-white transform ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out lg:hidden z-50`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           {/* Profile Icon */}
           <div className="profile h-10 w-10 rounded-full bg-black/40 flex items-center justify-center">
-            {user ? <CustomUserButton /> : <FaUserAlt />}
+            {user ? (
+              <CustomUserButton />
+            ) : (
+              <a href="/login">
+                <FaUserAlt />
+              </a>
+            )}
           </div>
 
           {/* Close Icon */}
@@ -155,6 +161,29 @@ const Nav = () => {
           >
             {defaultTexts.nav.menuItems[4]}
           </li>
+          {user && (
+            <li
+              className="cursor-pointer"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/app/profile");
+              }}
+            >
+              profile
+            </li>
+          )}
+          {user && (
+            <li
+              className="cursor-pointer"
+              onClick={() => {
+                setIsMenuOpen(false);
+                logout();
+                navigate("/");
+              }}
+            >
+              Logout
+            </li>
+          )}
         </ul>
       </div>
 
@@ -227,7 +256,7 @@ const Nav = () => {
           className="sm:block lg:hidden text-white text-3xl"
           onClick={toggleMenu}
         >
-          {isMenuOpen ? <RiCloseLine /> : <RiMenu3Line />}
+          {!isMenuOpen && <RiMenu3Line />}
         </button>
         {/* Profile Icon for Desktop */}
         <div className="profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-black/40 hidden lg:flex items-center justify-center">
