@@ -20,6 +20,7 @@ import { IoMail } from "react-icons/io5";
 import { FaSave } from "react-icons/fa";
 import { useOrganizerStore } from "../../store/OrganizerStore";
 import { useAuthStore } from "../../store/AuthStore";
+import { useEventStore } from "../../store/EventStore";
 
 const OrganizerProfile = () => {
   const { defaultTexts } = useData();
@@ -36,6 +37,8 @@ const OrganizerProfile = () => {
     fetchUser: getUser,
     loading: userLoading,
   } = useAuthStore();
+
+  const { events, fetchOrganizerEvents } = useEventStore();
 
   const [profile, setProfile] = useState({});
   const [organizerDetails, setOrganizerDetails] = useState({});
@@ -59,7 +62,6 @@ const OrganizerProfile = () => {
   const [logoFile, setLogoFile] = useState(null);
   const fileInputRef = useRef(null);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
-  const [createdEvents, setCreatedEvents] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
   const [activeProfileTab, setActiveProfileTab] = useState("user");
   const navigate = useNavigate();
@@ -111,38 +113,7 @@ const OrganizerProfile = () => {
   // Fetch events created by organizer
   const fetchCreatedEvents = async () => {
     try {
-      setTimeout(() => {
-        setCreatedEvents([
-          {
-            id: "event1",
-            title: "Tech Conference 2025",
-            date: "2025-06-15",
-            location: "San Francisco, CA",
-            imageUrl: "/images/event1.jpg",
-            description:
-              "Annual technology conference featuring the latest innovations",
-            price: 99.99,
-          },
-          {
-            id: "event2",
-            title: "Music Festival",
-            date: "2025-07-22",
-            location: "Austin, TX",
-            imageUrl: "/images/event2.jpg",
-            description: "Three-day music festival with top artists",
-            price: 149.99,
-          },
-          {
-            id: "event3",
-            title: "Art Exhibition",
-            date: "2025-05-30",
-            location: "New York, NY",
-            imageUrl: "/images/event3.jpg",
-            description: "Contemporary art exhibition featuring local artists",
-            price: 25.0,
-          },
-        ]);
-      }, 500);
+      await fetchOrganizerEvents();
     } catch (error) {
       console.error("Error fetching created events:", error);
     }
@@ -802,9 +773,9 @@ const OrganizerProfile = () => {
               </p>
             </div>
             <div className="p-6 pt-0">
-              {createdEvents.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                  {createdEvents.map((event) => (
+              {events.length > 0 ? (
+                <div className="flex flex-wrap gap-5">
+                  {events.map((event) => (
                     <EventCard key={event.id} {...event} />
                   ))}
                 </div>

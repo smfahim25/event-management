@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOrganizerStore } from "../../store/OrganizerStore";
+import { Trash } from "lucide-react";
 
 export default function OrganizerApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +18,7 @@ export default function OrganizerApprovals() {
     error,
     approveOrganizer,
     rejectOrganizer,
+    deleteOrganizer,
   } = useOrganizerStore();
 
   useEffect(() => {
@@ -41,6 +43,12 @@ export default function OrganizerApprovals() {
       await getOrganizers();
       setSelectedOrganizer(null);
       setRejectionReason("");
+    }
+  };
+
+  const handleDelete = async (organizerId) => {
+    if (window.confirm("Are you sure you want to delete this organizer?")) {
+      await deleteOrganizer(organizerId);
     }
   };
 
@@ -73,9 +81,6 @@ export default function OrganizerApprovals() {
     ),
   ];
 
-  // Format date for display
-
-  // Filter organizers based on search and filters
   const filteredOrganizers = organizers.filter((organizer) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -382,14 +387,14 @@ export default function OrganizerApprovals() {
                             organizer.verificationStatus.slice(1)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center gap-3">
                         {organizer.verificationStatus === "pending" && (
                           <>
                             <button
                               onClick={() =>
                                 handleApprove(organizer.userId?._id)
                               }
-                              className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-green-200 transition-colors duration-150"
+                              className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-1 hover:bg-green-200 transition-colors duration-150"
                             >
                               Approve
                             </button>
@@ -407,6 +412,12 @@ export default function OrganizerApprovals() {
                               Reason: {organizer.rejectionReason}
                             </div>
                           )}
+                        <button
+                          onClick={() => handleDelete(organizer.userId?._id)}
+                          className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-red-200 transition-colors duration-150"
+                        >
+                          <Trash />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -443,7 +454,7 @@ export default function OrganizerApprovals() {
                 <div className="mt-4">
                   <textarea
                     rows="4"
-                    className="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-gray-300 rounded- p-3"
                     placeholder="Enter rejection reason..."
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}

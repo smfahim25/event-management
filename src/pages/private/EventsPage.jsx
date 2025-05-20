@@ -3,141 +3,77 @@ import EventCard from "../../components/ui/EventCard";
 import Nav from "../../components/Nav";
 import img from "../../assets/eventPage.jpg";
 import { useData } from "../../context/DataContext";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FiTag } from "react-icons/fi";
+import { useEventStore } from "../../store/EventStore";
+import { useCategoryStore } from "../../store/CategoryStore";
+import { FileSearch2 } from "lucide-react";
 
 function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit /*setLimit*/] = useState(10);
   const { defaultTexts } = useData();
 
-  const staticEvents = [
-    {
-      id: 1,
-      name: "Summer Tech Conference",
-      description: "Join industry leaders in discussing the future of AI.",
-      date: "2025-08-01",
-      organizer: { username: "admin1" },
-      image: "", // Add image if needed
-      location: "San Francisco, CA",
-      category: "Conference",
-      price: 299,
-      startTime: "09:00",
-      endTime: "17:00",
-    },
-    {
-      id: 2,
-      name: "Coding Bootcamp",
-      description: "Intensive bootcamp for beginners in full-stack web dev.",
-      date: "2025-07-15",
-      organizer: { username: "devteam" },
-      image: "",
-      location: "New York, NY",
-      category: "Workshop",
-      price: 149,
-      startTime: "10:00",
-      endTime: "16:00",
-    },
-    {
-      id: 3,
-      name: "Past Tech Meetup",
-      description: "Networking event for developers and tech enthusiasts.",
-      date: "2025-03-10",
-      organizer: { username: "techhub" },
-      image: "",
-      location: "Seattle, WA",
-      category: "Meetup",
-      price: 0,
-      startTime: "19:00",
-      endTime: "21:00",
-    },
-    {
-      id: 4,
-      name: "Startup Pitch Night",
-      description:
-        "Watch innovative startups pitch their ideas to investors. Great networking opportunity for entrepreneurs and investors alike.",
-      date: "2025-05-10",
-      organizer: { username: "VentureConnectjghjghghhg" },
-      image: "",
-      location: "Boston, MA",
-      category: "Networking",
-      price: 0,
-      startTime: "18:00",
-      endTime: "21:00",
-    },
-    {
-      id: 5,
-      name: "Past Tech Meetup",
-      description:
-        "Networking event for developers and tech enthusiasts. Share ideas, collaborate on projects, and make new connections.",
-      date: "2025-03-10",
-      organizer: { username: "TechHub" },
-      image: "",
-      location: "Seattle, WA",
-      category: "Meetup",
-      price: 0,
-      startTime: "19:00",
-      endTime: "21:00",
-    },
-    {
-      id: 6,
-      name: "Design Workshop",
-      description:
-        "Learn UI/UX design principles from industry experts. Hands-on workshop with practical exercises and portfolio reviews.",
-      date: "2025-09-05",
-      organizer: { username: "DesignLab" },
-      image: "",
-      location: "Chicago, IL",
-      category: "Workshop",
-      price: 79,
-      startTime: "10:00",
-      endTime: "15:00",
-    },
-  ];
+  const {
+    events,
+    fetchAllEvents,
+    loading: eventsLoading,
+    error: eventsError,
+    total,
+  } = useEventStore();
+
+  const {
+    categories,
+    fetchCategories,
+    loading: categoriesLoading,
+  } = useCategoryStore();
+
+  // Calculate total pages
+  const totalPages = Math.ceil(total / limit);
 
   useEffect(() => {
-    setUpcomingEvents(staticEvents);
+    fetchCategories();
+    fetchAllEvents({ searchTerm: "", eventCategory: "", page, limit });
   }, []);
 
-  const handleSearch = (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchAllEvents({
+        searchTerm: searchQuery,
+        eventCategory: selectedCategory,
+        page,
+        limit,
+      });
+    }, 300);
 
-    const results = upcomingEvents.filter((event) => {
-      const nameMatch = event?.name
-        ?.toLowerCase()
-        .includes(query.toLowerCase());
-      const descriptionMatch = event?.description
-        ?.toLowerCase()
-        .includes(query.toLowerCase());
-      const organizerMatch = event?.organizer?.username
-        ?.toLowerCase()
-        .includes(query.toLowerCase());
-      return nameMatch || descriptionMatch || organizerMatch;
-    });
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, selectedCategory, page, limit, fetchAllEvents]);
 
-    setSearchResults(results);
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setPage(1);
   };
 
   const handleInputChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    const debounceTimeout = setTimeout(() => handleSearch(query), 300);
-    return () => clearTimeout(debounceTimeout);
+    setSearchQuery(e.target.value);
+    setPage(1);
   };
 
-  const sortedEvents = upcomingEvents
-    ? [
-        ...upcomingEvents
-          .filter((event) => new Date(event.date) > new Date())
-          .sort((a, b) => new Date(a.date) - new Date(b.date)),
-        ...upcomingEvents
-          .filter((event) => new Date(event.date) <= new Date())
-          .sort((a, b) => new Date(b.date) - new Date(a.date)),
-      ]
-    : [];
+  const handleNextPage = () => {
+    if (page < totalPages) {
+      setPage(page + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -157,59 +93,133 @@ function EventsPage() {
         </div>
       </div>
 
-      <div className="px-4 py-8 -mt-6 relative z-20">
-        <div className="bg-white rounded-xl shadow-lg p-4 mb-8 md:w-1/2 lg:w-1/3 mt-3">
-          <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-            <div className="relative flex-grow">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder={
-                  defaultTexts.eventCard.searchPlaceholder || "Search events..."
-                }
-                value={searchQuery}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
+      <div className="px-6 py-8 -mt-6 relative z-20 max-w-7xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-4 mb-8">
+          <form
+            className="flex flex-col md:flex-row items-center gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <div className="flex-grow w-full md:w-64">
+              <label
+                htmlFor="eventCategory"
+                className="mb-2 flex items-center text-sm font-medium text-gray-700"
+              >
+                <FileSearch2 className="mr-2 h-4 w-4 text-purple-500" />
+                Find Events
+              </label>
+
+              <div className="relative">
+                <FaSearch className="absolute left-4 top-6 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={
+                    defaultTexts.eventCard.searchPlaceholder ||
+                    "Search events..."
+                  }
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
             </div>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium"
-            >
-              {defaultTexts.eventCard.searchButton}
-            </button>
+
+            <div className="w-full md:w-64">
+              <label
+                htmlFor="eventCategory"
+                className="mb-2 flex items-center text-sm font-medium text-gray-700"
+              >
+                <FiTag className="mr-2 h-4 w-4 text-purple-500" />
+                Event Category
+              </label>
+              <select
+                id="eventCategory"
+                name="eventCategory"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                disabled={categoriesLoading}
+              >
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </form>
         </div>
 
-        {/* Search Results */}
-        {searchQuery.trim() && searchResults.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {defaultTexts.eventCard.searchResults}
-            </h2>
-            <div className="flex flex-col md:flex-row flex-wrap gap-5">
-              {searchResults.map((event) => (
-                <EventCard key={event.id} {...event} />
-              ))}
-            </div>
+        {eventsLoading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+            <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
           </div>
         )}
 
-        {searchQuery.trim() && searchResults.length > 0 && (
-          <hr className="my-8 border-gray-200" />
+        {eventsError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p>Error loading events: {eventsError}</p>
+          </div>
         )}
 
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {searchQuery.trim() && searchResults.length > 0
-              ? "All Events"
-              : "Events"}
+            {searchQuery || selectedCategory ? "Search Results" : "All Events"}
+            {total > 0 && (
+              <span className="text-sm text-gray-500 ml-2">
+                (Page {page} of {totalPages} - {total} total events)
+              </span>
+            )}
           </h2>
-          <div className="flex flex-col md:flex-row flex-wrap gap-5">
-            {sortedEvents.map((event) => (
-              <EventCard key={event.id} {...event} />
-            ))}
-          </div>
+
+          {events.length === 0 && !eventsLoading ? (
+            <div className="text-center py-8 text-gray-500">
+              No events found. Try adjusting your search criteria.
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap ga-5">
+                {events.map((event) => (
+                  <EventCard key={event._id} {...event} />
+                ))}
+              </div>
+
+              {/* Enhanced Pagination */}
+              {total > limit && (
+                <div className="flex justify-between items-center mt-8">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={page === 1}
+                    className={`flex items-center px-4 py-2 rounded-md ${
+                      page === 1
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    }`}
+                  >
+                    <FaChevronLeft className="mr-2" />
+                    Previous
+                  </button>
+
+                  <span className="text-gray-700">
+                    Page {page} of {totalPages}
+                  </span>
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={page === totalPages}
+                    className={`flex items-center px-4 py-2 rounded-md ${
+                      page === totalPages
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    }`}
+                  >
+                    Next
+                    <FaChevronRight className="ml-2" />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -1,64 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useEventStore } from "../../store/EventStore";
+import EventApprovalModal from "./EventApprovalModal";
+import EventDetailsModal from "./EventDetailsModal";
 
 export default function EventApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [organizerFilter, setOrganizerFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(50);
+  const [sort] = useState("eventDate");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [initialStatus, setInitialStatus] = useState("approved");
 
-  const events = [
-    {
-      id: 1,
-      name: "Tech Conference 2025",
-      organizer: "Tech Events Inc.",
-      date: "June 15-17, 2025",
-      location: "San Francisco, CA",
-      submitted: "May 10, 2025",
-      image: "/placeholder.svg?height=100&width=200",
-    },
-    {
-      id: 2,
-      name: "Summer Music Festival",
-      organizer: "Music Festival Productions",
-      date: "July 4-6, 2025",
-      location: "Austin, TX",
-      submitted: "May 11, 2025",
-      image: "/placeholder.svg?height=100&width=200",
-    },
-    {
-      id: 3,
-      name: "Modern Art Exhibition",
-      organizer: "Modern Art Gallery",
-      date: "August 1-30, 2025",
-      location: "New York, NY",
-      submitted: "May 12, 2025",
-      image: "/placeholder.svg?height=100&width=200",
-    },
-  ];
+  const { events, loading, fetchAdminEvents, updateEventStatus } =
+    useEventStore();
 
-  // Get unique organizers for filter
-  const organizers = [...new Set(events.map((event) => event.organizer))];
+  useEffect(() => {
+    fetchAdminEvents({
+      searchTerm,
+      page,
+      limit,
+      sort,
+    });
+  }, [searchTerm, page, limit, sort, fetchAdminEvents]);
 
-  // Get unique locations for filter
-  const locations = [...new Set(events.map((event) => event.location))];
+  const organizers = [
+    ...new Set(events.map((event) => event?.organizerId?.name || "")),
+  ].filter(Boolean);
 
-  // Get unique date ranges for filter
-  const dateRanges = [...new Set(events.map((event) => event.date))];
+  const locations = [
+    ...new Set(events.map((event) => event.venue?.address?.city || "")),
+  ].filter(Boolean);
 
-  // Filter events based on search and filters
+  const dateRanges = [
+    ...new Set(
+      events.map((event) => {
+        if (!event.eventDate) return "";
+        const date = new Date(event.eventDate);
+        return date.toLocaleDateString();
+      })
+    ),
+  ].filter(Boolean);
+
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       searchTerm === "" ||
-      event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.organizer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase());
+      event.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.organizer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.venue?.address?.city
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
     const matchesOrganizer =
-      organizerFilter === "" || event.organizer === organizerFilter;
+      organizerFilter === "" || event.organizer?.name === organizerFilter;
+
     const matchesLocation =
-      locationFilter === "" || event.location === locationFilter;
-    const matchesDateRange =
-      dateRangeFilter === "" || event.date === dateRangeFilter;
+      locationFilter === "" || event.venue?.address?.city === locationFilter;
+
+    const matchesDateRange = (() => {
+      if (dateRangeFilter === "") return true;
+      if (!event.eventDate) return false;
+      const eventDate = new Date(event.eventDate).toLocaleDateString();
+      return eventDate === dateRangeFilter;
+    })();
 
     return (
       matchesSearch && matchesOrganizer && matchesLocation && matchesDateRange
@@ -72,8 +80,43 @@ export default function EventApprovals() {
     setDateRangeFilter("");
   };
 
+  const openModal = (event, status) => {
+    setSelectedEvent(event);
+    setInitialStatus(status);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  const openEventDetails = (event) => {
+    setSelectedEvent(event);
+    setShowModal(true);
+  };
+
+  const handleApprove = async (eventId) => {
+    await updateEventStatus(eventId, { status: "approved" });
+  };
+
+  const handleReject = async (eventId, rejectionReason) => {
+    await updateEventStatus(eventId, {
+      status: "rejected",
+      rejectionReason: rejectionReason,
+    });
+  };
+
   const hasActiveFilters =
     searchTerm || organizerFilter || locationFilter || dateRangeFilter;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -323,8 +366,11 @@ export default function EventApprovals() {
                 >
                   Submitted
                 </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -332,7 +378,7 @@ export default function EventApprovals() {
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event) => (
                   <tr
-                    key={event.id}
+                    key={event._id}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -340,43 +386,66 @@ export default function EventApprovals() {
                         <div className="flex-shrink-0 h-16 w-24">
                           <img
                             className="h-16 w-24 rounded object-cover"
-                            src={event.image || "/placeholder.svg"}
-                            alt=""
+                            src={event.eventImages?.[0] || "/placeholder.svg"}
+                            alt={event.eventName}
                           />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {event.name}
+                            {event.eventName}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {event.organizer}
+                        {event.organizerId?.name || "N/A"}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{event.date}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {event.location}
+                        {event.eventDate
+                          ? new Date(event.eventDate).toLocaleDateString()
+                          : "N/A"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {event.venue?.address?.city || "N/A"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {event.submitted}
+                      {event.createdAt
+                        ? new Date(event.createdAt).toLocaleDateString()
+                        : "N/A"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                        View Details
-                      </button>
-                      <button className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-green-200 transition-colors duration-150">
-                        Approve
-                      </button>
-                      <button className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150">
-                        Reject
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <div className="flex justify-center items-center space-x-3">
+                        <button
+                          className="text-indigo-600 hover:text-indigo-900 font-medium"
+                          onClick={() => openEventDetails(event)}
+                        >
+                          View Details
+                        </button>
+
+                        {event?.status !== "approved" &&
+                          event?.status !== "rejected" && (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => openModal(event, "approved")}
+                                className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-green-200 transition-colors duration-150"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => openModal(event, "rejected")}
+                                className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -393,7 +462,115 @@ export default function EventApprovals() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing{" "}
+                <span className="font-medium">{(page - 1) * limit + 1}</span> to{" "}
+                <span className="font-medium">
+                  {Math.min(page * limit, events.length)}
+                </span>{" "}
+                of <span className="font-medium">{events.length}</span> results
+              </p>
+            </div>
+            <div>
+              <nav
+                className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                aria-label="Pagination"
+              >
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                >
+                  <span className="sr-only">Previous</span>
+                  <svg
+                    className="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {Array.from({ length: Math.ceil(events.length / limit) }).map(
+                  (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setPage(i + 1)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                        page === i + 1
+                          ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  )
+                )}
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page * limit >= events.length}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                >
+                  <span className="sr-only">Next</span>
+                  <svg
+                    className="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
       </div>
+      {/* Approval Modal */}
+      <EventApprovalModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        event={selectedEvent}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        initialStatus={initialStatus}
+      />
+      {showModal && selectedEvent && (
+        <EventDetailsModal
+          event={selectedEvent}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

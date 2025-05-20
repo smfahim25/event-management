@@ -2,8 +2,7 @@ import { create } from "zustand";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
-const API_URL =
-  "https://event-management-backend-0401.onrender.com/api/v1/categories";
+const API_URL = `${import.meta.env.VITE_API_URL}/categories`;
 
 export const useCategoryStore = create((set, get) => ({
   categories: [],

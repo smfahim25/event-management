@@ -10,16 +10,17 @@ import PropTypes from "prop-types";
 
 const EventCard = ({
   _id,
-  id,
-  name = "Untitled Event",
+  eventName = "Untitled Event",
   description = "",
-  date,
-  organizer = { username: "Unknown" },
-  price = 0,
-  poster = "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",
-  location = "TBD",
+  eventDate,
+  ticketTiers,
+  eventImages,
+  venue,
   startTime,
   endTime,
+  organizerId,
+  tags,
+  status,
 }) => {
   const { defaultTexts } = useData();
   const navigate = useNavigate();
@@ -28,14 +29,14 @@ const EventCard = ({
     text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 
   const renderLiveIndicator = () => {
-    if (!startTime || !endTime || !date) return null;
+    if (!startTime || !endTime || !eventDate) return null;
 
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
-    const eventDate = new Date(date);
-    const start = new Date(eventDate);
-    const end = new Date(eventDate);
+    const eventDates = new Date(eventDate);
+    const start = new Date(eventDates);
+    const end = new Date(eventDates);
 
     start.setHours(startHour, startMinute, 0, 0);
     end.setHours(endHour, endMinute, 0, 0);
@@ -56,10 +57,10 @@ const EventCard = ({
 
   const formatPrice = () => {
     let eventPrice = 0;
-    if (Array.isArray(price)) {
-      eventPrice = price[0]?.value ?? 0;
+    if (Array.isArray(ticketTiers)) {
+      eventPrice = ticketTiers[0]?.price ?? 0;
     } else if (typeof price === "number") {
-      eventPrice = price;
+      eventPrice = ticketTiers[0]?.price;
     }
 
     return eventPrice === 0 ? "FREE" : `$${eventPrice}`;
@@ -68,12 +69,12 @@ const EventCard = ({
   return (
     <div
       style={{ cursor: "pointer" }}
-      onClick={() => navigate(`/app/eventDetails/${_id || id}`)}
+      onClick={() => navigate(`/app/eventDetails/${_id}`)}
       className="w-full md:w-[285px] lg:w-[285px] h-[400px] rounded-xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col"
     >
       <div className="relative w-full h-[180px] min-h-[180px] overflow-hidden flex-shrink-0">
         <img
-          src={poster || "/placeholder.svg"}
+          src={eventImages[0] || "/placeholder.svg"}
           alt="event poster"
           className="object-cover h-full w-full transition-transform duration-500 hover:scale-105"
         />
@@ -82,7 +83,7 @@ const EventCard = ({
 
       <div className="p-4 flex flex-col flex-grow">
         <h2 className="text-xl font-bold text-gray-800 line-clamp-1 mb-1">
-          {name}
+          {eventName}
         </h2>
 
         <div className="h-[40px] mb-2">
@@ -94,8 +95,8 @@ const EventCard = ({
         <div className="flex items-center text-gray-600 text-sm mb-1">
           <FaCalendarAlt className="mr-2 text-purple-500 flex-shrink-0" />
           <span className="truncate">
-            {date &&
-              new Date(date).toLocaleDateString("en-US", {
+            {eventDate &&
+              new Date(eventDate).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -105,7 +106,10 @@ const EventCard = ({
 
         <div className="flex items-center text-gray-600 text-sm mb-1">
           <FaMapMarkerAlt className="mr-2 text-purple-500 flex-shrink-0" />
-          <span className="truncate">{location}</span>
+          <span className="truncate">
+            {venue?.address?.street}, {venue?.address?.city},
+            {venue?.address?.country}- {venue?.address?.zipCode}
+          </span>
         </div>
 
         <div className="flex-grow"></div>
@@ -117,9 +121,9 @@ const EventCard = ({
               {defaultTexts?.eventCard?.organizedBy || "Organized by"}{" "}
               <span
                 className="text-[#E167FF] inline-block max-w-[100px] truncate align-bottom"
-                title={organizer.username}
+                title={organizerId?.name}
               >
-                {organizer.username}
+                {organizerId?.name}
               </span>
             </span>
           </div>
@@ -134,7 +138,7 @@ const EventCard = ({
 };
 
 EventCard.propTypes = {
-  name: PropTypes.string,
+  eventName: PropTypes.string,
   _id: PropTypes.string,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   description: PropTypes.string,

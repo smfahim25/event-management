@@ -2,10 +2,9 @@ import { create } from "zustand";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
-const API_BASE =
-  "https://event-management-backend-0401.onrender.com/api/v1/organizers";
+const API_BASE = `${import.meta.env.VITE_API_URL}/organizers`;
 
-export const useOrganizerStore = create((set) => ({
+export const useOrganizerStore = create((set, get) => ({
   loading: false,
   error: null,
   success: false,
@@ -28,8 +27,25 @@ export const useOrganizerStore = create((set) => ({
       formData.append("commissionRate", formDataObj.commissionRate);
       formData.append("payoutSchedule", formDataObj.payoutSchedule);
 
-      formData.append("address", JSON.stringify(formDataObj.address));
-      formData.append("socialMedia", JSON.stringify(formDataObj.socialMedia));
+      formData.append("address[street]", formDataObj.address.street);
+      formData.append("address[city]", formDataObj.address.city);
+      formData.append("address[state]", formDataObj.address.state);
+      formData.append("address[zipCode]", formDataObj.address.zipCode);
+      formData.append("address[country]", formDataObj.address.country);
+
+      formData.append(
+        "socialMedia[facebook]",
+        formDataObj.socialMedia.facebook
+      );
+      formData.append("socialMedia[twitter]", formDataObj.socialMedia.twitter);
+      formData.append(
+        "socialMedia[instagram]",
+        formDataObj.socialMedia.instagram
+      );
+      formData.append(
+        "socialMedia[linkedin]",
+        formDataObj.socialMedia.linkedin
+      );
 
       const res = await fetch(API_BASE, {
         method: "POST",
@@ -190,6 +206,36 @@ export const useOrganizerStore = create((set) => ({
       }
       toast.success("Organizer rejected successfully");
       set({ success: true });
+    } catch (err) {
+      set({ error: err.message });
+      toast.error(err.message);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  deleteOrganizer: async (organizerId) => {
+    set({ loading: true, error: null, success: false });
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/${organizerId}/delete`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete organizer.");
+      }
+
+      toast.success("Organizer deleted successfully");
+      set({ success: true });
+
+      await get().getOrganizers();
     } catch (err) {
       set({ error: err.message });
       toast.error(err.message);

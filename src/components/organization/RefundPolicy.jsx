@@ -1,19 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  FiCalendar,
-  FiPercent,
-  FiPlus,
-  FiTrash2,
-  FiInfo,
-  FiCheck,
-} from "react-icons/fi";
+import { FiCalendar, FiPlus, FiTrash2, FiInfo, FiCheck } from "react-icons/fi";
 import PropTypes from "prop-types";
 
 const RefundPolicyManager = ({ eventId, onSave }) => {
   const [policies, setPolicies] = useState([]);
   const [newPolicy, setNewPolicy] = useState({
-    days: 7,
-    percentage: 50,
+    daysBeforeEvent: 7,
+    refundPercentage: 50,
     description: "",
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -25,27 +18,27 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
       setPolicies([
         {
           id: "policy_1",
-          days: 7,
-          percentage: 50,
+          daysBeforeEvent: 7,
+          refundPercentage: 50,
           description: "50% refund if canceled 7 days before the event",
           isDefault: true,
         },
         {
           id: "policy_2",
-          days: 14,
-          percentage: 75,
+          daysBeforeEvent: 14,
+          refundPercentage: 75,
           description: "75% refund if canceled 14 days before the event",
           isDefault: false,
         },
         {
           id: "policy_3",
-          days: 30,
-          percentage: 100,
+          daysBeforeEvent: 30,
+          refundPercentage: 100,
           description: "100% refund if canceled 30 days before the event",
           isDefault: false,
         },
       ]);
-      setSelectedPolicy("policy_1"); // Set default selected policy
+      setSelectedPolicy("policy_1");
       setIsLoading(false);
     }, 800);
   }, [eventId]);
@@ -54,25 +47,25 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
     if (!newPolicy.description) {
       setNewPolicy({
         ...newPolicy,
-        description: `${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`,
+        description: `${newPolicy.refundPercentage}% refund if canceled ${newPolicy.daysBeforeEvent} days before the event`,
       });
     }
 
     const policy = {
       id: `policy_${Date.now()}`,
-      days: newPolicy.days,
-      percentage: newPolicy.percentage,
+      daysBeforeEvent: newPolicy.daysBeforeEvent,
+      refundPercentage: newPolicy.refundPercentage,
       description:
         newPolicy.description ||
-        `${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`,
+        `${newPolicy.refundPercentage}% refund if canceled ${newPolicy.daysBeforeEvent} days before the event`,
       isDefault: policies.length === 0,
     };
 
     const updatedPolicies = [...policies, policy];
     setPolicies(updatedPolicies);
     setNewPolicy({
-      days: 7,
-      percentage: 50,
+      daysBeforeEvent: 7,
+      refundPercentage: 50,
       description: "",
     });
 
@@ -96,17 +89,17 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
 
   const handleSelectPolicy = (policyId) => {
     setSelectedPolicy(policyId);
-  };
-
-  const handleSavePolicies = () => {
-    // Update the default policy based on selection
     const updatedPolicies = policies.map((policy) => ({
       ...policy,
       isDefault: policy.id === selectedPolicy,
     }));
+    const selectedPolicyDetails = updatedPolicies.find(
+      (policy) => policy.id === policyId
+    );
 
-    setPolicies(updatedPolicies);
-    onSave(updatedPolicies);
+    console.log("Selected Policy:", selectedPolicyDetails);
+
+    onSave(selectedPolicyDetails);
   };
 
   if (isLoading) {
@@ -170,12 +163,12 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
                       <div className="flex items-center mt-1">
                         <span className="text-xs text-gray-500 flex items-center">
                           <FiCalendar className="mr-1 h-3 w-3" />
-                          {policy.days} days before event
+                          {policy.daysBeforeEvent} days before event
                         </span>
                         <span className="mx-2 text-gray-300">|</span>
                         <span className="text-xs text-gray-500 flex items-center">
-                          <FiPercent className="mr-1 h-3 w-3" />
-                          {policy.percentage}% refund
+                          {/* <FiPercent className="mr-1 h-3 w-3" /> */}
+                          {policy.refundPercentage}% refund
                         </span>
                       </div>
                     </div>
@@ -219,11 +212,11 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
               type="number"
               id="days"
               min="0"
-              value={newPolicy.days}
+              value={newPolicy.daysBeforeEvent}
               onChange={(e) =>
                 setNewPolicy({
                   ...newPolicy,
-                  days: Number.parseInt(e.target.value),
+                  daysBeforeEvent: Number.parseInt(e.target.value),
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
@@ -241,11 +234,11 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
               id="percentage"
               min="0"
               max="100"
-              value={newPolicy.percentage}
+              value={newPolicy.refundPercentage}
               onChange={(e) =>
                 setNewPolicy({
                   ...newPolicy,
-                  percentage: Number.parseInt(e.target.value),
+                  refundPercentage: Number.parseInt(e.target.value),
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
@@ -266,7 +259,7 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
             onChange={(e) =>
               setNewPolicy({ ...newPolicy, description: e.target.value })
             }
-            placeholder={`${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`}
+            placeholder={`${newPolicy.refundPercentage}% refund if canceled ${newPolicy.daysBeforeEvent} days before the event`}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
@@ -287,22 +280,6 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
             Add Policy
           </button>
         </div>
-      </div>
-
-      {/* Save Button */}
-      <div className="border-t border-gray-200 pt-6 flex justify-end">
-        <button
-          type="button"
-          onClick={handleSavePolicies}
-          disabled={!selectedPolicy}
-          className={`px-4 py-2 rounded-md text-sm font-medium ${
-            !selectedPolicy
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          }`}
-        >
-          Save Refund Policy
-        </button>
       </div>
     </div>
   );

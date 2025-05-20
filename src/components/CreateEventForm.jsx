@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiCalendar,
@@ -15,36 +15,27 @@ import {
   FiUsers,
   FiPackage,
   FiArrowLeft,
-  // FiExchangeAlt,
 } from "react-icons/fi";
-import RefundPolicyManager from "./organization/RefundPolicy";
 import { RiRefund2Line } from "react-icons/ri";
-
-// Event categories
-const EVENT_CATEGORIES = [
-  { id: "music", name: "Music" },
-  { id: "conference", name: "Conference" },
-  { id: "workshop", name: "Workshop" },
-  { id: "sports", name: "Sports" },
-  { id: "art", name: "Art & Culture" },
-  { id: "food", name: "Food & Drink" },
-  { id: "business", name: "Business" },
-  { id: "health", name: "Health & Wellness" },
-  { id: "education", name: "Education" },
-  { id: "other", name: "Other" },
-];
+import RefundPolicyManager from "./organization/RefundPolicy";
+import { useEventStore } from "../store/EventStore";
+import { useCategoryStore } from "../store/CategoryStore";
+import toast from "react-hot-toast";
 
 function CreateEventPage() {
   const navigate = useNavigate();
+  const { createEvent } = useEventStore();
+  const { categories, fetchCategories } = useCategoryStore();
+  const tagInputRef = useRef();
 
   const [formData, setFormData] = useState({
-    name: "",
+    eventName: "",
     description: "",
-    category: "",
-    date: "",
+    eventCategory: "",
+    eventDate: "",
     startTime: "",
     endTime: "",
-    limit: "",
+    totalCapacity: "",
     venue: {
       name: "",
       address: {
@@ -60,7 +51,7 @@ function CreateEventPage() {
       },
       mapUrl: "",
     },
-    price: [],
+    ticketTiers: [],
     tags: [],
   });
 
@@ -69,8 +60,12 @@ function CreateEventPage() {
 
   const [errors, setErrors] = useState({});
   const [eventImages, setEventImages] = useState([]);
-  const [activeSection, setActiveSection] = useState("basic"); // basic, datetime, pricing, refund, summary
+  const [activeSection, setActiveSection] = useState("basic");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,74 +74,76 @@ function CreateEventPage() {
       [name]: value,
     }));
 
-    // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
-
+  const handleAddTag = () => {
+    const input = tagInputRef.current;
+    const trimmedValue = input?.value.trim();
+    if (trimmedValue) {
+      setFormData((prev) => {
+        const updatedTags = [...prev.tags, trimmedValue];
+        console.log("Updating tags with:", updatedTags);
+        return {
+          ...prev,
+          tags: updatedTags,
+        };
+      });
+      input.value = "";
+    }
+  };
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      const newImages = [];
-
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newImages.push({
-            file,
-            preview: reader.result,
-            path: `store/images/${file.name}`, // This would be the path after upload
-          });
-          if (newImages.length === files.length) {
-            setEventImages((prev) => [...prev, ...newImages]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      const newImages = files.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+      setEventImages((prev) => [...prev, ...newImages]);
     }
   };
 
   const handleRemoveImage = (index) => {
+    URL.revokeObjectURL(eventImages[index].preview);
     setEventImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddPrice = () => {
+  const handleAddTicketTier = () => {
     setFormData((prev) => ({
       ...prev,
-      price: [
-        ...prev.price,
-        { label: "", value: "", quantity: "", maxPerOrder: "" },
+      ticketTiers: [
+        ...prev.ticketTiers,
+        { name: "", price: "", availableQuantity: "", maxPerOrder: "" },
       ],
     }));
   };
 
-  const handleRemovePrice = (index) => {
+  const handleRemoveTicketTier = (index) => {
     setFormData((prev) => ({
       ...prev,
-      price: prev.price.filter((_, i) => i !== index),
+      ticketTiers: prev.ticketTiers.filter((_, i) => i !== index),
     }));
   };
 
-  const handlePriceChange = (index, field, value) => {
+  const handleTicketTierChange = (index, field, value) => {
     setFormData((prev) => {
-      const updatedPrices = prev.price.map((price, i) =>
-        i === index ? { ...price, [field]: value } : price
+      const updatedTiers = prev.ticketTiers.map((tier, i) =>
+        i === index ? { ...tier, [field]: value } : tier
       );
-      return { ...prev, price: updatedPrices };
+      return { ...prev, ticketTiers: updatedTiers };
     });
   };
 
   const handleSaveRefundPolicies = (policies) => {
     setRefundPolicies(policies);
-    console.log("Refund policies saved:", policies);
   };
 
   const validateSection = (section) => {
     const newErrors = {};
 
     if (section === "basic") {
-      if (!formData.name) newErrors.name = "Event name is required";
+      if (!formData.eventName) newErrors.eventName = "Event name is required";
       if (!formData.description)
         newErrors.description = "Description is required";
       if (!formData.venue.name) newErrors.venueName = "Venue name is required";
@@ -158,25 +155,28 @@ function CreateEventPage() {
         newErrors.country = "Country is required";
       if (!formData.venue.address.zipCode)
         newErrors.zipCode = "Zip code is required";
-      if (!formData.category) newErrors.category = "Category is required";
+      if (!formData.eventCategory)
+        newErrors.eventCategory = "Category is required";
     } else if (section === "datetime") {
-      if (!formData.date) newErrors.date = "Date is required";
+      if (!formData.eventDate) newErrors.eventDate = "Date is required";
       if (!formData.startTime) newErrors.startTime = "Start time is required";
       if (!formData.endTime) newErrors.endTime = "End time is required";
-      if (!formData.limit) newErrors.limit = "Attendee limit is required";
+      if (!formData.totalCapacity)
+        newErrors.totalCapacity = "Attendee limit is required";
     } else if (section === "pricing") {
-      if (formData.price.length === 0) {
-        newErrors.price = "At least one ticket type is required";
+      if (formData.ticketTiers.length === 0) {
+        newErrors.ticketTiers = "At least one ticket type is required";
       } else {
-        formData.price.forEach((price, index) => {
-          if (!price.label) {
-            newErrors[`price_${index}_label`] = "Ticket name is required";
+        formData.ticketTiers.forEach((tier, index) => {
+          if (!tier.name) {
+            newErrors[`ticketTiers_${index}_name`] = "Ticket name is required";
           }
-          if (!price.value) {
-            newErrors[`price_${index}_value`] = "Price is required";
+          if (!tier.price) {
+            newErrors[`ticketTiers_${index}_price`] = "Price is required";
           }
-          if (!price.quantity) {
-            newErrors[`price_${index}_quantity`] = "Quantity is required";
+          if (!tier.availableQuantity) {
+            newErrors[`ticketTiers_${index}_availableQuantity`] =
+              "Quantity is required";
           }
         });
       }
@@ -189,55 +189,51 @@ function CreateEventPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate all sections before submitting
     const basicValid = validateSection("basic");
     const datetimeValid = validateSection("datetime");
     const pricingValid = validateSection("pricing");
 
     if (!basicValid || !datetimeValid || !pricingValid) {
-      // Show error message
-      alert("Please fill in all required fields before submitting");
+      toast.error("Please fill in all required fields before submitting");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Create the final form data to submit according to the expected API format
-      const apiFormData = new FormData();
+      const formDataToSend = new FormData();
 
-      // Basic info
-      apiFormData.append("eventName", formData.name);
-      apiFormData.append(
-        "slug",
-        formData.name.toLowerCase().replace(/\s+/g, "-")
-      ); // Generate slug from name
-      apiFormData.append("description", formData.description);
-      apiFormData.append("eventCategory", formData.category);
+      formDataToSend.append("eventName", formData.eventName);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("eventCategory", formData.eventCategory);
 
-      // Images
-      eventImages.forEach((image, index) => {
-        apiFormData.append(`eventImages[${index}]`, image.file);
+      eventImages.forEach((image) => {
+        formDataToSend.append("eventImages", image.file);
       });
 
-      // Date & Time
-      apiFormData.append("eventDate", formData.date);
-      apiFormData.append("startTime", formData.startTime);
-      apiFormData.append("endTime", formData.endTime);
+      formDataToSend.append("eventDate", formData.eventDate);
+      formDataToSend.append("startTime", formData.startTime);
+      formDataToSend.append("endTime", formData.endTime);
+      formDataToSend.append("totalCapacity", formData.totalCapacity);
 
-      // Venue
-      apiFormData.append("venue[name]", formData.venue.name);
-      apiFormData.append(
+      formDataToSend.append("venue[name]", formData.venue.name);
+      formDataToSend.append(
         "venue[address][street]",
         formData.venue.address.street
       );
-      apiFormData.append("venue[address][city]", formData.venue.address.city);
-      apiFormData.append("venue[address][state]", formData.venue.address.state);
-      apiFormData.append(
+      formDataToSend.append(
+        "venue[address][city]",
+        formData.venue.address.city
+      );
+      formDataToSend.append(
+        "venue[address][state]",
+        formData.venue.address.state
+      );
+      formDataToSend.append(
         "venue[address][country]",
         formData.venue.address.country
       );
-      apiFormData.append(
+      formDataToSend.append(
         "venue[address][zipCode]",
         formData.venue.address.zipCode
       );
@@ -246,90 +242,86 @@ function CreateEventPage() {
         formData.venue.coordinates.latitude &&
         formData.venue.coordinates.longitude
       ) {
-        apiFormData.append(
+        formDataToSend.append(
           "venue[coordinates][latitude]",
           formData.venue.coordinates.latitude
         );
-        apiFormData.append(
+        formDataToSend.append(
           "venue[coordinates][longitude]",
           formData.venue.coordinates.longitude
         );
       }
 
       if (formData.venue.mapUrl) {
-        apiFormData.append("venue[mapUrl]", formData.venue.mapUrl);
+        formDataToSend.append("venue[mapUrl]", formData.venue.mapUrl);
       }
 
-      // Capacity
-      apiFormData.append("totalCapacity", formData.limit);
-
-      // Ticket tiers
-      formData.price.forEach((price, index) => {
-        apiFormData.append(`ticketTiers[${index}][name]`, price.label);
-        apiFormData.append(`ticketTiers[${index}][price]`, price.value);
-        apiFormData.append(
+      formData.ticketTiers.forEach((tier, index) => {
+        formDataToSend.append(`ticketTiers[${index}][name]`, tier.name);
+        formDataToSend.append(`ticketTiers[${index}][price]`, tier.price);
+        formDataToSend.append(
           `ticketTiers[${index}][availableQuantity]`,
-          price.quantity
+          tier.availableQuantity
         );
-        if (price.maxPerOrder) {
-          apiFormData.append(
+        if (tier.maxPerOrder) {
+          formDataToSend.append(
             `ticketTiers[${index}][maxPerOrder]`,
-            price.maxPerOrder
+            tier.maxPerOrder
           );
         }
       });
 
-      // Refund policy
       if (refundPoliciesEnabled && refundPolicies.length > 0) {
-        apiFormData.append("refundPolicy[type]", "time-based");
-
-        refundPolicies.forEach((policy) => {
-          if (policy.rules && policy.rules.length > 0) {
-            policy.rules.forEach((rule, ruleIndex) => {
-              apiFormData.append(
-                `refundPolicy[rules][${ruleIndex}][daysBeforeEvent]`,
-                rule.daysBeforeEvent
-              );
-              apiFormData.append(
-                `refundPolicy[rules][${ruleIndex}][refundPercentage]`,
-                rule.refundPercentage
-              );
-              apiFormData.append(
-                `refundPolicy[rules][${ruleIndex}][description]`,
-                rule.description
-              );
-            });
-          }
+        formDataToSend.append("refundPolicy[type]", "time-based");
+        refundPolicies[0].rules.forEach((rule, index) => {
+          formDataToSend.append(
+            `refundPolicy[rules][${index}][daysBeforeEvent]`,
+            rule.daysBeforeEvent
+          );
+          formDataToSend.append(
+            `refundPolicy[rules][${index}][refundPercentage]`,
+            rule.refundPercentage
+          );
+          formDataToSend.append(
+            `refundPolicy[rules][${index}][description]`,
+            rule.description
+          );
         });
       }
 
-      // Tags
+      // Append tags
       formData.tags.forEach((tag, index) => {
-        apiFormData.append(`tags[${index}]`, tag);
+        formDataToSend.append(`tags[${index}]`, tag);
       });
 
-      console.log("Form submitted with data:", apiFormData);
+      await createEvent(formDataToSend);
 
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        navigate("/app/profile");
-      }, 1000);
+      navigate("/app/profile");
     } catch (error) {
       console.error("Error creating event:", error);
-      alert("Failed to create event. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
+    eventImages.forEach((image) => {
+      URL.revokeObjectURL(image.preview);
+    });
     navigate("/app/profile");
   };
+
+  useEffect(() => {
+    return () => {
+      eventImages.forEach((image) => {
+        URL.revokeObjectURL(image.preview);
+      });
+    };
+  }, [eventImages]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Back button */}
         <button
           onClick={handleCancel}
           className="mb-6 flex items-center text-gray-600 hover:text-gray-900 transition-colors"
@@ -339,7 +331,6 @@ function CreateEventPage() {
         </button>
 
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-6 py-6">
             <h1 className="text-2xl font-bold text-white">Create New Event</h1>
             <p className="mt-1 text-purple-100">
@@ -359,9 +350,6 @@ function CreateEventPage() {
               }`}
             >
               Basic Info
-              {activeSection === "basic" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-              )}
             </button>
             <button
               type="button"
@@ -375,9 +363,6 @@ function CreateEventPage() {
               }`}
             >
               Date & Time
-              {activeSection === "datetime" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-              )}
             </button>
             <button
               type="button"
@@ -392,9 +377,6 @@ function CreateEventPage() {
               }`}
             >
               Pricing
-              {activeSection === "pricing" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-              )}
             </button>
             <button
               type="button"
@@ -413,9 +395,6 @@ function CreateEventPage() {
               }`}
             >
               Refund Policies
-              {activeSection === "refund" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-              )}
             </button>
             <button
               type="button"
@@ -434,9 +413,6 @@ function CreateEventPage() {
               }`}
             >
               Summary
-              {activeSection === "summary" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-              )}
             </button>
           </div>
 
@@ -452,7 +428,7 @@ function CreateEventPage() {
                   {/* Event Name */}
                   <div className="mb-5">
                     <label
-                      htmlFor="name"
+                      htmlFor="eventName"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
                       <FiInfo className="mr-2 h-4 w-4 text-purple-500" />
@@ -461,21 +437,21 @@ function CreateEventPage() {
                     <div className="relative">
                       <input
                         type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="eventName"
+                        name="eventName"
+                        value={formData.eventName}
                         onChange={handleChange}
                         placeholder="Enter a catchy name for your event"
                         className={`w-full rounded-lg border ${
-                          errors.name
+                          errors.eventName
                             ? "border-red-300 bg-red-50"
                             : "border-purple-200 bg-white"
                         } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                       />
-                      {errors.name && (
+                      {errors.eventName && (
                         <div className="mt-1 flex items-center text-sm text-red-600">
                           <FiAlertCircle className="mr-1 h-4 w-4" />
-                          {errors.name}
+                          {errors.eventName}
                         </div>
                       )}
                     </div>
@@ -484,34 +460,34 @@ function CreateEventPage() {
                   {/* Event Category */}
                   <div className="mb-5">
                     <label
-                      htmlFor="category"
+                      htmlFor="eventCategory"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
                       <FiTag className="mr-2 h-4 w-4 text-purple-500" />
                       Event Category
                     </label>
                     <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
+                      id="eventCategory"
+                      name="eventCategory"
+                      value={formData.eventCategory}
                       onChange={handleChange}
                       className={`w-full rounded-lg border ${
-                        errors.category
+                        errors.eventCategory
                           ? "border-red-300 bg-red-50"
                           : "border-purple-200 bg-white"
                       } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                     >
                       <option value="">Select a category</option>
-                      {EVENT_CATEGORIES.map((category) => (
-                        <option key={category.id} value={category.id}>
+                      {categories.map((category) => (
+                        <option key={category._id} value={category._id}>
                           {category.name}
                         </option>
                       ))}
                     </select>
-                    {errors.category && (
+                    {errors.eventCategory && (
                       <div className="mt-1 flex items-center text-sm text-red-600">
                         <FiAlertCircle className="mr-1 h-4 w-4" />
-                        {errors.category}
+                        {errors.eventCategory}
                       </div>
                     )}
                   </div>
@@ -800,32 +776,13 @@ function CreateEventPage() {
                     <div className="flex">
                       <input
                         type="text"
-                        id="tagInput"
+                        ref={tagInputRef}
                         placeholder="Add tags (e.g., music, festival)"
                         className="flex-grow rounded-l-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && e.target.value.trim()) {
-                            e.preventDefault();
-                            setFormData((prev) => ({
-                              ...prev,
-                              tags: [...prev.tags, e.target.value.trim()],
-                            }));
-                            e.target.value = "";
-                          }
-                        }}
                       />
                       <button
                         type="button"
-                        onClick={() => {
-                          const input = document.getElementById("tagInput");
-                          if (input.value.trim()) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              tags: [...prev.tags, input.value.trim()],
-                            }));
-                            input.value = "";
-                          }
-                        }}
+                        onClick={handleAddTag}
                         className="rounded-r-lg bg-purple-600 px-4 py-3 text-white hover:bg-purple-700"
                       >
                         Add
@@ -864,14 +821,14 @@ function CreateEventPage() {
                                 className="relative aspect-video rounded-lg overflow-hidden"
                               >
                                 <img
-                                  src={image.preview || "/placeholder.svg"}
-                                  alt={`Event image ${index + 1}`}
+                                  src={image.preview}
+                                  alt={`Event preview ${index + 1}`}
                                   className="h-full w-full object-cover"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveImage(index)}
-                                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white transition-all hover:bg-black/70"
+                                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white transition-all hover:bg-black/70 z-50"
                                 >
                                   <FiX className="h-3 w-3" />
                                 </button>
@@ -937,7 +894,7 @@ function CreateEventPage() {
                   {/* Date */}
                   <div className="mb-5">
                     <label
-                      htmlFor="date"
+                      htmlFor="eventDate"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
                       <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
@@ -945,20 +902,20 @@ function CreateEventPage() {
                     </label>
                     <input
                       type="date"
-                      id="date"
-                      name="date"
-                      value={formData.date}
+                      id="eventDate"
+                      name="eventDate"
+                      value={formData.eventDate}
                       onChange={handleChange}
                       className={`w-full rounded-lg border ${
-                        errors.date
+                        errors.eventDate
                           ? "border-red-300 bg-red-50"
                           : "border-purple-200 bg-white"
                       } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                     />
-                    {errors.date && (
+                    {errors.eventDate && (
                       <div className="mt-1 flex items-center text-sm text-red-600">
                         <FiAlertCircle className="mr-1 h-4 w-4" />
-                        {errors.date}
+                        {errors.eventDate}
                       </div>
                     )}
                   </div>
@@ -1025,7 +982,7 @@ function CreateEventPage() {
                   {/* Attendee Limit */}
                   <div>
                     <label
-                      htmlFor="limit"
+                      htmlFor="totalCapacity"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
                       <FiUsers className="mr-2 h-4 w-4 text-purple-500" />
@@ -1033,22 +990,22 @@ function CreateEventPage() {
                     </label>
                     <input
                       type="number"
-                      id="limit"
-                      name="limit"
-                      value={formData.limit}
+                      id="totalCapacity"
+                      name="totalCapacity"
+                      value={formData.totalCapacity}
                       onChange={handleChange}
                       min="1"
                       placeholder="Maximum number of attendees"
                       className={`w-full rounded-lg border ${
-                        errors.limit
+                        errors.totalCapacity
                           ? "border-red-300 bg-red-50"
                           : "border-purple-200 bg-white"
                       } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                     />
-                    {errors.limit && (
+                    {errors.totalCapacity && (
                       <div className="mt-1 flex items-center text-sm text-red-600">
                         <FiAlertCircle className="mr-1 h-4 w-4" />
-                        {errors.limit}
+                        {errors.totalCapacity}
                       </div>
                     )}
                     <p className="mt-2 text-sm text-gray-500">
@@ -1090,7 +1047,7 @@ function CreateEventPage() {
                     </h2>
                     <button
                       type="button"
-                      onClick={handleAddPrice}
+                      onClick={handleAddTicketTier}
                       className="flex items-center rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700"
                     >
                       <FiPlus className="mr-1.5 h-3.5 w-3.5" />
@@ -1098,14 +1055,14 @@ function CreateEventPage() {
                     </button>
                   </div>
 
-                  {errors.price && (
+                  {errors.ticketTiers && (
                     <div className="mb-4 flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg">
                       <FiAlertCircle className="mr-2 h-4 w-4" />
-                      {errors.price}
+                      {errors.ticketTiers}
                     </div>
                   )}
 
-                  {formData.price.length === 0 ? (
+                  {formData.ticketTiers.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-200 bg-white py-10">
                       <div className="mb-3 rounded-full bg-purple-100 p-3">
                         <FiDollarSign className="h-6 w-6 text-purple-600" />
@@ -1118,7 +1075,7 @@ function CreateEventPage() {
                       </p>
                       <button
                         type="button"
-                        onClick={handleAddPrice}
+                        onClick={handleAddTicketTier}
                         className="flex items-center rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700"
                       >
                         <FiPlus className="mr-1.5 h-3.5 w-3.5" />
@@ -1127,7 +1084,7 @@ function CreateEventPage() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {formData.price.map((priceItem, index) => (
+                      {formData.ticketTiers.map((tier, index) => (
                         <div
                           key={index}
                           className="group relative overflow-hidden rounded-lg border border-purple-200 bg-white p-4 shadow-sm transition-all hover:border-purple-300 hover:shadow-md"
@@ -1138,7 +1095,7 @@ function CreateEventPage() {
                             </h3>
                             <button
                               type="button"
-                              onClick={() => handleRemovePrice(index)}
+                              onClick={() => handleRemoveTicketTier(index)}
                               className="rounded-full bg-red-50 p-1.5 text-red-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-100"
                             >
                               <FiTrash2 className="h-4 w-4" />
@@ -1153,23 +1110,23 @@ function CreateEventPage() {
                               <input
                                 type="text"
                                 placeholder="e.g. VIP, Early Bird, General"
-                                value={priceItem.label}
+                                value={tier.name}
                                 onChange={(e) =>
-                                  handlePriceChange(
+                                  handleTicketTierChange(
                                     index,
-                                    "label",
+                                    "name",
                                     e.target.value
                                   )
                                 }
                                 className={`w-full rounded-lg border ${
-                                  errors[`price_${index}_label`]
+                                  errors[`ticketTiers_${index}_name`]
                                     ? "border-red-300 bg-red-50"
                                     : "border-gray-200 bg-gray-50"
                                 } px-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                               />
-                              {errors[`price_${index}_label`] && (
+                              {errors[`ticketTiers_${index}_name`] && (
                                 <div className="mt-1 text-xs text-red-600">
-                                  {errors[`price_${index}_label`]}
+                                  {errors[`ticketTiers_${index}_name`]}
                                 </div>
                               )}
                             </div>
@@ -1184,25 +1141,25 @@ function CreateEventPage() {
                                 <input
                                   type="number"
                                   placeholder="0.00"
-                                  value={priceItem.value}
+                                  value={tier.price}
                                   onChange={(e) =>
-                                    handlePriceChange(
+                                    handleTicketTierChange(
                                       index,
-                                      "value",
+                                      "price",
                                       e.target.value
                                     )
                                   }
                                   min="0"
                                   step="0.01"
                                   className={`w-full rounded-lg border ${
-                                    errors[`price_${index}_value`]
+                                    errors[`ticketTiers_${index}_price`]
                                       ? "border-red-300 bg-red-50"
                                       : "border-gray-200 bg-gray-50"
                                   } pl-8 pr-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                                 />
-                                {errors[`price_${index}_value`] && (
+                                {errors[`ticketTiers_${index}_price`] && (
                                   <div className="mt-1 text-xs text-red-600">
-                                    {errors[`price_${index}_value`]}
+                                    {errors[`ticketTiers_${index}_price`]}
                                   </div>
                                 )}
                               </div>
@@ -1218,24 +1175,32 @@ function CreateEventPage() {
                                 <input
                                   type="number"
                                   placeholder="Number of tickets"
-                                  value={priceItem.quantity}
+                                  value={tier.availableQuantity}
                                   onChange={(e) =>
-                                    handlePriceChange(
+                                    handleTicketTierChange(
                                       index,
-                                      "quantity",
+                                      "availableQuantity",
                                       e.target.value
                                     )
                                   }
                                   min="1"
                                   className={`w-full rounded-lg border ${
-                                    errors[`price_${index}_quantity`]
+                                    errors[
+                                      `ticketTiers_${index}_availableQuantity`
+                                    ]
                                       ? "border-red-300 bg-red-50"
                                       : "border-gray-200 bg-gray-50"
                                   } pl-8 pr-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                                 />
-                                {errors[`price_${index}_quantity`] && (
+                                {errors[
+                                  `ticketTiers_${index}_availableQuantity`
+                                ] && (
                                   <div className="mt-1 text-xs text-red-600">
-                                    {errors[`price_${index}_quantity`]}
+                                    {
+                                      errors[
+                                        `ticketTiers_${index}_availableQuantity`
+                                      ]
+                                    }
                                   </div>
                                 )}
                               </div>
@@ -1247,9 +1212,9 @@ function CreateEventPage() {
                               <input
                                 type="number"
                                 placeholder="Leave blank for no limit"
-                                value={priceItem.maxPerOrder || ""}
+                                value={tier.maxPerOrder || ""}
                                 onChange={(e) =>
-                                  handlePriceChange(
+                                  handleTicketTierChange(
                                     index,
                                     "maxPerOrder",
                                     e.target.value
@@ -1269,7 +1234,7 @@ function CreateEventPage() {
 
                       <button
                         type="button"
-                        onClick={handleAddPrice}
+                        onClick={handleAddTicketTier}
                         className="flex w-full items-center justify-center rounded-lg border-2 border-dashed border-purple-200 bg-white py-3 text-sm font-medium text-purple-600 transition-all hover:border-purple-300 hover:bg-purple-50"
                       >
                         <FiPlus className="mr-1.5 h-4 w-4" />
@@ -1405,7 +1370,7 @@ function CreateEventPage() {
                           Event Name
                         </p>
                         <p className="text-sm text-gray-600">
-                          {formData.name || "Not specified"}
+                          {formData.eventName || "Not specified"}
                         </p>
                       </div>
                     </div>
@@ -1417,8 +1382,8 @@ function CreateEventPage() {
                           Category
                         </p>
                         <p className="text-sm text-gray-600">
-                          {EVENT_CATEGORIES.find(
-                            (c) => c.id === formData.category
+                          {categories.find(
+                            (c) => c._id === formData.eventCategory
                           )?.name || "Not specified"}
                         </p>
                       </div>
@@ -1450,8 +1415,8 @@ function CreateEventPage() {
                           Date & Time
                         </p>
                         <p className="text-sm text-gray-600">
-                          {formData.date
-                            ? `${formData.date} from ${
+                          {formData.eventDate
+                            ? `${formData.eventDate} from ${
                                 formData.startTime || "?"
                               } to ${formData.endTime || "?"}`
                             : "Not specified"}
@@ -1466,8 +1431,8 @@ function CreateEventPage() {
                           Total Capacity
                         </p>
                         <p className="text-sm text-gray-600">
-                          {formData.limit
-                            ? `${formData.limit} attendees`
+                          {formData.totalCapacity
+                            ? `${formData.totalCapacity} attendees`
                             : "Not specified"}
                         </p>
                       </div>
@@ -1479,13 +1444,18 @@ function CreateEventPage() {
                         <p className="text-sm font-medium text-gray-700">
                           Ticket Types
                         </p>
-                        {formData.price.length > 0 ? (
+                        {formData.ticketTiers.length > 0 ? (
                           <ul className="mt-1 space-y-1">
-                            {formData.price.map((price, index) => (
+                            {formData.ticketTiers.map((tier, index) => (
                               <li key={index} className="text-sm text-gray-600">
-                                {price.label || `Ticket ${index + 1}`}: $
-                                {price.value || "0.00"} (Qty:{" "}
-                                {price.quantity || "0"})
+                                {tier.name || `Ticket ${index + 1}`}: $
+                                {tier.price || "0.00"} (Qty:{" "}
+                                {tier.availableQuantity || "0"})
+                                {tier.maxPerOrder && (
+                                  <span className="text-gray-400 ml-2">
+                                    (Max {tier.maxPerOrder} per order)
+                                  </span>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -1498,27 +1468,17 @@ function CreateEventPage() {
                     </div>
 
                     <div className="flex items-start">
-                      <FiDollarSign className="mr-2 mt-0.5 h-4 w-4 text-green-600" />
+                      <RiRefund2Line className="mr-2 mt-0.5 h-4 w-4 text-green-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-700">
                           Refund Policies
                         </p>
                         {refundPoliciesEnabled ? (
-                          refundPolicies.length > 0 ? (
+                          refundPolicies ? (
                             <ul className="mt-1 space-y-1">
-                              {refundPolicies.map((policy, index) => (
-                                <li
-                                  key={index}
-                                  className="text-sm text-gray-600"
-                                >
-                                  {policy.isDefault && (
-                                    <span className="text-green-600 font-medium">
-                                      (Default){" "}
-                                    </span>
-                                  )}
-                                  {policy.description}
-                                </li>
-                              ))}
+                              <li className="text-sm text-gray-600">
+                                {refundPolicies.description}
+                              </li>
                             </ul>
                           ) : (
                             <p className="text-sm text-gray-600">
