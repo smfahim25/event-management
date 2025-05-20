@@ -178,7 +178,7 @@ function EventsPage() {
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap ga-5">
+              <div className="flex flex-wrap gap-5">
                 {events.map((event) => (
                   <EventCard key={event._id} {...event} />
                 ))}

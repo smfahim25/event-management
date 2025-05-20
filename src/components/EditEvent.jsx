@@ -1,9 +1,6 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  FaImage,
   FaCalendarAlt,
   FaMapMarkerAlt,
   FaTicketAlt,
@@ -15,26 +12,14 @@ import {
   FaExchangeAlt,
 } from "react-icons/fa";
 import RefundPolicyManager from "./organization/RefundPolicy";
-
-// Event categories
-const EVENT_CATEGORIES = [
-  { id: "music", name: "Music" },
-  { id: "conference", name: "Conference" },
-  { id: "workshop", name: "Workshop" },
-  { id: "sports", name: "Sports" },
-  { id: "art", name: "Art & Culture" },
-  { id: "food", name: "Food & Drink" },
-  { id: "business", name: "Business" },
-  { id: "health", name: "Health & Wellness" },
-  { id: "education", name: "Education" },
-  { id: "other", name: "Other" },
-];
+import { useEventStore } from "../store/EventStore";
+import { useCategoryStore } from "../store/CategoryStore";
 
 const EditEvent = () => {
   const { eventID } = useParams();
   const navigate = useNavigate();
+  const tagInputRef = useRef();
 
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -63,13 +48,83 @@ const EditEvent = () => {
     tags: [],
   });
 
-  const [previewImage, setPreviewImage] = useState(
-    "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg"
-  );
+  const [previewImages, setPreviewImages] = useState([
+    "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",
+  ]);
   const [errors, setErrors] = useState({});
   const [activeSection, setActiveSection] = useState("basic"); // basic, pricing, refund
   const [refundPolicies, setRefundPolicies] = useState([]);
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(true);
+
+  const { categories, fetchCategories } = useCategoryStore();
+  const {
+    selectedEvent,
+    fetchEventById,
+    updateEvent,
+    loading: eventLoading,
+  } = useEventStore();
+
+  // Fetch event data when component mounts or eventID changes
+  useEffect(() => {
+    if (eventID) {
+      fetchEventById(eventID);
+    }
+  }, [eventID, fetchEventById]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setFormData({
+        name: selectedEvent.eventName,
+        description: selectedEvent.description,
+        category: selectedEvent.eventCategory?._id || "",
+        date: selectedEvent.eventDate?.split("T")[0] || "",
+        startTime: selectedEvent.startTime || "",
+        endTime: selectedEvent.endTime || "",
+        venue: {
+          name: selectedEvent.venue?.name || "",
+          address: {
+            street: selectedEvent.venue?.address?.street || "",
+            city: selectedEvent.venue?.address?.city || "",
+            state: selectedEvent.venue?.address?.state || "",
+            country: selectedEvent.venue?.address?.country || "",
+            zipCode: selectedEvent.venue?.address?.zipCode || "",
+          },
+          coordinates: {
+            latitude: selectedEvent.venue?.coordinates?.latitude || "",
+            longitude: selectedEvent.venue?.coordinates?.longitude || "",
+          },
+          mapUrl: selectedEvent.venue?.mapUrl || "",
+        },
+        price:
+          selectedEvent.ticketTiers?.map((tier) => ({
+            label: tier.name,
+            value: tier.price,
+            quantity: tier.availableQuantity,
+            maxPerOrder: tier.maxPerOrder,
+          })) || [],
+        limit: selectedEvent.totalCapacity || "",
+        poster: null,
+        tags: selectedEvent.tags || [],
+      });
+
+      // Set the preview images if available
+      if (selectedEvent.eventImages && selectedEvent.eventImages.length > 0) {
+        setPreviewImages(selectedEvent.eventImages);
+      }
+
+      // Set refund policies if available
+      if (selectedEvent.refundPolicy) {
+        setRefundPoliciesEnabled(
+          selectedEvent.refundPolicy.type === "time-based"
+        );
+        setRefundPolicies(selectedEvent.refundPolicy.rules || []);
+      }
+    }
+  }, [selectedEvent]);
 
   const handleAddPrice = () => {
     setFormData((prev) => ({
@@ -79,6 +134,22 @@ const EditEvent = () => {
         { label: "", value: "", quantity: "", maxPerOrder: "" },
       ],
     }));
+  };
+
+  const handleAddTag = () => {
+    const input = tagInputRef.current;
+    const trimmedValue = input?.value.trim();
+    if (trimmedValue) {
+      setFormData((prev) => {
+        const updatedTags = [...prev.tags, trimmedValue];
+        console.log("Updating tags with:", updatedTags);
+        return {
+          ...prev,
+          tags: updatedTags,
+        };
+      });
+      input.value = "";
+    }
   };
 
   const handleRemovePrice = (index) => {
@@ -102,65 +173,6 @@ const EditEvent = () => {
     console.log("Refund policies saved:", policies);
   };
 
-  // Mock fetch event details
-  const fetchEventDetails = () => {
-    setLoading(true);
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Mock data
-      const mockEvent = {
-        name: "AI Summit 2025",
-        description:
-          "Join us to explore the latest trends in artificial intelligence and machine learning.",
-        category: "conference",
-        date: new Date().toISOString().split("T")[0],
-        startTime: "10:00",
-        endTime: "15:00",
-        venue: {
-          name: "Tech Park",
-          address: {
-            street: "123 Innovation Ave",
-            city: "San Francisco",
-            state: "CA",
-            country: "USA",
-            zipCode: "94103",
-          },
-          coordinates: {
-            latitude: "37.7749",
-            longitude: "-122.4194",
-          },
-          mapUrl: "https://maps.google.com/...",
-        },
-        price: [
-          { label: "Regular", value: "50", quantity: "80" },
-          { label: "VIP", value: "100", quantity: "20", maxPerOrder: "2" },
-        ],
-        limit: "100",
-        tags: ["technology", "ai", "conference"],
-      };
-
-      setFormData({
-        name: mockEvent.name,
-        description: mockEvent.description,
-        category: mockEvent.category,
-        date: mockEvent.date,
-        startTime: mockEvent.startTime,
-        endTime: mockEvent.endTime,
-        venue: mockEvent.venue,
-        price: mockEvent.price,
-        limit: mockEvent.limit,
-        poster: null,
-        tags: mockEvent.tags,
-      });
-
-      setLoading(false);
-    }, 500);
-  };
-
-  useEffect(() => {
-    fetchEventDetails();
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -181,10 +193,20 @@ const EditEvent = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Just set the local preview - no actual file handling
-      setPreviewImage(URL.createObjectURL(file));
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newImages = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPreviewImages((prev) => [...prev, ...newImages]);
+
+      // Store the actual files in formData
+      setFormData((prev) => ({
+        ...prev,
+        poster: prev.poster
+          ? [...prev.poster, ...Array.from(files)]
+          : Array.from(files),
+      }));
     }
   };
 
@@ -236,20 +258,91 @@ const EditEvent = () => {
 
     if (!validateForm()) return;
 
-    setLoading(true);
+    const formDataObj = new FormData();
 
-    // Simulate processing
-    setTimeout(() => {
-      const finalFormData = {
-        ...formData,
-        refundPolicies: refundPoliciesEnabled ? refundPolicies : [],
-      };
+    formDataObj.append("eventName", formData.name);
+    formDataObj.append("description", formData.description);
+    formDataObj.append("eventCategory", formData.category);
+    formDataObj.append("eventDate", formData.date);
+    formDataObj.append("startTime", formData.startTime);
+    formDataObj.append("endTime", formData.endTime);
 
-      console.log("Event updated with data:", finalFormData);
-      alert("Event updated successfully!");
+    formDataObj.append("venue[name]", formData.venue.name);
+    formDataObj.append("venue[address][street]", formData.venue.address.street);
+    formDataObj.append("venue[address][city]", formData.venue.address.city);
+    formDataObj.append("venue[address][state]", formData.venue.address.state);
+    formDataObj.append(
+      "venue[address][country]",
+      formData.venue.address.country
+    );
+    formDataObj.append(
+      "venue[address][zipCode]",
+      formData.venue.address.zipCode
+    );
+
+    if (formData.venue.coordinates.latitude) {
+      formDataObj.append(
+        "venue[coordinates][latitude]",
+        formData.venue.coordinates.latitude
+      );
+    }
+    if (formData.venue.coordinates.longitude) {
+      formDataObj.append(
+        "venue[coordinates][longitude]",
+        formData.venue.coordinates.longitude
+      );
+    }
+    if (formData.venue.mapUrl) {
+      formDataObj.append("venue[mapUrl]", formData.venue.mapUrl);
+    }
+
+    formData.price.forEach((price, index) => {
+      formDataObj.append(`ticketTiers[${index}][name]`, price.label);
+      formDataObj.append(`ticketTiers[${index}][price]`, price.value);
+      formDataObj.append(
+        `ticketTiers[${index}][availableQuantity]`,
+        price.quantity
+      );
+      if (price.maxPerOrder) {
+        formDataObj.append(
+          `ticketTiers[${index}][maxPerOrder]`,
+          price.maxPerOrder
+        );
+      }
+    });
+
+    formDataObj.append("totalCapacity", formData.limit);
+
+    formData.tags.forEach((tag, index) => {
+      formDataObj.append(`tags[${index}]`, tag);
+    });
+
+    if (refundPoliciesEnabled && refundPolicies.length > 0) {
+      formDataObj.append("refundPolicy[type]", "time-based");
+      refundPolicies.forEach((policy, index) => {
+        formDataObj.append(
+          `refundPolicy[rules][${index}][timeBeforeEvent]`,
+          policy.timeBeforeEvent
+        );
+        formDataObj.append(
+          `refundPolicy[rules][${index}][refundPercentage]`,
+          policy.refundPercentage
+        );
+      });
+    }
+
+    if (formData.poster && formData.poster.length > 0) {
+      formData.poster.forEach((file) => {
+        formDataObj.append(`eventImages`, file);
+      });
+    }
+
+    try {
+      await updateEvent(eventID, formDataObj);
       navigate(`/app/eventDetails/${eventID}`);
-      setLoading(false);
-    }, 800);
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
   return (
@@ -312,27 +405,49 @@ const EditEvent = () => {
             <div className={activeSection === "basic" ? "block" : "hidden"}>
               {/* Event Image */}
               <div className="mb-8">
-                <div className="relative">
-                  <img
-                    src={previewImage || "/placeholder.svg"}
-                    alt="Event preview"
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {previewImages.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image || "/placeholder.svg"}
+                        alt={`Event preview ${index + 1}`}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewImages((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          );
+                          setFormData((prev) => ({
+                            ...prev,
+                            poster: prev.poster
+                              ? prev.poster.filter((_, i) => i !== index)
+                              : null,
+                          }));
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                      >
+                        <FaTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="relative h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
                     <label
                       htmlFor="poster-upload"
-                      className="bg-white text-purple-600 px-4 py-2 rounded-lg cursor-pointer flex items-center"
+                      className="cursor-pointer flex flex-col items-center justify-center w-full h-full"
                     >
-                      <FaImage className="mr-2" />
-                      Change Image
+                      <FaPlus className="text-gray-400 mb-2" size={24} />
+                      <span className="text-gray-500">Add Image</span>
+                      <input
+                        id="poster-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                        multiple
+                      />
                     </label>
-                    <input
-                      id="poster-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
                   </div>
                 </div>
                 <p className="text-sm text-gray-500 mt-2">
@@ -377,7 +492,7 @@ const EditEvent = () => {
                   } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                 >
                   <option value="">Select a category</option>
-                  {EVENT_CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -735,32 +850,13 @@ const EditEvent = () => {
                 <div className="flex">
                   <input
                     type="text"
-                    id="tagInput"
+                    ref={tagInputRef}
                     placeholder="Add tags (e.g., music, festival)"
                     className="flex-grow rounded-l-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && e.target.value.trim()) {
-                        e.preventDefault();
-                        setFormData((prev) => ({
-                          ...prev,
-                          tags: [...prev.tags, e.target.value.trim()],
-                        }));
-                        e.target.value = "";
-                      }
-                    }}
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      const input = document.getElementById("tagInput");
-                      if (input.value.trim()) {
-                        setFormData((prev) => ({
-                          ...prev,
-                          tags: [...prev.tags, input.value.trim()],
-                        }));
-                        input.value = "";
-                      }
-                    }}
+                    onClick={handleAddTag}
                     className="rounded-r-lg bg-[#E167FF] px-4 py-3 text-white hover:bg-[#C840E9]"
                   >
                     Add
@@ -1027,13 +1123,13 @@ const EditEvent = () => {
               <button
                 type="submit"
                 className={`px-6 py-3 rounded-lg text-white transition-colors ${
-                  loading
+                  eventLoading
                     ? "bg-[#E167FF]/70 cursor-not-allowed"
                     : "bg-purple-600 hover:bg-[#C840E9] active:scale-[0.98]"
                 }`}
-                disabled={loading}
+                disabled={eventLoading}
               >
-                {loading ? (
+                {eventLoading ? (
                   <span className="flex items-center">
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
