@@ -23,62 +23,200 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
     });
   };
 
-  // Generate PDF content for the ticket
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":").map(Number);
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
+
   const generatePdfContent = (callback) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
 
     const loadImage = (url, callback) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = url || "/placeholder.svg?height=300&width=400";
-      img.onload = () => {
-        callback(img);
-      };
+      img.onload = () => callback(img);
     };
 
-    // Use event poster or placeholder
     const posterUrl =
-      data.event?.poster ||
       "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 
+    doc.setProperties({
+      title: `${data.eventName} Ticket`,
+      subject: "Event Ticket",
+      author: data.event?.organizer?.username || "Event Organizer",
+      keywords: "ticket, event, " + data.eventName,
+      creator: "Ticket System",
+    });
+
     loadImage(posterUrl, (img) => {
-      const aspectRatio = img.width / img.height;
-      const imgWidth = 160;
-      const imgHeight = imgWidth / aspectRatio;
+      const primaryColor = [41, 128, 185];
+      const secondaryColor = [44, 62, 80];
+      const accentColor = [231, 76, 60];
 
-      doc.addImage(img, "JPEG", 25, 20, imgWidth, imgHeight);
+      doc.setFillColor(250, 250, 250);
+      doc.rect(0, 0, 210, 297, "F");
 
-      const yPosition = 20 + imgHeight + 10;
-      doc.setFontSize(20);
-      doc.text("Event Ticket", 105, yPosition, { align: "center" });
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 0, 210, 40, "F");
 
-      doc.setFontSize(14);
-      doc.text(`Event Name: ${data.eventName}`, 20, yPosition + 20);
-      doc.text(`Event Date: ${formatDate(data.date)}`, 20, yPosition + 30);
-      doc.text(`Location: ${data.location}`, 20, yPosition + 40);
-      doc.text(`Ticket Type: ${data.ticketType}`, 20, yPosition + 50);
-      doc.text(`Price: $${data.price.toFixed(2)}`, 20, yPosition + 60);
-
-      if (data.event?.description) {
-        doc.text(`Description: ${data.event.description}`, 20, yPosition + 70, {
-          maxWidth: 170,
-        });
-      }
-
-      // Add QR code placeholder
-      doc.setDrawColor(0);
-      doc.setFillColor(240, 240, 240);
-      doc.roundedRect(140, yPosition + 70, 50, 50, 3, 3, "FD");
-      doc.setFontSize(8);
-      doc.text("QR Code", 165, yPosition + 95, { align: "center" });
-      doc.text(data.qrCode || "qr12345", 165, yPosition + 100, {
-        align: "center",
-      });
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(24);
+      doc.text("EVENT TICKET", 105, 20, { align: "center" });
 
       doc.setFontSize(12);
-      doc.text(`Ticket ID: ${data.id}`, 20, yPosition + 130);
+      doc.text(`${formatDate(data.eventDate)}`, 105, 30, { align: "center" });
 
-      callback(doc.output("datauristring"));
+      const aspectRatio = img.width / img.height;
+      const imgWidth = 180;
+      const imgHeight = imgWidth / aspectRatio;
+
+      doc.setDrawColor(...secondaryColor);
+      doc.setLineWidth(0.5);
+      doc.rect(15, 50, imgWidth, imgHeight);
+      doc.addImage(img, "JPEG", 15, 50, imgWidth, imgHeight);
+
+      let yPos = 50 + imgHeight + 15;
+
+      doc.setFillColor(...secondaryColor);
+      doc.rect(15, yPos - 10, 180, 15, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text(data.eventName, 105, yPos - 1, { align: "center" });
+
+      yPos += 10;
+      doc.setDrawColor(...secondaryColor);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(15, yPos, 180, 70, 3, 3);
+
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("ORGANIZER", 25, yPos + 15);
+
+      doc.text("LOCATION", 25, yPos + 25);
+
+      doc.text("TIME", 25, yPos + 35);
+
+      doc.text("TICKET TYPE", 25, yPos + 45);
+      doc.text("PRICE", 25, yPos + 55);
+
+      const formattedTimeRange = `${formatTime(data.startTime)} - ${formatTime(
+        data.endTime
+      )}`;
+      doc.setFont("helvetica", "normal");
+      doc.text(data.event.organizer.username, 75, yPos + 15);
+      doc.text(data.location, 75, yPos + 25);
+      doc.text(formattedTimeRange, 75, yPos + 35);
+      doc.text(data.ticketType, 75, yPos + 45);
+      doc.text(`$${data.price.toFixed(2)}`, 75, yPos + 55);
+
+      if (data.qrCodeUrl) {
+        const qrImg = new Image();
+        qrImg.src = data.qrCodeUrl;
+
+        qrImg.onload = () => {
+          doc.setDrawColor(...secondaryColor);
+          doc.setLineWidth(0.5);
+          doc.roundedRect(130, yPos + 5, 55, 55, 3, 3);
+          doc.addImage(qrImg, "PNG", 132.5, yPos + 7.5, 50, 50);
+
+          doc.setFontSize(8);
+          doc.setTextColor(...accentColor);
+          doc.text("SCAN TO VERIFY", 157.5, yPos + 67, { align: "center" });
+
+          finishPdf();
+        };
+
+        qrImg.onerror = () => {
+          doc.setDrawColor(...secondaryColor);
+          doc.setFillColor(240, 240, 240);
+          doc.roundedRect(130, yPos + 5, 55, 55, 3, 3, "FD");
+          doc.setFontSize(10);
+          doc.setTextColor(100, 100, 100);
+          doc.text("QR Code", 157.5, yPos + 25, { align: "center" });
+          doc.text("Failed to load", 157.5, yPos + 35, { align: "center" });
+
+          finishPdf();
+        };
+      } else {
+        doc.setDrawColor(...secondaryColor);
+        doc.setFillColor(240, 240, 240);
+        doc.roundedRect(130, yPos + 5, 55, 55, 3, 3, "FD");
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text("No QR Code", 157.5, yPos + 30, { align: "center" });
+
+        finishPdf();
+      }
+
+      function finishPdf() {
+        yPos += 80;
+        doc.setFillColor(...accentColor);
+        doc.rect(15, yPos, 180, 15, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`TICKET ID: ${data.ticketId || data._id}`, 105, yPos + 10, {
+          align: "center",
+        });
+
+        if (data.event?.description) {
+          yPos += 25;
+          doc.setTextColor(...secondaryColor);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "italic");
+          doc.text("EVENT DESCRIPTION", 15, yPos);
+          doc.setFont("helvetica", "normal");
+          doc.text(data.event.description, 15, yPos + 10, {
+            maxWidth: 180,
+          });
+        }
+
+        if (data.event?.organizer) {
+          yPos += 40;
+          doc.setTextColor(...secondaryColor);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          doc.text("ORGANIZED BY", 15, yPos);
+          doc.setFont("helvetica", "normal");
+          doc.text(
+            data.event.organizer.username || "Event Organizer",
+            15,
+            yPos + 7
+          );
+
+          if (data.event.organizer.contact) {
+            doc.text(`Contact: ${data.event.organizer.contact}`, 15, yPos + 14);
+          }
+        }
+
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 277, 210, 20, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text(
+          "This ticket is valid only for the event and date specified. Non-transferable.",
+          105,
+          287,
+          { align: "center" }
+        );
+        doc.text(`Generated on - ${new Date().toLocaleString()}`, 105, 292, {
+          align: "center",
+        });
+
+        callback(doc.output("datauristring"));
+      }
     });
   };
 
@@ -96,7 +234,7 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
     generatePdfContent((pdfUri) => {
       const doc = new jsPDF();
       doc.loadFile(pdfUri);
-      doc.save(`ticket-${data.id}.pdf`);
+      doc.save(`ticket-${data._id}.pdf`);
     });
   };
 
@@ -140,7 +278,7 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
           <div className="space-y-2 mb-3">
             <div className="flex items-center text-sm text-gray-600">
               <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
-              {formatDate(data.date)}
+              {formatDate(data.eventDate)}
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
@@ -226,10 +364,12 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
 
 UserTicket.propTypes = {
   data: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    _id: PropTypes.string.isRequired,
     eventId: PropTypes.string.isRequired,
     eventName: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
+    eventDate: PropTypes.string.isRequired,
+    startTime: PropTypes.string.isRequired,
+    endTime: PropTypes.string.isRequired,
     location: PropTypes.string.isRequired,
     ticketType: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,

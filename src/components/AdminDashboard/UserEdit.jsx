@@ -9,9 +9,9 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
     name: user.name || "",
     email: user.email || "",
     status: user.isVerified ? "true" : "false",
-    role: user.role || "User",
+    role: user.role || "user",
     image: user.image || "",
-    password: "",
+    password: user.password || "",
   });
 
   const handleChange = (e) => {
@@ -30,9 +30,9 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
       ...formData,
       isVerified: formData.status === "true",
     };
-    if (!isNewUser) {
-      delete finalData.password;
-    }
+    // if (!isNewUser) {
+    //   delete finalData.password;
+    // }
     try {
       if (isNewUser) {
         await createUser(finalData);
@@ -159,26 +159,26 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               <option value="false">Unverified</option>
             </select>
           </div>
-          {isNewUser && (
-            <div className="mb-4">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                className="mt-1 h-[40px] px-2 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-          )}
+
+          <div className="mb-4">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              disabled={loading}
+              required
+              className="mt-1 h-[40px] px-2 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
           <div className="mb-4">
             <label
               htmlFor="image"

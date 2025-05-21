@@ -58,7 +58,7 @@ export default function EventDetailsModal({ event, onClose }) {
             {event.eventImages && event.eventImages.length > 0 ? (
               <div className="rounded-lg overflow-hidden">
                 <img
-                  src="/api/placeholder/800/400"
+                  src={event.eventImages[0]}
                   alt={event.eventName}
                   className="w-full object-cover h-52"
                 />

@@ -9,6 +9,15 @@ import { FileText, MapPin, Phone, User, X } from "phosphor-react";
 import { FaUserCheck } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/AuthStore";
+import { useBookingStore } from "../store/BookingStore";
+
+const mockRefundPolicies = {
+  event101: { policy: "Non-refundable", deadline: null },
+  event102: {
+    policy: "Refundable up to 3 days before event",
+    deadline: "2025-06-07",
+  },
+};
 
 const mockOrders = [
   {
@@ -41,18 +50,11 @@ const mockOrders = [
   },
 ];
 
-const mockRefundPolicies = {
-  event101: { policy: "Non-refundable", deadline: null },
-  event102: {
-    policy: "Refundable up to 3 days before event",
-    deadline: "2025-06-07",
-  },
-};
-
 export default function UserProfileComponent() {
   const { defaultTexts } = useData();
   const { profilePage } = defaultTexts;
   const { user, updateUser, fetchUser: getUser } = useAuthStore();
+  const { getMyBookings } = useBookingStore();
 
   const [profile, setProfile] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -69,6 +71,14 @@ export default function UserProfileComponent() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dataFetched, setDataFetched] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 8,
+    total: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,7 +87,6 @@ export default function UserProfileComponent() {
 
       try {
         setLoading(true);
-
         if (user) {
           setProfile({
             fullName: user.name || user.fullName,
@@ -112,49 +121,59 @@ export default function UserProfileComponent() {
     }
   }, [dataFetched, user]);
 
-  const fetchBoughtTickets = async () => {
+  const fetchBoughtTickets = async (page = 1, limit = 8) => {
     try {
       setLoading(true);
+      const response = await getMyBookings({ page, limit });
 
-      setTimeout(() => {
-        setBoughtTickets([
-          {
-            id: "ticket1",
-            eventId: "event101",
-            eventName: "Jazz Night",
-            date: "2025-05-20",
-            location: "Chicago Jazz Club",
-            ticketType: "VIP",
-            price: 75.0,
-            qrCode: "qr12345",
-          },
-          {
-            id: "ticket2",
-            eventId: "event102",
-            eventName: "Business Workshop",
-            date: "2025-06-10",
-            location: "Downtown Conference Center",
-            ticketType: "Standard",
-            price: 50.0,
-            qrCode: "qr67890",
-          },
-        ]);
-        setLoading(false);
-      }, 500);
+      if (response && response.bookings) {
+        const tickets = response.bookings.flatMap((booking) =>
+          booking.ticketDetails.map((ticket) => ({
+            ...ticket,
+            bookingId: booking._id,
+            eventId: booking.eventId._id,
+            eventName: booking.eventId.eventName,
+            eventDate: booking.eventId.eventDate,
+            startTime: booking.eventId.startTime,
+            endTime: booking.eventId.endTime,
+            location: booking.eventId.venue.name,
+            ticketType: ticket.tierName,
+            price:
+              booking.tickets.find((t) => t.tierName === ticket.tierName)
+                ?.price || 0,
+            event: {
+              poster: booking.eventId.eventImages[0],
+              description: booking.eventId.description,
+              organizer: {
+                username: booking.organizerId.name,
+                contact: booking.organizerId.phone,
+              },
+            },
+          }))
+        );
+
+        setBoughtTickets(tickets);
+        setPagination({
+          page: response.meta.page,
+          limit: response.meta.limit,
+          total: response.meta.total,
+          totalPages: response.meta.totalPage,
+          hasNextPage: response.meta.hasNextPage,
+          hasPreviousPage: response.meta.hasPreviousPage,
+        });
+      }
     } catch (error) {
       console.error("Error fetching bought tickets:", error);
+    } finally {
       setLoading(false);
     }
   };
-
+  // console.log("fetchBoughtTickets", boughtTickets);
   const fetchOrders = async () => {
     try {
       setLoading(true);
-
-      setTimeout(() => {
-        setOrders(mockOrders);
-        setLoading(false);
-      }, 500);
+      // Implement orders fetching if needed
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching orders:", error);
       setLoading(false);
@@ -173,17 +192,8 @@ export default function UserProfileComponent() {
   };
 
   const isRefundable = (ticket) => {
-    const policy = mockRefundPolicies[ticket.eventId];
-    if (!policy) return false;
-
-    if (policy.policy === "Non-refundable") return false;
-
-    if (policy.deadline) {
-      const deadlineDate = new Date(policy.deadline);
-      const today = new Date();
-      return today <= deadlineDate;
-    }
-
+    // Implement refund policy check based on your business logic
+    // For now, we'll assume all tickets are refundable
     return true;
   };
 
@@ -218,13 +228,18 @@ export default function UserProfileComponent() {
 
   const handleCancelEdit = () => {
     setEditMode(false);
-
     setFormData({
       fullName: profile.fullName || "",
       email: profile.email || "",
       phone: profile.phone || "",
       address: profile.address || "",
     });
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchBoughtTickets(newPage, pagination.limit);
+    }
   };
 
   return (
@@ -549,19 +564,57 @@ export default function UserProfileComponent() {
               </p>
             </div>
             <div className="p-6 pt-0">
-              {boughtTickets.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                  {boughtTickets.map((ticket) => (
-                    <div key={ticket.id} className="relative">
-                      <UserTicket
-                        key={ticket.id}
-                        data={ticket}
-                        isRefundable={isRefundable(ticket)}
-                        onRequestRefund={handleRequestRefund}
-                      />
-                    </div>
-                  ))}
+              {loading && boughtTickets.length === 0 ? (
+                <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+                  <p className="text-center text-gray-500">
+                    Loading tickets...
+                  </p>
                 </div>
+              ) : boughtTickets.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                    {boughtTickets.map((ticket, index) => (
+                      <div key={index} className="relative">
+                        <UserTicket
+                          data={ticket}
+                          isRefundable={isRefundable(ticket)}
+                          onRequestRefund={handleRequestRefund}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination controls */}
+                  <div className="mt-6 flex items-center justify-between">
+                    <button
+                      onClick={() => handlePageChange(pagination.page - 1)}
+                      disabled={!pagination.hasPreviousPage || loading}
+                      className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ${
+                        !pagination.hasPreviousPage || loading
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      Previous
+                    </button>
+
+                    <span className="text-sm text-gray-600">
+                      Page {pagination.page} of {pagination.totalPages}
+                    </span>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.page + 1)}
+                      disabled={!pagination.hasNextPage || loading}
+                      className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ${
+                        !pagination.hasNextPage || loading
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
               ) : (
                 <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
                   <p className="text-center text-gray-500">

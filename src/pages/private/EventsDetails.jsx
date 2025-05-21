@@ -37,7 +37,6 @@ const EventsDetails = () => {
     error: eventError,
   } = useEventStore();
 
-  // Fetch event data when component mounts or eventID changes
   useEffect(() => {
     if (eventID) {
       fetchEventById(eventID);
@@ -84,6 +83,11 @@ const EventsDetails = () => {
     return currentTime >= startDate && currentTime <= endDate;
   };
 
+  const handleTicketTypeSelect = (ticketType) => {
+    setSelectedTicketType(ticketType);
+    scrollToSection("register-form");
+  };
+
   const calculateProgress = () => {
     if (!selectedEvent) return 0;
     const totalSold = selectedEvent.ticketTiers.reduce(
@@ -91,11 +95,6 @@ const EventsDetails = () => {
       0
     );
     return (totalSold / selectedEvent.totalCapacity) * 100;
-  };
-
-  const handleTicketTypeSelect = (ticketType) => {
-    setSelectedTicketType(ticketType);
-    scrollToSection("register-form");
   };
 
   if (eventLoading) {
@@ -229,7 +228,7 @@ const EventsDetails = () => {
 
         <div className="container mx-auto px-6 py-12">
           <div className="flex flex-col lg:flex-row gap-12">
-            <div className="lg:w-2/3" id="details">
+            <div className="lg:w-2/3 mx-auto" id="details">
               <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span className="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -486,8 +485,8 @@ const EventsDetails = () => {
               </div>
             </div>
 
-            <div className="lg:w-1/3" id="register-form">
-              {selectedEvent.organizerId?._id === user._id && (
+            {selectedEvent.organizerId?._id === user._id && (
+              <div className="lg:w-1/3">
                 <div className="bg-white rounded-xl shadow-sm p-8 sticky top-32">
                   <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <FaChartBar className="mr-3 text-purple-500" />
@@ -615,18 +614,20 @@ const EventsDetails = () => {
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div>
-        <RegisterForm
-          event={selectedEvent}
-          selectedTicketType={selectedTicketType}
-          onClose={() => setSelectedTicketType(null)}
-        />
-      </div>
+      {user.role === "user" && (
+        <div id="register-form">
+          <RegisterForm
+            event={selectedEvent}
+            selectedTicketType={selectedTicketType}
+            onClose={() => setSelectedTicketType(null)}
+          />
+        </div>
+      )}
     </section>
   );
 };

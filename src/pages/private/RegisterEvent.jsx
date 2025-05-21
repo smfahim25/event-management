@@ -12,11 +12,12 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { useAuthStore } from "../../store/AuthStore";
+import { useBookingStore } from "../../store/BookingStore";
+import toast from "react-hot-toast";
 
-const RegisterForm = ({ event, selectedTicketType }) => {
+const RegisterForm = ({ event, selectedTicketType, onClose }) => {
   const { user } = useAuthStore();
-
-  console.log("Selected Ticket Type:", event);
+  const { createBooking, loading } = useBookingStore();
 
   const [formData, setFormData] = useState({
     username: user?.name || "",
@@ -29,7 +30,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
   const [ticketCounts, setTicketCounts] = useState({});
   const [showFeeInfo, setShowFeeInfo] = useState(null);
 
-  // Initialize ticket counts
   useEffect(() => {
     if (Array.isArray(event?.ticketTiers)) {
       const initialCounts = {};
@@ -47,6 +47,10 @@ const RegisterForm = ({ event, selectedTicketType }) => {
         const currentCount = prev[ticketId] || 0;
         const newCount = Math.max(0, currentCount + change);
 
+        if (currentCount === 1 && newCount === 0 && onClose) {
+          setTimeout(() => onClose(), 0);
+        }
+
         if (ticket && ticket.availableQuantity !== undefined) {
           const available = ticket.availableQuantity - ticket.sold;
           if (newCount > available) {
@@ -57,37 +61,37 @@ const RegisterForm = ({ event, selectedTicketType }) => {
         return { ...prev, [ticketId]: newCount };
       });
     },
-    [event?.ticketTiers]
+    [event?.ticketTiers, onClose]
   );
 
   useEffect(() => {
-    if (selectedTicketType && ticketCounts[selectedTicketType._id] === 0) {
-      handleTicketCountChange(selectedTicketType._id, 1);
+    if (selectedTicketType && selectedTicketType._id) {
+      setTicketCounts((prev) => {
+        if (prev[selectedTicketType._id] === 0) {
+          return { ...prev, [selectedTicketType._id]: 1 };
+        }
+        return prev;
+      });
     }
-  }, [selectedTicketType, ticketCounts, handleTicketCountChange]);
+  }, [selectedTicketType]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const calculateFee = (price) => {
-    return Math.round(price * 0.08 * 100) / 100;
-  };
-
   const calculateTotal = () => {
-    if (!Array.isArray(event.ticketTiers)) return 0;
+    if (!Array.isArray(event?.ticketTiers)) return 0;
 
     return event.ticketTiers.reduce((total, ticket) => {
       const count = ticketCounts[ticket._id] || 0;
       const ticketTotal = ticket.price * count;
-      const feeTotal = calculateFee(ticket.price) * count;
-      return total + ticketTotal + feeTotal;
+      return total + ticketTotal;
     }, 0);
   };
 
   const calculateSubtotal = () => {
-    if (!Array.isArray(event.ticketTiers)) return 0;
+    if (!Array.isArray(event?.ticketTiers)) return 0;
 
     return event.ticketTiers.reduce((total, ticket) => {
       const count = ticketCounts[ticket._id] || 0;
@@ -99,41 +103,48 @@ const RegisterForm = ({ event, selectedTicketType }) => {
     return Object.values(ticketCounts).reduce((sum, count) => sum + count, 0);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (calculateTotalTickets() === 0) {
-      alert("Please select at least one ticket");
+      toast.error("Please select at least one ticket");
       return;
     }
 
     setIsSubmitting(true);
 
-    const ticketData = event.ticketTiers
+    const tickets = event.ticketTiers
       .filter((ticket) => ticketCounts[ticket._id] > 0)
       .map((ticket) => ({
-        ticketId: ticket._id,
-        ticketName: ticket.name,
-        quantity: ticketCounts[ticket._id],
+        ticketTierId: ticket._id,
+        tierName: ticket.name,
         price: ticket.price,
+        quantity: ticketCounts[ticket._id],
       }));
 
-    setTimeout(() => {
-      console.log("Form submitted with:", {
-        ...formData,
-        eventId: event._id,
-        eventName: event.eventName,
-        tickets: ticketData,
-        totalPrice: calculateTotal(),
-      });
+    const bookingData = {
+      eventId: event._id,
+      tickets,
+      paymentMethod: "stripe",
+    };
 
-      alert(
-        `Ticket request submitted for ${
-          event.eventName
-        }. Total: $${calculateTotal().toFixed(2)}`
-      );
+    try {
+      await createBooking(bookingData);
+
+      const resetCounts = {};
+      event.ticketTiers.forEach((ticket) => {
+        resetCounts[ticket._id] = 0;
+      });
+      setTicketCounts(resetCounts);
+
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const toggleFeeInfo = (ticketId) => {
@@ -161,9 +172,7 @@ const RegisterForm = ({ event, selectedTicketType }) => {
 
       <form onSubmit={handleFormSubmit} className="p-6">
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Column - Ticket Selection and User Info */}
           <div className="w-full lg:w-7/12">
-            {/* Ticket Selection */}
             {Array.isArray(event?.ticketTiers) &&
               event?.ticketTiers.length > 0 && (
                 <div className="mb-6">
@@ -173,7 +182,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
 
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
                     {event?.ticketTiers.map((ticket) => {
-                      const fee = calculateFee(ticket.price);
                       const available = ticket.availableQuantity - ticket.sold;
                       return (
                         <div
@@ -192,7 +200,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                                   ${ticket.price.toFixed(2)}
                                 </span>
                                 <span className="text-gray-500 ml-2 text-sm">
-                                  Plus ${fee.toFixed(2)} fee
                                   <button
                                     type="button"
                                     onClick={() => toggleFeeInfo(ticket._id)}
@@ -275,7 +282,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                 </div>
               )}
 
-            {/* Contact Information */}
             <div className="mb-6">
               <label className="block text-gray-700 font-medium mb-3">
                 Contact Information
@@ -314,7 +320,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
             </div>
           </div>
 
-          {/* Right Column - Cart/Order Summary */}
           <div className="w-full lg:w-5/12 md:mt-10">
             <div className="bg-gray-50 rounded-lg p-5 sticky top-4">
               <div className="flex items-center justify-between mb-4">
@@ -334,7 +339,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                 </div>
               ) : (
                 <>
-                  {/* Selected Tickets */}
                   <div className="space-y-3 max-h-[250px] overflow-y-auto mb-4">
                     {getSelectedTickets().map((ticket) => (
                       <div
@@ -346,10 +350,7 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                             {ticket.name}
                           </h4>
                           <div className="flex items-center text-sm text-gray-600">
-                            <span>
-                              ${ticket.price.toFixed(2)} + $
-                              {calculateFee(ticket.price).toFixed(2)} fee
-                            </span>
+                            <span>${ticket.price.toFixed(2)}</span>
                           </div>
                         </div>
 
@@ -377,9 +378,22 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                           </button>
                           <button
                             type="button"
-                            onClick={() =>
-                              handleTicketCountChange(ticket._id, -ticket.count)
-                            }
+                            onClick={() => {
+                              if (ticket.count === 1 && onClose) {
+                                setTicketCounts((prev) => {
+                                  const newState = { ...prev };
+                                  newState[ticket._id] = 0;
+
+                                  setTimeout(() => onClose(), 0);
+                                  return newState;
+                                });
+                              } else {
+                                handleTicketCountChange(
+                                  ticket._id,
+                                  -ticket.count
+                                );
+                              }
+                            }}
                             className="h-8 w-8 flex items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-red-500 hover:bg-red-500 hover:text-white ml-1"
                           >
                             <FaTrash className="text-xs" />
@@ -389,7 +403,6 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                     ))}
                   </div>
 
-                  {/* Order Summary */}
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-600">Subtotal</span>
@@ -411,23 +424,23 @@ const RegisterForm = ({ event, selectedTicketType }) => {
                     </div>
                   </div>
 
-                  {/* Secure Checkout Notice */}
                   <div className="flex items-center text-sm text-gray-500 mt-4 mb-4">
                     <FaLock className="mr-2" />
                     <span>Secure checkout. Your information is protected.</span>
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting || calculateTotalTickets() === 0}
+                    disabled={
+                      isSubmitting || calculateTotalTickets() === 0 || loading
+                    }
                     className={`w-full py-3 px-6 rounded-lg font-semibold text-white text-lg transition-colors duration-200 ${
-                      isSubmitting || calculateTotalTickets() === 0
+                      isSubmitting || calculateTotalTickets() === 0 || loading
                         ? "bg-purple-400 cursor-not-allowed"
                         : "bg-purple-600 hover:bg-purple-700"
                     }`}
                   >
-                    {isSubmitting ? (
+                    {isSubmitting || loading ? (
                       <span className="flex items-center justify-center">
                         <svg
                           className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -465,9 +478,8 @@ const RegisterForm = ({ event, selectedTicketType }) => {
   );
 };
 
-// Add prop validation
 RegisterForm.propTypes = {
-  details: PropTypes.shape({
+  event: PropTypes.shape({
     _id: PropTypes.string,
     eventName: PropTypes.string,
     ticketTiers: PropTypes.arrayOf(
@@ -486,10 +498,7 @@ RegisterForm.propTypes = {
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
   }),
-};
-
-RegisterForm.defaultProps = {
-  selectedTicketType: null,
+  onClose: PropTypes.func,
 };
 
 export default RegisterForm;
