@@ -16,7 +16,7 @@ const Nav = () => {
   const navigate = useNavigate();
   const navRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { defaultTexts, isOrganizer } = useData();
+  const { defaultTexts } = useData();
   const location = useLocation();
   const isProfilePage = location.pathname === "/app/profile";
 
@@ -128,7 +128,7 @@ const Nav = () => {
             {defaultTexts.nav.menuItems[1]}
           </li>
 
-          {!isOrganizer && user?.role === "user" && (
+          {user?.role === "user" && (
             <>
               <li
                 style={{
@@ -152,15 +152,17 @@ const Nav = () => {
           >
             {defaultTexts.nav.menuItems[2]}
           </li>
-          <li
-            className="cursor-pointer"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/dashboard");
-            }}
-          >
-            {defaultTexts.nav.menuItems[4]}
-          </li>
+          {user?.role === "organizer" && (
+            <li
+              className="cursor-pointer"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/dashboard");
+              }}
+            >
+              {defaultTexts.nav.menuItems[4]}
+            </li>
+          )}
           {user && (
             <li
               className="cursor-pointer"
@@ -210,7 +212,7 @@ const Nav = () => {
           {defaultTexts.nav.menuItems[1]}
         </li>
 
-        {!isOrganizer && user?.role === "user" && (
+        {user?.role === "user" && (
           <>
             <li
               style={{
@@ -235,15 +237,17 @@ const Nav = () => {
         >
           {defaultTexts.nav.menuItems[2]}
         </li>
-        <li
-          className="cursor-pointer"
-          onClick={() => {
-            setIsMenuOpen(false);
-            navigate("/dashboard");
-          }}
-        >
-          {defaultTexts.nav.menuItems[4]}
-        </li>
+        {user?.role === "organizer" && (
+          <li
+            className="cursor-pointer"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/dashboard");
+            }}
+          >
+            {defaultTexts.nav.menuItems[4]}
+          </li>
+        )}
       </ul>
 
       <div className="flex gap-3 md:gap-4 lg:gap-5">

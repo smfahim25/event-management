@@ -1,5 +1,6 @@
 import { Clock, MapPin, Calendar, User, PlayCircle, Tag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/AuthStore";
 
 export default function EventCard({
   _id,
@@ -16,6 +17,7 @@ export default function EventCard({
   status,
 }) {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const defaultTexts = { eventCard: { organizedBy: "Organized by" } };
 
   const truncateText = (text, maxLength) =>
@@ -54,8 +56,8 @@ export default function EventCard({
     const statusColors = {
       upcoming: "bg-blue-100 text-blue-800",
       live: "bg-green-100 text-green-800",
-      completed: "bg-gray-100 text-gray-800",
-      cancelled: "bg-red-100 text-red-800",
+      approved: "bg-green-300 text-black",
+      rejected: "bg-red-100 text-red-800",
       postponed: "bg-yellow-100 text-yellow-800",
     };
 
@@ -102,7 +104,7 @@ export default function EventCard({
           className="object-cover h-full w-full transition-transform duration-500 hover:scale-105"
         />
         {renderLiveIndicator()}
-        {renderStatusBadge()}
+        {user?.role === "organizer" && renderStatusBadge()}
       </div>
 
       <div className="p-4 flex flex-col flex-grow">

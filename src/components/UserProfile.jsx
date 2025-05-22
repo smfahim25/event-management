@@ -10,6 +10,7 @@ import { FaUserCheck } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/AuthStore";
 import { useBookingStore } from "../store/BookingStore";
+import toast from "react-hot-toast";
 
 const mockRefundPolicies = {
   event101: { policy: "Non-refundable", deadline: null },
@@ -18,37 +19,6 @@ const mockRefundPolicies = {
     deadline: "2025-06-07",
   },
 };
-
-const mockOrders = [
-  {
-    id: "order1",
-    date: "2025-04-15",
-    total: 149.99,
-    status: "Completed",
-    items: [
-      {
-        id: "ticket1",
-        eventName: "Jazz Night",
-        quantity: 2,
-        price: 75.0,
-      },
-    ],
-  },
-  {
-    id: "order2",
-    date: "2025-03-22",
-    total: 50.0,
-    status: "Completed",
-    items: [
-      {
-        id: "ticket2",
-        eventName: "Business Workshop",
-        quantity: 1,
-        price: 50.0,
-      },
-    ],
-  },
-];
 
 export default function UserProfileComponent() {
   const { defaultTexts } = useData();
@@ -117,11 +87,10 @@ export default function UserProfileComponent() {
   useEffect(() => {
     if (!dataFetched && user) {
       fetchBoughtTickets();
-      fetchOrders();
     }
   }, [dataFetched, user]);
 
-  const fetchBoughtTickets = async (page = 1, limit = 8) => {
+  const fetchBoughtTickets = async (page = 1, limit = 50) => {
     try {
       setLoading(true);
       const response = await getMyBookings({ page, limit });
@@ -135,6 +104,8 @@ export default function UserProfileComponent() {
             eventName: booking.eventId.eventName,
             eventDate: booking.eventId.eventDate,
             startTime: booking.eventId.startTime,
+            refund: booking.eventId.refundPolicy,
+            refundStatus: booking.refundDetails.status,
             endTime: booking.eventId.endTime,
             location: booking.eventId.venue.name,
             ticketType: ticket.tierName,
@@ -161,21 +132,40 @@ export default function UserProfileComponent() {
           hasNextPage: response.meta.hasNextPage,
           hasPreviousPage: response.meta.hasPreviousPage,
         });
+
+        // Transform booking data to orders format
+        const transformedOrders = response.bookings.map((booking) => ({
+          id: booking.orderNumber,
+          status: booking.paymentDetails.status,
+          date: booking.createdAt,
+          eventName: booking.eventId.eventName,
+          eventDate: booking.eventId.eventDate,
+          venue: booking.eventId.venue.name,
+          items: booking.tickets.map((ticket) => ({
+            id: ticket._id,
+            eventName: booking.eventId.eventName,
+            tierName: ticket.tierName,
+            quantity: ticket.quantity,
+            price: ticket.price,
+            totalPrice: ticket.totalPrice,
+          })),
+          paymentDetails: {
+            method: booking.paymentDetails.method,
+            status: booking.paymentDetails.status,
+            totalAmount: booking.paymentDetails.totalAmount,
+            platformFee: booking.paymentDetails.platformFee,
+            organizerRevenue: booking.paymentDetails.organizerRevenue,
+            currency: booking.paymentDetails.currency,
+          },
+          refundDetails: booking.refundDetails,
+          total: booking.paymentDetails.totalAmount,
+        }));
+
+        setOrders(transformedOrders);
       }
     } catch (error) {
       console.error("Error fetching bought tickets:", error);
     } finally {
-      setLoading(false);
-    }
-  };
-  // console.log("fetchBoughtTickets", boughtTickets);
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      // Implement orders fetching if needed
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
       setLoading(false);
     }
   };
@@ -186,15 +176,24 @@ export default function UserProfileComponent() {
   };
 
   const submitRefundRequest = () => {
-    alert(`Refund request submitted for ${selectedTicket.eventName}`);
+    toast.success(`Refund request submitted for ${selectedTicket.eventName}`);
     setIsRefundModalOpen(false);
     setSelectedTicket(null);
   };
 
   const isRefundable = (ticket) => {
-    // Implement refund policy check based on your business logic
-    // For now, we'll assume all tickets are refundable
-    return true;
+    if (!ticket?.eventDate || !ticket?.refundPolicy?.rules?.length)
+      return false;
+
+    const eventDate = new Date(ticket.eventDate);
+    const rule = ticket.refundPolicy.rules[0];
+    const daysBeforeEvent = rule.daysBeforeEvent;
+
+    const now = new Date();
+    const latestRefundDate = new Date(eventDate);
+    latestRefundDate.setDate(eventDate.getDate() - daysBeforeEvent);
+
+    return now <= latestRefundDate;
   };
 
   const handleInputChange = (e) => {
@@ -322,20 +321,20 @@ export default function UserProfileComponent() {
       <div className="w-full">
         <div className="flex space-x-1 rounded-md bg-muted p-1 mb-4">
           <button
-            className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+            className={`flex-1 justify-center rounded-lg px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "profile"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("profile")}
           >
             Profile
           </button>
           <button
-            className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+            className={`flex-1 justify-center rounded-lg px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "tickets"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("tickets")}
           >
@@ -343,10 +342,10 @@ export default function UserProfileComponent() {
             My Tickets
           </button>
           <button
-            className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+            className={`flex-1 justify-center rounded-lg px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "orders"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("orders")}
           >
@@ -572,7 +571,7 @@ export default function UserProfileComponent() {
                 </div>
               ) : boughtTickets.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                  <div className="flex items-center flex-wrap gap-5">
                     {boughtTickets.map((ticket, index) => (
                       <div key={index} className="relative">
                         <UserTicket
@@ -650,36 +649,124 @@ export default function UserProfileComponent() {
                           <h3 className="text-lg font-semibold leading-none tracking-tight">
                             Order #{order.id}
                           </h3>
-                          <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                            {order.status}
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                              order.status === "completed"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : order.status === "pending"
+                                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                : order.status === "failed"
+                                ? "bg-red-50 text-red-700 border-red-200"
+                                : "bg-gray-50 text-gray-700 border-gray-200"
+                            }`}
+                          >
+                            {order.status.charAt(0).toUpperCase() +
+                              order.status.slice(1)}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           Placed on {new Date(order.date).toLocaleDateString()}
                         </p>
                       </div>
+
                       <div className="p-6 pt-0">
-                        <div className="space-y-2">
+                        {/* Event Details */}
+                        <div className="mb-4 p-3 bg-purple-50 rounded-md">
+                          <h4 className="font-medium text-gray-900">
+                            {order.eventName}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            Event Date:{" "}
+                            {new Date(order.eventDate).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Venue: {order.venue}
+                          </p>
+                        </div>
+
+                        {/* Ticket Items */}
+                        <div className="space-y-2 mb-4">
+                          <h5 className="font-medium text-gray-900">
+                            Tickets:
+                          </h5>
                           {order.items.map((item) => (
                             <div
                               key={item.id}
-                              className="flex justify-between items-center"
+                              className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
                             >
                               <div>
-                                <p className="font-medium">{item.eventName}</p>
+                                <p className="font-medium">{item.tierName}</p>
                                 <p className="text-sm text-gray-500">
-                                  Qty: {item.quantity}
+                                  Qty: {item.quantity} × $
+                                  {item.price.toFixed(2)}
                                 </p>
                               </div>
                               <p className="font-medium">
-                                ${item.price.toFixed(2)}
+                                ${item.totalPrice.toFixed(2)}
                               </p>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-4 pt-4 border-t flex justify-between">
-                          <p className="font-bold">Total</p>
-                          <p className="font-bold">${order.total.toFixed(2)}</p>
+
+                        {/* Payment Details */}
+                        <div className="mb-4 p-3 bg-purple-100 rounded-md">
+                          <h5 className="font-medium text-blue-900 mb-2">
+                            Payment Details:
+                          </h5>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-blue-600">Method:</span>
+                              <span className="ml-2 capitalize">
+                                {order.paymentDetails.method}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-blue-600">Currency:</span>
+                              <span className="ml-2">
+                                {order.paymentDetails.currency}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-blue-600">
+                                Platform Fee:
+                              </span>
+                              <span className="ml-2">
+                                ${order.paymentDetails.platformFee.toFixed(2)}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-blue-600">
+                                Organizer Revenue:
+                              </span>
+                              <span className="ml-2">
+                                $
+                                {order.paymentDetails.organizerRevenue.toFixed(
+                                  2
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Refund Status */}
+                        {order.refundDetails.status !== "none" && (
+                          <div className="mb-4 p-3 bg-orange-50 rounded-md">
+                            <h5 className="font-medium text-orange-900">
+                              Refund Status:
+                            </h5>
+                            <p className="text-sm text-orange-700 capitalize">
+                              {order.refundDetails.status}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Total */}
+                        <div className="pt-4 border-t flex justify-between">
+                          <p className="font-bold">Total Amount</p>
+                          <p className="font-bold text-lg">
+                            ${order.total.toFixed(2)}{" "}
+                            {order.paymentDetails.currency}
+                          </p>
                         </div>
                       </div>
                     </div>

@@ -135,9 +135,13 @@ export const useBookingStore = create((set, get) => ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/organizer/export/${eventId}`, {
+      const url = `${API_BASE}/organizer/export${
+        eventId ? `?eventId=${eventId}` : ""
+      }`;
+      const res = await fetch(url, {
         headers: get().getHeaders(),
       });
+
       if (!res.ok) throw new Error("Failed to export bookings.");
       toast.success("Bookings exported successfully.");
       return await res.blob();
@@ -149,20 +153,28 @@ export const useBookingStore = create((set, get) => ({
     }
   },
 
-  getAllBookings: async () => {
+  getAllBookings: async (params = {}) => {
     const { setLoading, setError } = get();
     setLoading(true);
     setError(null);
     try {
       const url = new URL(`${API_BASE}`);
-      url.searchParams.append("page", 1);
-      url.searchParams.append("limit", 50);
-      const res = await fetch(url, {
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, value);
+        }
+      });
+
+      const res = await fetch(url.toString(), {
         headers: get().getHeaders(),
       });
+
       const data = await res.json();
+
       if (!res.ok)
         throw new Error(data?.message || "Failed to fetch bookings.");
+
       return data;
     } catch (error) {
       toast.error(error.message);
@@ -269,6 +281,7 @@ export const useBookingStore = create((set, get) => ({
       if (!res.ok)
         throw new Error(data?.message || "Failed to request refund.");
       toast.success("Refund request submitted.");
+      await get().getMyBookings();
       return data;
     } catch (error) {
       toast.error(error.message);
@@ -298,6 +311,38 @@ export const useBookingStore = create((set, get) => ({
       return data;
     } catch (error) {
       toast.error(error.message);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  },
+  getRefundBookings: async ({ eventId, userId }) => {
+    const { setLoading, setError } = get();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const url = new URL(`${API_BASE}/refunds`);
+
+      if (eventId) url.searchParams.append("eventId", eventId);
+      if (userId) url.searchParams.append("userId", userId);
+
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          ...get().getHeaders(),
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to fetch refunds.");
+      }
+
+      return data;
+    } catch (error) {
+      toast.error(error.message || "Error fetching refunds");
       setError(error);
     } finally {
       setLoading(false);

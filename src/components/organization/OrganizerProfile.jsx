@@ -261,8 +261,8 @@ const OrganizerProfile = () => {
           <button
             className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "profile"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("profile")}
           >
@@ -271,8 +271,8 @@ const OrganizerProfile = () => {
           <button
             className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "events"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("events")}
           >
@@ -282,8 +282,8 @@ const OrganizerProfile = () => {
           <button
             className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
               activeTab === "dashboard"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-purple-200 text-foreground shadow-lg"
+                : "text-muted-foreground shadow-md"
             }`}
             onClick={() => setActiveTab("dashboard")}
           >
@@ -299,8 +299,8 @@ const OrganizerProfile = () => {
               <button
                 className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
                   activeProfileTab === "user"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
+                    ? "bg-purple-200 text-foreground shadow-lg"
+                    : "text-muted-foreground shadow-md"
                 }`}
                 onClick={() => setActiveProfileTab("user")}
               >
@@ -309,8 +309,8 @@ const OrganizerProfile = () => {
               <button
                 className={`flex-1 justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
                   activeProfileTab === "organizer"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
+                    ? "bg-purple-200 text-foreground shadow-lg"
+                    : "text-muted-foreground shadow-md"
                 }`}
                 onClick={() => setActiveProfileTab("organizer")}
               >

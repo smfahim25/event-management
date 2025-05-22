@@ -7,63 +7,35 @@ import {
   FiDownload,
   FiMenu,
   FiX,
-  FiPlus,
 } from "react-icons/fi";
-import RefundPolicyManager from "../../components/organization/RefundPolicy";
 import StripeDashboard from "../../components/organization/StripeDashboard";
 import EarningsSummary from "../../components/organization/OrganizationSummary";
 import EventCard from "../../components/ui/EventCard";
+import { useData } from "../../context/DataContext";
+import { useEventStore } from "../../store/EventStore";
+import AttendeeTable from "../../components/organization/AttendeeList";
+import Nav from "../../components/Nav";
+import { useBookingStore } from "../../store/BookingStore";
+import RefundTable from "../../components/organization/RefundTable";
 
 const OrganizerDashboard = () => {
+  const { defaultTexts } = useData();
+  const { profilePage } = defaultTexts;
   const [activeTab, setActiveTab] = useState("overview");
   const [dateRange, setDateRange] = useState("7days");
   const [isExporting, setIsExporting] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState("all");
-  const [events, setEvents] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [createdEvents, setCreatedEvents] = useState([]);
+
+  const { events, fetchOrganizerEvents } = useEventStore();
+  const { exportBookings } = useBookingStore();
 
   const fetchCreatedEvents = async () => {
     try {
-      // setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setCreatedEvents([
-          {
-            id: "event1",
-            title: "Tech Conference 2025",
-            date: "2025-06-15",
-            location: "San Francisco, CA",
-            imageUrl: "/images/event1.jpg",
-            description:
-              "Annual technology conference featuring the latest innovations",
-            price: 99.99,
-          },
-          {
-            id: "event2",
-            title: "Music Festival",
-            date: "2025-07-22",
-            location: "Austin, TX",
-            imageUrl: "/images/event2.jpg",
-            description: "Three-day music festival with top artists",
-            price: 149.99,
-          },
-          {
-            id: "event3",
-            title: "Art Exhibition",
-            date: "2025-05-30",
-            location: "New York, NY",
-            imageUrl: "/images/event3.jpg",
-            description: "Contemporary art exhibition featuring local artists",
-            price: 25.0,
-          },
-        ]);
-        // setLoading(false);
-      }, 500);
+      await fetchOrganizerEvents();
     } catch (error) {
       console.error("Error fetching created events:", error);
-      // setLoading(false);
     }
   };
 
@@ -71,53 +43,50 @@ const OrganizerDashboard = () => {
     fetchCreatedEvents();
   }, []);
 
-  // Fetch dashboard data
   useEffect(() => {
-    // Simulate API call
     const fetchDashboardData = () => {
-      // Mock data
-      const mockEvents = [
-        { id: "event1", name: "Tech Conference 2025" },
-        { id: "event2", name: "Music Festival" },
-        { id: "event3", name: "Art Exhibition" },
-      ];
-
       const mockDashboardData = {
         totalSales: 156,
         totalRevenue: 8750.5,
-        platformFee: 875.05, // 10% of revenue
+        platformFee: 875.05,
         netEarnings: 7875.45,
         ticketsSold: 243,
         averageTicketPrice: 36.01,
         conversionRate: 68.5,
         refundRate: 3.2,
       };
-
-      setEvents(mockEvents);
       setDashboardData(mockDashboardData);
     };
 
     fetchDashboardData();
   }, [dateRange, selectedEvent]);
 
-  // Handle export attendee list
-  const handleExportAttendees = () => {
+  const handleExportAttendees = async () => {
     setIsExporting(true);
 
-    // Simulate export process
-    setTimeout(() => {
+    try {
+      const blob = await exportBookings(
+        selectedEvent === "all" ? "" : selectedEvent
+      );
+
+      if (blob) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+
+        a.download = "bookings.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
       setIsExporting(false);
-      alert("Attendee list exported successfully!");
-    }, 1500);
+    }
   };
 
-  // Handle save refund policies
-  const handleSaveRefundPolicies = (policies) => {
-    console.log("Saving refund policies:", policies);
-    alert("Refund policies saved successfully!");
-  };
-
-  // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setMobileMenuOpen(false);
@@ -143,7 +112,8 @@ const OrganizerDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-8 sm:pb-12">
       {/* Dashboard Header */}
-      <div className="bg-white border-b">
+      <Nav />
+      <div className="bg-white border-b mt-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -173,8 +143,8 @@ const OrganizerDashboard = () => {
                   >
                     <option value="all">All Events</option>
                     {events.map((event) => (
-                      <option key={event.id} value={event.id}>
-                        {event.name}
+                      <option key={event._id} value={event._id}>
+                        {event.eventName}
                       </option>
                     ))}
                   </select>
@@ -250,8 +220,8 @@ const OrganizerDashboard = () => {
             >
               <option value="all">All Events</option>
               {events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
+                <option key={event._id} value={event._id}>
+                  {event.eventName}
                 </option>
               ))}
             </select>
@@ -350,16 +320,6 @@ const OrganizerDashboard = () => {
               Payouts
             </button>
             <button
-              onClick={() => handleTabChange("refunds")}
-              className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
-                activeTab === "refunds"
-                  ? "border-purple-500 text-purple-600"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              }`}
-            >
-              Refund Policies
-            </button>
-            <button
               onClick={() => handleTabChange("mytickets")}
               className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
                 activeTab === "mytickets"
@@ -369,18 +329,34 @@ const OrganizerDashboard = () => {
             >
               My Tickets
             </button>
+            <button
+              onClick={() => handleTabChange("attendee")}
+              className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                activeTab === "attendee"
+                  ? "border-purple-500 text-purple-600"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`}
+            >
+              Attendees
+            </button>
+            <button
+              onClick={() => handleTabChange("refund")}
+              className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                activeTab === "refund"
+                  ? "border-purple-500 text-purple-600"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`}
+            >
+              Refund requests
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Dashboard Content */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
-        {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="space-y-6 sm:space-y-8">
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Total Revenue Card */}
               <div className="overflow-hidden rounded-lg bg-white shadow">
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center">
@@ -410,7 +386,6 @@ const OrganizerDashboard = () => {
                 </div>
               </div>
 
-              {/* Tickets Sold Card */}
               <div className="overflow-hidden rounded-lg bg-white shadow">
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center">
@@ -441,7 +416,6 @@ const OrganizerDashboard = () => {
                 </div>
               </div>
 
-              {/* Conversion Rate Card */}
               <div className="overflow-hidden rounded-lg bg-white shadow">
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center">
@@ -471,7 +445,6 @@ const OrganizerDashboard = () => {
                 </div>
               </div>
 
-              {/* Refund Rate Card */}
               <div className="overflow-hidden rounded-lg bg-white shadow">
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center">
@@ -492,13 +465,10 @@ const OrganizerDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 sm:px-5 py-2 sm:py-3">
+                <div className="bg-gray-50 px-4 sm:px-5 py-4 sm:py-5">
                   <div className="text-xs sm:text-sm">
-                    <button
-                      onClick={() => handleTabChange("refunds")}
-                      className="font-medium text-purple-600 hover:text-purple-900"
-                    >
-                      Manage refund policies
+                    <button className="font-medium text-gray-500 ">
+                      Of refund policies
                     </button>
                   </div>
                 </div>
@@ -519,36 +489,15 @@ const OrganizerDashboard = () => {
           </div>
         )}
 
-        {/* Earnings Tab */}
         {activeTab === "earnings" && (
           <div className="space-y-6 sm:space-y-8">
             <EarningsSummary eventId={selectedEvent} />
           </div>
         )}
 
-        {/* Payouts Tab */}
         {activeTab === "payouts" && (
           <div className="space-y-6 sm:space-y-8">
             <StripeDashboard />
-          </div>
-        )}
-
-        {/* Refund Policies Tab */}
-        {activeTab === "refunds" && (
-          <div className="space-y-6 sm:space-y-8">
-            <div className="overflow-hidden rounded-lg bg-white shadow">
-              <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200">
-                <h3 className="text-base sm:text-lg font-medium leading-6 text-gray-900">
-                  Refund Policy Management
-                </h3>
-              </div>
-              <div className="p-4 sm:p-6">
-                <RefundPolicyManager
-                  eventId={selectedEvent}
-                  onSave={handleSaveRefundPolicies}
-                />
-              </div>
-            </div>
           </div>
         )}
 
@@ -560,9 +509,9 @@ const OrganizerDashboard = () => {
               </p>
             </div>
             <div className="p-6 pt-0">
-              {createdEvents.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                  {createdEvents.map((event) => (
+              {events.length > 0 ? (
+                <div className="flex flex-wrap gap-5 items-center">
+                  {events.map((event) => (
                     <EventCard key={event.id} {...event} />
                   ))}
                 </div>
@@ -575,6 +524,17 @@ const OrganizerDashboard = () => {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === "attendee" && (
+          <div className="space-y-6 sm:space-y-8">
+            <AttendeeTable eventId={selectedEvent} />
+          </div>
+        )}
+        {activeTab === "refund" && (
+          <div className="space-y-6 sm:space-y-8">
+            <RefundTable eventId={selectedEvent} />
           </div>
         )}
       </div>

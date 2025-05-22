@@ -48,9 +48,7 @@ const EditEvent = () => {
     tags: [],
   });
 
-  const [previewImages, setPreviewImages] = useState([
-    "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",
-  ]);
+  const [previewImages, setPreviewImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [activeSection, setActiveSection] = useState("basic"); // basic, pricing, refund
   const [refundPolicies, setRefundPolicies] = useState([]);
@@ -317,18 +315,21 @@ const EditEvent = () => {
       formDataObj.append(`tags[${index}]`, tag);
     });
 
-    if (refundPoliciesEnabled && refundPolicies.length > 0) {
+    if (refundPoliciesEnabled && refundPolicies) {
       formDataObj.append("refundPolicy[type]", "time-based");
-      refundPolicies.forEach((policy, index) => {
-        formDataObj.append(
-          `refundPolicy[rules][${index}][timeBeforeEvent]`,
-          policy.timeBeforeEvent
-        );
-        formDataObj.append(
-          `refundPolicy[rules][${index}][refundPercentage]`,
-          policy.refundPercentage
-        );
-      });
+
+      formDataObj.append(
+        `refundPolicy[rules][daysBeforeEvent]`,
+        refundPolicies.daysBeforeEvent
+      );
+      formDataObj.append(
+        `refundPolicy[rules][refundPercentage]`,
+        refundPolicies.refundPercentage
+      );
+      formDataObj.append(
+        `refundPolicy[rules][description]`,
+        refundPolicies.description
+      );
     }
 
     if (formData.poster && formData.poster.length > 0) {
@@ -1096,8 +1097,8 @@ const EditEvent = () => {
                 <div className="bg-white rounded-lg">
                   {refundPoliciesEnabled ? (
                     <RefundPolicyManager
-                      eventId={eventID}
                       onSave={handleSaveRefundPolicies}
+                      initial={refundPolicies}
                     />
                   ) : (
                     <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">

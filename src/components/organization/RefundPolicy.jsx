@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FiCalendar, FiPlus, FiTrash2, FiInfo, FiCheck } from "react-icons/fi";
 import PropTypes from "prop-types";
 
-const RefundPolicyManager = ({ eventId, onSave }) => {
+const RefundPolicyManager = ({ onSave, initial }) => {
   const [policies, setPolicies] = useState([]);
   const [newPolicy, setNewPolicy] = useState({
     daysBeforeEvent: 7,
@@ -11,37 +11,81 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const initialized = useRef(false);
+  // const initialPolicyIdRef = useRef(null);
 
   useEffect(() => {
-    // Simulate fetching policies for this event
-    setTimeout(() => {
-      setPolicies([
-        {
-          id: "policy_1",
-          daysBeforeEvent: 7,
-          refundPercentage: 50,
-          description: "50% refund if canceled 7 days before the event",
-          isDefault: true,
-        },
-        {
-          id: "policy_2",
-          daysBeforeEvent: 14,
-          refundPercentage: 75,
-          description: "75% refund if canceled 14 days before the event",
-          isDefault: false,
-        },
-        {
-          id: "policy_3",
-          daysBeforeEvent: 30,
-          refundPercentage: 100,
-          description: "100% refund if canceled 30 days before the event",
-          isDefault: false,
-        },
-      ]);
-      setSelectedPolicy("policy_1");
-      setIsLoading(false);
-    }, 800);
-  }, [eventId]);
+    let isMounted = true;
+
+    if (!initialized.current && initial?.length) {
+      initialized.current = true;
+
+      const loadPolicies = () => {
+        const defaultPolicies = [
+          {
+            id: "policy_1",
+            daysBeforeEvent: 7,
+            refundPercentage: 50,
+            description: "50% refund if canceled 7 days before the event",
+            isDefault: true,
+          },
+          {
+            id: "policy_2",
+            daysBeforeEvent: 14,
+            refundPercentage: 75,
+            description: "75% refund if canceled 14 days before the event",
+            isDefault: false,
+          },
+          {
+            id: "policy_3",
+            daysBeforeEvent: 30,
+            refundPercentage: 100,
+            description: "100% refund if canceled 30 days before the event",
+            isDefault: false,
+          },
+        ];
+
+        let updatedPolicies = [...defaultPolicies];
+        let selectedId = null;
+
+        const initialId =
+          initial[0]._id ||
+          `custom_${initial[0].daysBeforeEvent}_${initial[0].refundPercentage}`;
+
+        // Always create or find the initial policy
+        const existingPolicy = updatedPolicies.find(
+          (p) =>
+            p.daysBeforeEvent === initial[0].daysBeforeEvent &&
+            p.refundPercentage === initial[0].refundPercentage
+        );
+
+        if (existingPolicy) {
+          selectedId = existingPolicy.id;
+        } else {
+          const newPolicy = {
+            id: initialId,
+            ...initial[0],
+            isDefault: false,
+          };
+          updatedPolicies.push(newPolicy);
+          selectedId = initialId;
+        }
+
+        if (isMounted) {
+          setPolicies(updatedPolicies);
+          setSelectedPolicy(selectedId); // Force select the initial policy
+          setIsLoading(false);
+          onSave(updatedPolicies.find((p) => p.id === selectedId));
+        }
+      };
+
+      // Remove timeout for more predictable behavior
+      loadPolicies();
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [initial, onSave]);
 
   const handleAddPolicy = () => {
     if (!newPolicy.description) {
@@ -89,17 +133,8 @@ const RefundPolicyManager = ({ eventId, onSave }) => {
 
   const handleSelectPolicy = (policyId) => {
     setSelectedPolicy(policyId);
-    const updatedPolicies = policies.map((policy) => ({
-      ...policy,
-      isDefault: policy.id === selectedPolicy,
-    }));
-    const selectedPolicyDetails = updatedPolicies.find(
-      (policy) => policy.id === policyId
-    );
-
-    console.log("Selected Policy:", selectedPolicyDetails);
-
-    onSave(selectedPolicyDetails);
+    const selected = policies.find((p) => p.id === policyId);
+    onSave(selected);
   };
 
   if (isLoading) {

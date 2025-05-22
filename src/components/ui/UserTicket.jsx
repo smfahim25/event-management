@@ -9,12 +9,17 @@ import {
 } from "react-icons/fi";
 import jsPDF from "jspdf";
 import PropTypes from "prop-types";
+import { useBookingStore } from "../../store/BookingStore";
+import toast from "react-hot-toast";
 
-const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
+const UserTicket = ({ data, isRefundable = false }) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundReason, setRefundReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [pdfContent, setPdfContent] = useState(null);
+  const { requestRefund } = useBookingStore();
 
-  // Format date to a readable string
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -228,22 +233,48 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
     });
   };
 
-  // Handle ticket download
   const handleDownload = (e) => {
     e.stopPropagation();
     generatePdfContent((pdfUri) => {
-      const doc = new jsPDF();
-      doc.loadFile(pdfUri);
-      doc.save(`ticket-${data._id}.pdf`);
+      const link = document.createElement("a");
+      link.href = pdfUri;
+      link.download = `ticket-${data._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     });
   };
 
-  // Handle refund request
   const handleRequestRefund = (e) => {
     e.stopPropagation();
-    if (onRequestRefund) {
-      onRequestRefund(data);
+    setShowRefundModal(true);
+  };
+
+  const handleRefundSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!refundReason.trim()) {
+      return;
     }
+
+    setIsSubmitting(true);
+
+    try {
+      await requestRefund(data.bookingId || data._id, refundReason.trim());
+
+      setShowRefundModal(false);
+      setRefundReason("");
+    } catch (error) {
+      console.error("Error submitting refund request:", error);
+      toast.error("Failed to submit refund request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRefundModalClose = () => {
+    setShowRefundModal(false);
+    setRefundReason("");
   };
 
   return (
@@ -251,7 +282,7 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
       {/* Ticket Card */}
       <div
         onClick={handlePreview}
-        className="w-full overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-100 group cursor-pointer"
+        className="w-[300px] overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-100 group cursor-pointer"
       >
         {/* Ticket Header with Image */}
         <div className="relative h-40 w-full overflow-hidden">
@@ -294,15 +325,24 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-3">
-            <button
-              className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
-              onClick={handleDownload}
-            >
-              <FiDownload className="mr-2 h-4 w-4" />
-              Download
-            </button>
-
-            {isRefundable && (
+            {data.refundStatus === "none" && (
+              <button
+                className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+                onClick={handleDownload}
+              >
+                <FiDownload className="mr-2 h-4 w-4" />
+                Download
+              </button>
+            )}
+            {data.refundStatus === "requested" && (
+              <button
+                className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+                onClick={handleDownload}
+              >
+                Refund requested
+              </button>
+            )}
+            {isRefundable && data.refundStatus === "none" && (
               <button
                 className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
                 onClick={handleRequestRefund}
@@ -314,6 +354,72 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
           </div>
         </div>
       </div>
+
+      {/* Refund Reason Modal */}
+      {showRefundModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={handleRefundModalClose}
+        >
+          <div
+            className="relative mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">
+                Request Refund
+              </h2>
+              <button
+                className="rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                onClick={handleRefundModalClose}
+                disabled={isSubmitting}
+              >
+                <FiX className="h-5 w-5" />
+                <span className="sr-only">Close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleRefundSubmit}>
+              <div className="mb-4">
+                <label
+                  htmlFor="refundReason"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Reason for refund request
+                  <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="refundReason"
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Please explain why you want to request a refund..."
+                  className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  disabled={isSubmitting}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleRefundModalClose}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-violet-600 rounded-md hover:from-purple-700 hover:to-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || !refundReason.trim()}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Request"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Ticket Preview Modal */}
       {showPreview && (
@@ -365,6 +471,8 @@ const UserTicket = ({ data, isRefundable = false, onRequestRefund }) => {
 UserTicket.propTypes = {
   data: PropTypes.shape({
     _id: PropTypes.string.isRequired,
+    bookingId: PropTypes.string,
+    refundStatus: PropTypes.string,
     eventId: PropTypes.string.isRequired,
     eventName: PropTypes.string.isRequired,
     eventDate: PropTypes.string.isRequired,
