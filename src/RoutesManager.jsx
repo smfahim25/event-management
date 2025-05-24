@@ -1,5 +1,3 @@
-// src/RoutesManager.js
-
 import { Routes, Route } from "react-router-dom";
 
 import LandingPage from "./pages/public/LandingPage";
@@ -7,12 +5,9 @@ import EventsPage from "./pages/private/EventsPage";
 import ProfilePage from "./pages/private/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
-
 import EventsDetails from "./pages/private/EventsDetails";
-
 import SuccessPage from "./pages/payment/SuccessPage";
 import CancelPage from "./pages/payment/CancelPage";
-import RegisterEvent from "./pages/private/RegisterEvent";
 import SuccessSplit from "./pages/payment/SuccessSplit";
 import ContactPage from "./pages/public/ContactPage";
 import EditEvent from "./components/EditEvent";
@@ -31,6 +26,9 @@ import OrganizerRegistrationForm from "./components/organization/OrganizerRegist
 import SettingsPage from "./components/AdminDashboard/Settings";
 import EventPreferences from "./pages/private/EventPreference";
 import CategoryManagement from "./components/AdminDashboard/CategoryManagement";
+import RequireUser from "./pages/private/RequireUser";
+import RequireOrganizer from "./pages/private/RequireOrganizer";
+import RequireAdmin from "./pages/private/RequireAdmin";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -52,18 +50,56 @@ function RoutesManager() {
 
       {/* Protected Routes */}
       <Route path="/app/events" element={<EventsPage />} />
-      <Route path="/app/profile" element={<ProfilePage />} />
-      <Route path="/app/register-event/:eventID" element={<RegisterEvent />} />
-
-      <Route path="/app/eventDetails/:eventID" element={<EventsDetails />} />
-      <Route path="/app/edit-Event/:eventID" element={<EditEvent />} />
-      <Route path="/app/create-event" element={<CreateEventForm />} />
       <Route
-        path="/app/create-organizer"
-        element={<OrganizerRegistrationForm />}
+        path="/app/profile"
+        element={
+          <RequireUser>
+            <ProfilePage />
+          </RequireUser>
+        }
       />
 
-      <Route path="/admin" element={<AdminDashboard />}>
+      <Route
+        path="/app/eventDetails/:eventID"
+        element={
+          <RequireUser>
+            <EventsDetails />
+          </RequireUser>
+        }
+      />
+      <Route
+        path="/app/edit-Event/:eventID"
+        element={
+          <RequireOrganizer>
+            <EditEvent />
+          </RequireOrganizer>
+        }
+      />
+      <Route
+        path="/app/create-event"
+        element={
+          <RequireOrganizer>
+            <CreateEventForm />
+          </RequireOrganizer>
+        }
+      />
+      <Route
+        path="/app/create-organizer"
+        element={
+          <RequireOrganizer>
+            <OrganizerRegistrationForm />
+          </RequireOrganizer>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <RequireAdmin>
+            <AdminDashboard />
+          </RequireAdmin>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="users" element={<UserManagement />} />
@@ -75,7 +111,14 @@ function RoutesManager() {
         <Route path="content" element={<ContentManagement />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
-      <Route path="/dashboard" element={<OrganizerDashboard />} />
+      <Route
+        path="/dashboard"
+        element={
+          <RequireOrganizer>
+            <OrganizerDashboard />
+          </RequireOrganizer>
+        }
+      />
 
       {/* Catch-all Route */}
       <Route path="/success" element={<SuccessPage />} />

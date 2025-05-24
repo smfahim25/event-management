@@ -1,112 +1,26 @@
+import { useNavigate } from "react-router-dom";
+import { useSettingsStore } from "../../store/SettingsStore";
 import PendingApprovalCard from "./PendingApprovalCard";
-import RecentEventsTable from "./RecentEvents";
-import RevenueChart from "./RevenueChart";
 import StatsCard from "./StatsCard";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
-  const [dashboardData, setDashboardData] = useState({
-    totalEvents: 0,
-    activeEvents: 0,
-    activeOrganizers: 0,
-    totalOrganizers: 0,
-    totalRevenue: 0,
-    platformCommission: 0,
-    totalUsers: 0,
-    revenueByMonth: [],
-    recentEvents: [],
-  });
-
-  const [pendingApprovals, setPendingApprovals] = useState({
-    organizers: 0,
-    events: 0,
-    refunds: 0,
-  });
-
-  const handleSectionChange = (section) => {
-    console.log(`Navigating to section: ${section}`);
-  };
+  const [dashboardData, setDashboardData] = useState(null);
+  const { adminStats, fetchAdminStats } = useSettingsStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      await fetchAdminStats();
+    };
     fetchDashboardData();
-    fetchPendingApprovals();
-  }, []);
+  }, [fetchAdminStats]);
 
-  const fetchDashboardData = () => {
-    setTimeout(() => {
-      setDashboardData({
-        totalEvents: 156,
-        activeEvents: 42,
-        activeOrganizers: 28,
-        totalOrganizers: 54,
-        totalRevenue: 125750.25,
-        platformCommission: 12575.03,
-        totalUsers: 1254,
-        revenueByMonth: [
-          { month: "Jan", revenue: 10500 },
-          { month: "Feb", revenue: 12000 },
-          { month: "Mar", revenue: 15000 },
-          { month: "Apr", revenue: 18500 },
-          { month: "May", revenue: 22000 },
-          { month: "Jun", revenue: 24750 },
-          { month: "Jul", revenue: 23000 },
-        ],
-        recentEvents: [
-          {
-            id: "evt-001",
-            name: "Tech Conference 2025",
-            date: "2025-06-15",
-            organizer: "TechHub Inc.",
-            attendees: 450,
-            revenue: 22500,
-          },
-          {
-            id: "evt-002",
-            name: "Summer Music Festival",
-            date: "2025-07-22",
-            organizer: "Music Alliance",
-            attendees: 1200,
-            revenue: 36000,
-          },
-          {
-            id: "evt-003",
-            name: "Startup Workshop",
-            date: "2025-05-28",
-            organizer: "Founder Network",
-            attendees: 120,
-            revenue: 6000,
-          },
-          {
-            id: "evt-004",
-            name: "Design Summit",
-            date: "2025-06-05",
-            organizer: "Design Guild",
-            attendees: 350,
-            revenue: 17500,
-          },
-          {
-            id: "evt-005",
-            name: "Health & Wellness Expo",
-            date: "2025-07-10",
-            organizer: "Wellness Partners",
-            attendees: 800,
-            revenue: 24000,
-          },
-        ],
-      });
-    }, 500);
-  };
-
-  const fetchPendingApprovals = () => {
-    // Simulate API response
-    setTimeout(() => {
-      setPendingApprovals({
-        organizers: 5,
-        events: 12,
-        refunds: 8,
-      });
-    }, 700);
-  };
+  useEffect(() => {
+    if (adminStats) {
+      setDashboardData(adminStats);
+    }
+  }, [adminStats]);
 
   return (
     <div>
@@ -116,7 +30,7 @@ export default function Dashboard() {
       <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Events"
-          value={dashboardData.totalEvents}
+          value={dashboardData?.totalEvents}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -133,12 +47,12 @@ export default function Dashboard() {
               />
             </svg>
           }
-          footer={`${dashboardData.activeEvents} active events`}
+          footer={`${dashboardData?.totalActiveEvents} active events`}
         />
 
         <StatsCard
           title="Active Organizers"
-          value={dashboardData.activeOrganizers}
+          value={dashboardData?.activeOrganizers}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -155,12 +69,12 @@ export default function Dashboard() {
               />
             </svg>
           }
-          footer={`${dashboardData.totalOrganizers} total organizers`}
+          footer={`${dashboardData?.totalOrganizers} total organizers`}
         />
 
         <StatsCard
           title="Total Revenue"
-          value={`$${dashboardData.totalRevenue.toFixed(2)}`}
+          value={`$${dashboardData?.totalRevenue?.toFixed(2)}`}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -177,13 +91,15 @@ export default function Dashboard() {
               />
             </svg>
           }
-          footer={`$${dashboardData.platformCommission.toFixed(2)} commission`}
+          footer={`$${dashboardData?.totalPlatformCommission?.toFixed(
+            2
+          )} commission`}
           footerColor="text-green-600"
         />
 
         <StatsCard
           title="Total Users"
-          value={dashboardData.totalUsers}
+          value={dashboardData?.totalUsers}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +118,7 @@ export default function Dashboard() {
           }
           footer={
             <button
-              onClick={() => handleSectionChange("users")}
+              onClick={() => navigate("/admin/users")}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               View all users
@@ -219,7 +135,7 @@ export default function Dashboard() {
         <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3">
           <PendingApprovalCard
             title="Organizer Approvals"
-            count={pendingApprovals.organizers}
+            count={dashboardData?.pendingOrganizers}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -236,34 +152,11 @@ export default function Dashboard() {
                 />
               </svg>
             }
-            onClick={() => handleSectionChange("organizers")}
           />
 
           <PendingApprovalCard
             title="Event Approvals"
-            count={pendingApprovals.events}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-indigo-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            }
-            onClick={() => handleSectionChange("events")}
-          />
-
-          <PendingApprovalCard
-            title="Refund Requests"
-            count={pendingApprovals.refunds}
+            count={dashboardData?.pendingRefunds}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -280,22 +173,8 @@ export default function Dashboard() {
                 />
               </svg>
             }
-            onClick={() => handleSectionChange("refunds")}
           />
         </div>
-      </div>
-
-      {/* Revenue Chart */}
-      <div className="mt-8">
-        <RevenueChart data={dashboardData.revenueByMonth} />
-      </div>
-
-      {/* Recent Events */}
-      <div className="mt-8">
-        <RecentEventsTable
-          events={dashboardData.recentEvents}
-          onViewAll={() => handleSectionChange("events")}
-        />
       </div>
     </div>
   );

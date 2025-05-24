@@ -2,13 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../../store/AuthStore";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar({
-  mobileMenuOpen,
-  setMobileMenuOpen,
-  pendingApprovals,
-  dateRange,
-  setDateRange,
-}) {
+export default function Navbar({ mobileMenuOpen, setMobileMenuOpen }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user, logout } = useAuthStore();
@@ -32,11 +26,6 @@ export default function Navbar({
     logout();
     navogate("/");
   };
-
-  const totalNotifications =
-    pendingApprovals.organizers +
-    pendingApprovals.events +
-    pendingApprovals.refunds;
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -91,45 +80,6 @@ export default function Navbar({
           </div>
           <div className="flex items-center">
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <div className="relative">
-                <select
-                  value={dateRange}
-                  onChange={(e) => setDateRange(e.target.value)}
-                  className="rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm font-medium text-gray-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                >
-                  <option value="7days">Last 7 Days</option>
-                  <option value="30days">Last 30 Days</option>
-                  <option value="90days">Last 90 Days</option>
-                  <option value="year">This Year</option>
-                  <option value="all">All Time</option>
-                </select>
-              </div>
-              <div className="ml-3 relative">
-                <button className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  <span className="sr-only">View notifications</span>
-                  <div className="relative">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {totalNotifications > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                        {totalNotifications}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              </div>
               <div className="ml-3 relative" ref={dropdownRef}>
                 <div>
                   <button

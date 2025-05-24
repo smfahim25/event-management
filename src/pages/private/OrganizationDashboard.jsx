@@ -22,14 +22,13 @@ const OrganizerDashboard = () => {
   const { defaultTexts } = useData();
   const { profilePage } = defaultTexts;
   const [activeTab, setActiveTab] = useState("overview");
-  const [dateRange, setDateRange] = useState("7days");
   const [isExporting, setIsExporting] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { events, fetchOrganizerEvents } = useEventStore();
-  const { exportBookings } = useBookingStore();
+  const { exportBookings, getOrganizerDashboard } = useBookingStore();
 
   const fetchCreatedEvents = async () => {
     try {
@@ -38,28 +37,19 @@ const OrganizerDashboard = () => {
       console.error("Error fetching created events:", error);
     }
   };
+  const fetchDashboardData = async () => {
+    try {
+      const data = await getOrganizerDashboard();
+      setDashboardData(data?.data);
+    } catch (error) {
+      console.error("Error fetching created events:", error);
+    }
+  };
 
   useEffect(() => {
     fetchCreatedEvents();
-  }, []);
-
-  useEffect(() => {
-    const fetchDashboardData = () => {
-      const mockDashboardData = {
-        totalSales: 156,
-        totalRevenue: 8750.5,
-        platformFee: 875.05,
-        netEarnings: 7875.45,
-        ticketsSold: 243,
-        averageTicketPrice: 36.01,
-        conversionRate: 68.5,
-        refundRate: 3.2,
-      };
-      setDashboardData(mockDashboardData);
-    };
-
     fetchDashboardData();
-  }, [dateRange, selectedEvent]);
+  }, []);
 
   const handleExportAttendees = async () => {
     setIsExporting(true);
@@ -149,19 +139,7 @@ const OrganizerDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <div className="relative">
-                  <select
-                    value={dateRange}
-                    onChange={(e) => setDateRange(e.target.value)}
-                    className="rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm font-medium text-gray-700 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  >
-                    <option value="7days">Last 7 Days</option>
-                    <option value="30days">Last 30 Days</option>
-                    <option value="90days">Last 90 Days</option>
-                    <option value="year">This Year</option>
-                    <option value="all">All Time</option>
-                  </select>
-                </div>
+
                 <button
                   onClick={handleExportAttendees}
                   disabled={isExporting}
@@ -226,22 +204,7 @@ const OrganizerDashboard = () => {
               ))}
             </select>
           </div>
-          <div className="flex flex-col space-y-2">
-            <label className="text-xs font-medium text-gray-500">
-              Time Range
-            </label>
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm font-medium text-gray-700 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-            >
-              <option value="7days">Last 7 Days</option>
-              <option value="30days">Last 30 Days</option>
-              <option value="90days">Last 90 Days</option>
-              <option value="year">This Year</option>
-              <option value="all">All Time</option>
-            </select>
-          </div>
+
           <button
             onClick={handleExportAttendees}
             disabled={isExporting}
@@ -370,7 +333,7 @@ const OrganizerDashboard = () => {
                         </dt>
                         <dd>
                           <div className="text-base sm:text-lg font-medium text-gray-900">
-                            ${dashboardData.totalRevenue.toFixed(2)}
+                            ${dashboardData?.grossRevenue}
                           </div>
                         </dd>
                       </dl>
@@ -380,7 +343,8 @@ const OrganizerDashboard = () => {
                 <div className="bg-gray-50 px-4 sm:px-5 py-2 sm:py-3">
                   <div className="text-xs sm:text-sm">
                     <span className="font-medium text-gray-500">
-                      Net: ${dashboardData.netEarnings.toFixed(2)} (after fees)
+                      Net: ${dashboardData?.netEarnings?.toFixed(2)} (after
+                      fees)
                     </span>
                   </div>
                 </div>
@@ -399,19 +363,11 @@ const OrganizerDashboard = () => {
                         </dt>
                         <dd>
                           <div className="text-base sm:text-lg font-medium text-gray-900">
-                            {dashboardData.ticketsSold}
+                            {dashboardData?.totalTicketsSold}
                           </div>
                         </dd>
                       </dl>
                     </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 sm:px-5 py-2 sm:py-3">
-                  <div className="text-xs sm:text-sm">
-                    <span className="font-medium text-gray-500">
-                      Avg. ${dashboardData.averageTicketPrice.toFixed(2)} per
-                      ticket
-                    </span>
                   </div>
                 </div>
               </div>
@@ -425,11 +381,11 @@ const OrganizerDashboard = () => {
                     <div className="ml-3 sm:ml-5 w-0 flex-1">
                       <dl>
                         <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                          Conversion Rate
+                          Total Bookings
                         </dt>
                         <dd>
                           <div className="text-base sm:text-lg font-medium text-gray-900">
-                            {dashboardData.conversionRate}%
+                            {dashboardData.totalBookings}
                           </div>
                         </dd>
                       </dl>
@@ -439,7 +395,7 @@ const OrganizerDashboard = () => {
                 <div className="bg-gray-50 px-4 sm:px-5 py-2 sm:py-3">
                   <div className="text-xs sm:text-sm">
                     <span className="font-medium text-gray-500">
-                      Of page visitors who purchased
+                      page visitors who purchased
                     </span>
                   </div>
                 </div>
@@ -458,14 +414,14 @@ const OrganizerDashboard = () => {
                         </dt>
                         <dd>
                           <div className="text-base sm:text-lg font-medium text-gray-900">
-                            {dashboardData.refundRate}%
+                            {dashboardData?.refundRate}%
                           </div>
                         </dd>
                       </dl>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 sm:px-5 py-4 sm:py-5">
+                <div className="bg-gray-50 px-4 sm:px-5 py-4 sm:py-3">
                   <div className="text-xs sm:text-sm">
                     <button className="font-medium text-gray-500 ">
                       Of refund policies
@@ -483,7 +439,7 @@ const OrganizerDashboard = () => {
                 </h3>
               </div>
               <div className="p-4 sm:p-6">
-                <EarningsSummary eventId={selectedEvent} />
+                <EarningsSummary data={dashboardData} />
               </div>
             </div>
           </div>

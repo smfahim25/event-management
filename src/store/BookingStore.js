@@ -348,4 +348,30 @@ export const useBookingStore = create((set, get) => ({
       setLoading(false);
     }
   },
+  getOrganizerDashboard: async () => {
+    const { setLoading, setError } = get();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/organizer/dashboard`, {
+        method: "GET",
+        headers: {
+          ...get().getHeaders(),
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to fetch dashboard data.");
+      }
+      return data;
+    } catch (error) {
+      toast.error(error.message || "Error fetching dashboard data");
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  },
 }));

@@ -271,15 +271,17 @@ export default function UserProfileComponent() {
               </div>
             </div>
 
-            <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
-              <button
-                onClick={() => navigate("/app/create-organizer")}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white h-10 px-4 py-2"
-              >
-                <FiCreditCard className="mr-2 h-4 w-4" />
-                Become an Organizer
-              </button>
-            </div>
+            {user?.role === "user" && (
+              <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
+                <button
+                  onClick={() => navigate("/app/create-organizer")}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white h-10 px-4 py-2"
+                >
+                  <FiCreditCard className="mr-2 h-4 w-4" />
+                  Become an Organizer
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

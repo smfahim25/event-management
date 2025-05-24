@@ -1,19 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSettingsStore } from "../../store/SettingsStore";
 
 export default function SettingsPage() {
-  const [companyName, setCompanyName] = useState("TECH PLANES");
-  const [currency, setCurrency] = useState("$ (Dollar)");
+  const [companyName, setCompanyName] = useState("");
   const [taxAlias, setTaxAlias] = useState("GST");
   const [taxPercentage, setTaxPercentage] = useState("12");
-  const [expiryDays, setExpiryDays] = useState("30");
+  const [daysBeforeProductExpiry, setDaysBeforeProductExpiry] = useState("30");
   const [address, setAddress] = useState("");
   const [logo, setLogo] = useState("/placeholder.svg?height=100&width=100");
+  const [logoFile, setLogoFile] = useState(null);
   const [isLogoUploaded, setIsLogoUploaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { settings, fetchSettings, updateSettings } = useSettingsStore();
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        setIsLoading(true);
+        await fetchSettings();
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, [fetchSettings]);
+
+  useEffect(() => {
+    if (settings) {
+      setCompanyName(settings.companyName || "");
+
+      setTaxAlias(settings.taxAlias || "GST");
+      setTaxPercentage(settings.taxPercentage?.toString() || "12");
+      setDaysBeforeProductExpiry(
+        settings.daysBeforeProductExpiry?.toString() || "30"
+      );
+      setAddress(settings.address || "");
+
+      if (settings.companyLogo) {
+        setLogo(settings.companyLogo);
+        setIsLogoUploaded(true);
+      }
+    }
+  }, [settings]);
 
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      setLogoFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result) {
@@ -25,14 +63,42 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveChanges = () => {
-    setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
+  const handleSaveChanges = async () => {
+    try {
+      setIsSaving(true);
+
+      const formData = new FormData();
+
+      formData.append("companyName", companyName);
+      formData.append("taxAlias", taxAlias);
+      formData.append("taxPercentage", taxPercentage);
+      formData.append("daysBeforeProductExpiry", daysBeforeProductExpiry);
+      formData.append("address", address);
+
+      if (logoFile) {
+        formData.append("companyLogo", logoFile);
+      }
+      await updateSettings(formData);
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      alert("Failed to save settings. Please try again.");
+    } finally {
       setIsSaving(false);
-      alert("Settings saved successfully!");
-    }, 1000);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">Loading settings...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -97,49 +163,6 @@ export default function SettingsPage() {
               />
             </div>
 
-            {/* Currency Symbol */}
-            <div>
-              <label
-                htmlFor="currency"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Currency Symbol
-              </label>
-              <div className="relative">
-                <select
-                  id="currency"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="appearance-none w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option>$ (Dollar)</option>
-                  <option>€ (Euro)</option>
-                  <option>£ (Pound)</option>
-                  <option>₹ (Rupee)</option>
-                  <option>¥ (Yen)</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-              <p className="mt-1 text-sm text-gray-500">
-                Used in invoices and reports
-              </p>
-            </div>
-
             {/* Tax Alias */}
             <div>
               <label
@@ -155,10 +178,8 @@ export default function SettingsPage() {
                   onChange={(e) => setTaxAlias(e.target.value)}
                   className="appearance-none w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option>GST</option>
-                  <option>VAT</option>
-                  <option>Sales Tax</option>
-                  <option>Service Tax</option>
+                  <option value="GST">GST</option>
+                  <option value="VAT">VAT</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <svg
@@ -210,8 +231,8 @@ export default function SettingsPage() {
               <input
                 type="number"
                 id="expiry-days"
-                value={expiryDays}
-                onChange={(e) => setExpiryDays(e.target.value)}
+                value={daysBeforeProductExpiry}
+                onChange={(e) => setDaysBeforeProductExpiry(e.target.value)}
                 min="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
@@ -250,6 +271,7 @@ export default function SettingsPage() {
                   <button
                     onClick={() => {
                       setLogo("/placeholder.svg?height=100&width=100");
+                      setLogoFile(null);
                       setIsLogoUploaded(false);
                     }}
                     className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:bg-gray-100"

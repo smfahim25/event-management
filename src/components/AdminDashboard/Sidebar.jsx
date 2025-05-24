@@ -1,14 +1,18 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/AuthStore";
 import { CiSettings } from "react-icons/ci";
 import { TbCategory } from "react-icons/tb";
 import { LiaUsersSolid } from "react-icons/lia";
 
-export default function Sidebar({
-  pendingApprovals,
-  setMobileMenuOpen,
-  mobileMenuOpen,
-}) {
+export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   // Navigation items with routes
   const navItems = [
@@ -76,7 +80,6 @@ export default function Sidebar({
           />
         </svg>
       ),
-      badge: pendingApprovals?.organizers,
     },
     {
       id: "events",
@@ -98,7 +101,6 @@ export default function Sidebar({
           />
         </svg>
       ),
-      badge: pendingApprovals?.events,
     },
     {
       id: "commission",
@@ -127,7 +129,6 @@ export default function Sidebar({
       name: "Attendees List",
       path: "/admin/refunds",
       icon: <LiaUsersSolid size={25} />,
-      badge: pendingApprovals?.refunds,
     },
     {
       id: "categories",
@@ -206,6 +207,63 @@ export default function Sidebar({
               {navItems.map((item) => renderSidebarItem(item))}
             </nav>
           </div>
+          {/* Desktop Footer */}
+          <div className="flex-shrink-0 border-t border-gray-200 px-4 py-2">
+            <div className="flex items-center mb-3">
+              <img
+                className="h-8 w-8 rounded-full"
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="Admin profile"
+              />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700">
+                  {user?.name || "Admin"}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Link
+                to="/"
+                className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+                Back Home
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -251,23 +309,64 @@ export default function Sidebar({
                 {navItems.map((item) => renderSidebarItem(item, true))}
               </nav>
             </div>
-            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-              <div className="flex items-center">
-                <div>
-                  <img
-                    className="inline-block h-10 w-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt="Admin profile"
-                  />
-                </div>
+            <div className="flex-shrink-0 border-t border-gray-200 p-4">
+              <div className="flex items-center mb-3">
+                <img
+                  className="inline-block h-10 w-10 rounded-full"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Admin profile"
+                />
                 <div className="ml-3">
                   <p className="text-base font-medium text-gray-700">
-                    Admin User
-                  </p>
-                  <p className="text-sm font-medium text-gray-500">
-                    admin@example.com
+                    {user?.name || "Admin"}
                   </p>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors duration-200"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    />
+                  </svg>
+                  Back Home
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors duration-200"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  Sign Out
+                </button>
               </div>
             </div>
           </div>

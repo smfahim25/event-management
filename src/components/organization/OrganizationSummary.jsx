@@ -1,89 +1,253 @@
-import { useState, useEffect } from "react";
-import {
-  FiDollarSign,
-  FiTrendingUp,
-  FiCalendar,
-  FiPieChart,
-} from "react-icons/fi";
-import PropTypes from "prop-types";
+const DollarSign = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+    />
+  </svg>
+);
 
-const EarningsSummary = ({ eventId }) => {
-  const [earningsData, setEarningsData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState("all");
+const TrendingUp = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+    />
+  </svg>
+);
 
-  useEffect(() => {
-    setTimeout(() => {
-      const mockData = {
-        totalGross: 5250.0,
-        platformFee: 525.0,
-        netEarnings: 4725.0,
-        ticketsSold: 105,
-        averageTicketPrice: 50.0,
-        ticketTypes: [
-          { name: "General Admission", count: 75, revenue: 3000.0 },
-          { name: "VIP", count: 20, revenue: 1600.0 },
-          { name: "Early Bird", count: 10, revenue: 650.0 },
-        ],
-        dailyEarnings: [
-          { date: "2025-05-01", gross: 1200, net: 1080 },
-          { date: "2025-05-02", gross: 800, net: 720 },
-          { date: "2025-05-03", gross: 1500, net: 1350 },
-          { date: "2025-05-04", gross: 950, net: 855 },
-          { date: "2025-05-05", gross: 800, net: 720 },
-        ],
-      };
-      setEarningsData(mockData);
-      setIsLoading(false);
-    }, 1000);
-  }, [eventId, timeRange]);
+const Calendar = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+);
 
-  if (isLoading) {
-    return (
-      <div className="animate-pulse space-y-6">
-        <div className="h-8 bg-gray-200 rounded w-full sm:w-1/3"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-          <div className="h-32 bg-gray-200 rounded"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
+const PieChart = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
+    />
+  </svg>
+);
+
+const EarningsSummary = ({ data }) => {
+  const sampleData = {
+    grossRevenue: 15000,
+    netEarnings: 13500,
+    totalTicketsSold: 150,
+    ticketTypeSales: {
+      "General Admission": 80,
+      VIP: 30,
+      "Early Bird": 40,
+    },
+  };
+
+  const currentData = data || sampleData;
+
+  const ticketTypes = currentData?.ticketTypeSales
+    ? Object.entries(currentData.ticketTypeSales).map(([name, count]) => ({
+        name,
+        count,
+        revenue:
+          (currentData.grossRevenue / currentData.totalTicketsSold) * count,
+      }))
+    : [];
+
+  const PieChartComponent = ({ ticketTypes }) => {
+    if (!ticketTypes || ticketTypes.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-48 text-gray-500">
+          No ticket data available
         </div>
-        <div className="h-64 bg-gray-200 rounded"></div>
+      );
+    }
+
+    const totalRevenue = ticketTypes.reduce((sum, t) => sum + t.revenue, 0);
+    const colors = ["#8b5cf6", "#ec4899", "#3b82f6", "#10b981", "#f59e0b"];
+
+    if (ticketTypes.length === 1) {
+      return (
+        <div className="relative h-48 sm:h-64 flex items-center justify-center">
+          <svg
+            width="200"
+            height="200"
+            viewBox="0 0 200 200"
+            className="max-w-full max-h-full"
+          >
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              fill={colors[0]}
+              stroke="white"
+              strokeWidth="2"
+            />
+
+            <circle
+              cx="100"
+              cy="100"
+              r="40"
+              fill="white"
+              stroke="#e5e7eb"
+              strokeWidth="1"
+            />
+
+            <text
+              x="100"
+              y="95"
+              textAnchor="middle"
+              className="text-xs font-medium fill-gray-600"
+            >
+              Total
+            </text>
+            <text
+              x="100"
+              y="110"
+              textAnchor="middle"
+              className="text-sm font-bold fill-gray-900"
+            >
+              ${totalRevenue.toFixed(0)}
+            </text>
+          </svg>
+        </div>
+      );
+    }
+
+    let cumulativeAngle = 0;
+
+    return (
+      <div className="relative h-48 sm:h-64 flex items-center justify-center">
+        <svg
+          width="200"
+          height="200"
+          viewBox="0 0 200 200"
+          className="max-w-full max-h-full"
+        >
+          {ticketTypes.map((ticket, index) => {
+            const percentage = (ticket.revenue / totalRevenue) * 100;
+            const angle = (ticket.revenue / totalRevenue) * 360;
+
+            if (percentage < 0.5) return null;
+
+            const startAngle = cumulativeAngle;
+            const endAngle = cumulativeAngle + angle;
+
+            const startRad = (startAngle - 90) * (Math.PI / 180);
+            const endRad = (endAngle - 90) * (Math.PI / 180);
+
+            const radius = 80;
+            const centerX = 100;
+            const centerY = 100;
+
+            const x1 = centerX + radius * Math.cos(startRad);
+            const y1 = centerY + radius * Math.sin(startRad);
+            const x2 = centerX + radius * Math.cos(endRad);
+            const y2 = centerY + radius * Math.sin(endRad);
+
+            const largeArcFlag = angle > 180 ? 1 : 0;
+
+            const pathData = [
+              `M ${centerX} ${centerY}`,
+              `L ${x1} ${y1}`,
+              `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+              "Z",
+            ].join(" ");
+
+            cumulativeAngle += angle;
+
+            return (
+              <path
+                key={index}
+                d={pathData}
+                fill={colors[index % colors.length]}
+                stroke="white"
+                strokeWidth="2"
+              />
+            );
+          })}
+
+          <circle
+            cx="100"
+            cy="100"
+            r="40"
+            fill="white"
+            stroke="#e5e7eb"
+            strokeWidth="1"
+          />
+
+          <text
+            x="100"
+            y="95"
+            textAnchor="middle"
+            className="text-xs font-medium fill-gray-600"
+          >
+            Total
+          </text>
+          <text
+            x="100"
+            y="110"
+            textAnchor="middle"
+            className="text-sm font-bold fill-gray-900"
+          >
+            ${totalRevenue.toFixed(0)}
+          </text>
+        </svg>
       </div>
     );
-  }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
-        <h3 className="text-lg font-medium text-gray-900">Earnings Summary</h3>
-        <div>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
-          >
-            <option value="7days">Last 7 days</option>
-            <option value="30days">Last 30 days</option>
-            <option value="90days">Last 90 days</option>
-            <option value="all">All time</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
+    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        {/* Gross Earnings */}
         <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 sm:p-3 rounded-full bg-green-100 mr-3 sm:mr-4">
-              <FiDollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+              <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-medium text-gray-500">
                 Gross Earnings
               </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                ${earningsData.totalGross.toFixed(2)}
+                ${currentData?.grossRevenue?.toFixed(2) || "0.00"}
               </p>
             </div>
           </div>
@@ -91,24 +255,23 @@ const EarningsSummary = ({ eventId }) => {
             <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">Platform Fee (10%)</span>
               <span className="font-medium text-gray-700">
-                -${earningsData.platformFee.toFixed(2)}
+                -${((currentData?.grossRevenue || 0) * 0.1).toFixed(2)}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Net Earnings */}
         <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 sm:p-3 rounded-full bg-purple-100 mr-3 sm:mr-4">
-              <FiTrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-medium text-gray-500">
                 Net Earnings
               </p>
               <p className="text-xl sm:text-2xl font-bold text-purple-600">
-                ${earningsData.netEarnings.toFixed(2)}
+                ${currentData?.netEarnings?.toFixed(2) || "0.00"}
               </p>
             </div>
           </div>
@@ -117,7 +280,8 @@ const EarningsSummary = ({ eventId }) => {
               <span className="text-gray-500">After platform fees</span>
               <span className="font-medium text-gray-700">
                 {(
-                  (earningsData.netEarnings / earningsData.totalGross) *
+                  ((currentData?.netEarnings || 0) /
+                    (currentData?.grossRevenue || 1)) *
                   100
                 ).toFixed(0)}
                 % of gross
@@ -126,18 +290,17 @@ const EarningsSummary = ({ eventId }) => {
           </div>
         </div>
 
-        {/* Tickets Sold */}
         <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 sm:p-3 rounded-full bg-blue-100 mr-3 sm:mr-4">
-              <FiCalendar className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-medium text-gray-500">
                 Tickets Sold
               </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                {earningsData.ticketsSold}
+                {currentData?.totalTicketsSold || 0}
               </p>
             </div>
           </div>
@@ -145,162 +308,29 @@ const EarningsSummary = ({ eventId }) => {
             <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">Avg. Ticket Price</span>
               <span className="font-medium text-gray-700">
-                ${earningsData.averageTicketPrice.toFixed(2)}
+                $
+                {(
+                  (currentData?.grossRevenue || 0) /
+                  (currentData?.totalTicketsSold || 1)
+                ).toFixed(2)}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Earnings Over Time */}
-        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
-          <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
-            Earnings Over Time
-          </h4>
-          <div className="h-48 sm:h-64">
-            <div className="relative h-full">
-              {/* Y-axis labels */}
-              <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-xs text-gray-500 py-2">
-                <span>$0</span>
-                <span>
-                  $
-                  {Math.round(
-                    Math.max(
-                      ...earningsData.dailyEarnings.map((d) => d.gross)
-                    ) / 2
-                  )}
-                </span>
-                <span>
-                  $
-                  {Math.round(
-                    Math.max(...earningsData.dailyEarnings.map((d) => d.gross))
-                  )}
-                </span>
-              </div>
+      <div className="bg-white md:max-w-3xl mx-auto rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+        <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
+          Earnings by Ticket Type
+        </h4>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PieChartComponent ticketTypes={ticketTypes} />
 
-              {/* Chart area */}
-              <div className="absolute inset-0 ml-8 sm:ml-12">
-                {/* Horizontal grid lines */}
-                <div className="absolute inset-0 flex flex-col justify-between">
-                  <div className="border-t border-gray-200 h-0"></div>
-                  <div className="border-t border-gray-200 h-0"></div>
-                  <div className="border-t border-gray-200 h-0"></div>
-                </div>
-
-                {/* Bars */}
-                <div className="absolute inset-0 flex items-end justify-around">
-                  {earningsData.dailyEarnings.map((day, index) => {
-                    const maxGross = Math.max(
-                      ...earningsData.dailyEarnings.map((d) => d.gross)
-                    );
-                    const grossHeight = (day.gross / maxGross) * 100;
-                    const netHeight = (day.net / maxGross) * 100;
-
-                    return (
-                      <div key={index} className="flex flex-col items-center">
-                        <div className="relative w-6 sm:w-12 flex items-end">
-                          {/* Gross bar (background) */}
-                          <div
-                            className="absolute w-4 sm:w-8 bg-purple-200 rounded-t"
-                            style={{ height: `${grossHeight}%` }}
-                          ></div>
-                          {/* Net bar (foreground) */}
-                          <div
-                            className="absolute w-4 sm:w-8 bg-purple-600 rounded-t"
-                            style={{ height: `${netHeight}%` }}
-                          ></div>
-                        </div>
-                        <span className="mt-1 text-xs text-gray-500 text-center">
-                          {new Date(day.date).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center justify-center space-x-4 sm:space-x-6 flex-wrap">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-purple-600 rounded-sm mr-2"></div>
-              <span className="text-xs text-gray-600">Net Earnings</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-purple-200 rounded-sm mr-2"></div>
-              <span className="text-xs text-gray-600">Platform Fee</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Ticket Type Distribution */}
-        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
-          <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
-            Earnings by Ticket Type
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Pie Chart */}
-            <div className="relative h-48 sm:h-64 flex items-center justify-center">
-              <svg
-                width="160"
-                height="160"
-                viewBox="0 0 100 100"
-                className="sm:w-[180px] sm:h-[180px]"
-              >
-                {/* Create pie chart segments */}
-                {earningsData.ticketTypes.map((ticket, index, array) => {
-                  // Calculate start and end angles for pie segments
-                  const totalRevenue = array.reduce(
-                    (sum, t) => sum + t.revenue,
-                    0
-                  );
-                  const percentage = (ticket.revenue / totalRevenue) * 100;
-
-                  let startAngle = 0;
-                  for (let i = 0; i < index; i++) {
-                    startAngle += (array[i].revenue / totalRevenue) * 360;
-                  }
-                  const endAngle =
-                    startAngle + (ticket.revenue / totalRevenue) * 360;
-
-                  // Convert angles to radians
-                  const startRad = (startAngle - 90) * (Math.PI / 180);
-                  const endRad = (endAngle - 90) * (Math.PI / 180);
-
-                  // Calculate path
-                  const x1 = 50 + 40 * Math.cos(startRad);
-                  const y1 = 50 + 40 * Math.sin(startRad);
-                  const x2 = 50 + 40 * Math.cos(endRad);
-                  const y2 = 50 + 40 * Math.sin(endRad);
-
-                  // Determine if the arc should be drawn as a large arc
-                  const largeArcFlag = percentage > 50 ? 1 : 0;
-
-                  return (
-                    <path
-                      key={index}
-                      d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                      fill={
-                        ["#8b5cf6", "#ec4899", "#3b82f6", "#10b981", "#f59e0b"][
-                          index % 5
-                        ]
-                      }
-                    />
-                  );
-                })}
-                {/* Center circle for donut chart */}
-                <circle cx="50" cy="50" r="25" fill="white" />
-              </svg>
-            </div>
-
-            {/* Legend and Stats */}
-            <div className="space-y-3 sm:space-y-4">
-              {earningsData.ticketTypes.map((ticket, index) => {
-                const totalRevenue = earningsData.ticketTypes.reduce(
+          {/* Legend and Stats */}
+          <div className="space-y-3 sm:space-y-4">
+            {ticketTypes.length > 0 ? (
+              ticketTypes.map((ticket, index) => {
+                const totalRevenue = ticketTypes.reduce(
                   (sum, t) => sum + t.revenue,
                   0
                 );
@@ -308,6 +338,13 @@ const EarningsSummary = ({ eventId }) => {
                   (ticket.revenue / totalRevenue) *
                   100
                 ).toFixed(1);
+                const colors = [
+                  "#8b5cf6",
+                  "#ec4899",
+                  "#3b82f6",
+                  "#10b981",
+                  "#f59e0b",
+                ];
 
                 return (
                   <div
@@ -316,17 +353,11 @@ const EarningsSummary = ({ eventId }) => {
                   >
                     <div className="flex items-center">
                       <div
-                        className="h-3 w-3 rounded-sm mr-2"
+                        className="h-3 w-3 rounded-sm mr-3 flex-shrink-0"
                         style={{
-                          backgroundColor: [
-                            "#8b5cf6",
-                            "#ec4899",
-                            "#3b82f6",
-                            "#10b981",
-                            "#f59e0b",
-                          ][index % 5],
+                          backgroundColor: colors[index % colors.length],
                         }}
-                      ></div>
+                      />
                       <span className="text-xs sm:text-sm text-gray-700">
                         {ticket.name}
                       </span>
@@ -341,8 +372,12 @@ const EarningsSummary = ({ eventId }) => {
                     </div>
                   </div>
                 );
-              })}
-            </div>
+              })
+            ) : (
+              <div className="text-center text-gray-500 text-sm">
+                No ticket sales data available
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -351,7 +386,7 @@ const EarningsSummary = ({ eventId }) => {
       <div className="bg-purple-50 rounded-xl p-4 sm:p-6 border border-purple-100">
         <div className="flex items-start">
           <div className="flex-shrink-0">
-            <FiPieChart className="h-5 w-5 text-purple-600" />
+            <PieChart className="h-5 w-5 text-purple-600" />
           </div>
           <div className="ml-3">
             <h3 className="text-sm font-medium text-purple-800">
@@ -368,9 +403,6 @@ const EarningsSummary = ({ eventId }) => {
       </div>
     </div>
   );
-};
-EarningsSummary.propTypes = {
-  eventId: PropTypes.string.isRequired,
 };
 
 export default EarningsSummary;

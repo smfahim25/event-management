@@ -29,7 +29,6 @@ export default function RefundTable({ eventId, userId }) {
         if (response?.success) {
           setRefundBookings(response.data || []);
 
-          // If the API returns pagination metadata
           if (response.meta) {
             setPagination({
               page: response.meta.page || 1,
@@ -40,7 +39,6 @@ export default function RefundTable({ eventId, userId }) {
               hasPreviousPage: response.meta.hasPreviousPage || false,
             });
           } else {
-            // If no pagination metadata, calculate based on data length
             setPagination((prev) => ({
               ...prev,
               total: response.data.length,
@@ -67,7 +65,6 @@ export default function RefundTable({ eventId, userId }) {
 
   const hasActiveFilters = searchTerm;
 
-  // Format date to readable string
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -351,7 +348,6 @@ export default function RefundTable({ eventId, userId }) {
                         <button
                           className="inline-flex items-center px-2.5 py-1.5 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                           onClick={() => {
-                            // Handle approve action
                             toast.success(
                               `Approved refund for order ${booking.orderNumber}`
                             );
@@ -362,7 +358,6 @@ export default function RefundTable({ eventId, userId }) {
                         <button
                           className="inline-flex items-center px-2.5 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                           onClick={() => {
-                            // Handle reject action
                             toast.success(
                               `Rejected refund for order ${booking.orderNumber}`
                             );

@@ -250,98 +250,102 @@ const EventsDetails = () => {
                   {selectedEvent.description}
                 </p>
 
-                <div className="mt-8">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600 font-medium">
-                      Tickets Remaining
-                    </span>
-                    <span className="text-gray-800 font-bold">
-                      {selectedEvent.totalCapacity -
-                        selectedEvent.ticketTiers.reduce(
-                          (sum, tier) => sum + tier.sold,
-                          0
-                        )}{" "}
-                      of {selectedEvent.totalCapacity}
-                    </span>
+                {user?.role === "organizer" && (
+                  <div className="mt-8">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-gray-600 font-medium">
+                        Tickets Remaining
+                      </span>
+                      <span className="text-gray-800 font-bold">
+                        {selectedEvent.totalCapacity -
+                          selectedEvent.ticketTiers.reduce(
+                            (sum, tier) => sum + tier.sold,
+                            0
+                          )}{" "}
+                        of {selectedEvent.totalCapacity}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div
+                        className="bg-purple-600 h-2.5 rounded-full"
+                        style={{ width: `${calculateProgress()}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {selectedEvent.ticketTiers.reduce(
+                        (sum, tier) => sum + tier.sold,
+                        0
+                      )}{" "}
+                      tickets sold
+                    </p>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-purple-600 h-2.5 rounded-full"
-                      style={{ width: `${calculateProgress()}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {selectedEvent.ticketTiers.reduce(
-                      (sum, tier) => sum + tier.sold,
-                      0
-                    )}{" "}
-                    tickets sold
-                  </p>
-                </div>
+                )}
               </div>
 
-              <div
-                className="bg-white rounded-xl shadow-sm p-8 mb-8"
-                id="tickets"
-              >
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Ticket Types
-                </h2>
+              {user?.role === "organizer" && (
+                <div
+                  className="bg-white rounded-xl shadow-sm p-8 mb-8"
+                  id="tickets"
+                >
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    Ticket Types
+                  </h2>
 
-                <div className="space-y-4">
-                  {selectedEvent.ticketTiers.map((ticket, index) => (
-                    <div
-                      key={index}
-                      className={`border rounded-lg p-4 transition-all ${
-                        selectedTicketType === ticket
-                          ? "border-purple-500 bg-purple-50 shadow-md"
-                          : "border-gray-200 hover:border-purple-300 hover:shadow-sm"
-                      }`}
-                    >
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div className="mb-3 md:mb-0">
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            {ticket.name}
-                          </h3>
-                          <div className="flex items-center mt-1 text-sm text-gray-600">
-                            <FaUsers
-                              className="mr-1.5 text-gray-400"
-                              size={14}
-                            />
-                            <span>
-                              {ticket.availableQuantity - ticket.sold} remaining
-                              ({ticket.sold} sold)
+                  <div className="space-y-4">
+                    {selectedEvent.ticketTiers.map((ticket, index) => (
+                      <div
+                        key={index}
+                        className={`border rounded-lg p-4 transition-all ${
+                          selectedTicketType === ticket
+                            ? "border-purple-500 bg-purple-50 shadow-md"
+                            : "border-gray-200 hover:border-purple-300 hover:shadow-sm"
+                        }`}
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="mb-3 md:mb-0">
+                            <h3 className="text-lg font-semibold text-gray-800">
+                              {ticket.name}
+                            </h3>
+                            <div className="flex items-center mt-1 text-sm text-gray-600">
+                              <FaUsers
+                                className="mr-1.5 text-gray-400"
+                                size={14}
+                              />
+                              <span>
+                                {ticket.availableQuantity - ticket.sold}{" "}
+                                remaining ({ticket.sold} sold)
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between md:justify-end gap-4">
+                            <span className="text-xl font-bold text-purple-600">
+                              ${ticket.price.toFixed(2)}
                             </span>
+                            <button
+                              onClick={() => handleTicketTypeSelect(ticket)}
+                              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                            >
+                              Select
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between md:justify-end gap-4">
-                          <span className="text-xl font-bold text-purple-600">
-                            ${ticket.price.toFixed(2)}
-                          </span>
-                          <button
-                            onClick={() => handleTicketTypeSelect(ticket)}
-                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                          >
-                            Select
-                          </button>
+                        <div className="mt-3">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div
+                              className="bg-purple-600 h-1.5 rounded-full"
+                              style={{
+                                width: `${
+                                  (ticket.sold / ticket.availableQuantity) * 100
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-3">
-                        <div className="w-full bg-gray-200 rounded-full h-1.5">
-                          <div
-                            className="bg-purple-600 h-1.5 rounded-full"
-                            style={{
-                              width: `${
-                                (ticket.sold / ticket.availableQuantity) * 100
-                              }%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div
                 className="bg-white rounded-xl shadow-sm p-8 mb-8"
