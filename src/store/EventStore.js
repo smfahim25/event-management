@@ -143,6 +143,7 @@ export const useEventStore = create((set, get) => ({
     limit = 100,
     sort = "eventDate",
     status = "",
+    isSpecialCommision,
   } = {}) => {
     set({ loading: true });
     try {
@@ -156,6 +157,11 @@ export const useEventStore = create((set, get) => ({
       if (status) {
         params.status = status;
       }
+      if (typeof isSpecialCommision === "boolean") {
+        params.isSpecialCommision = isSpecialCommision;
+      }
+
+      console.log(params);
 
       const res = await axios.get(`${API_BASE}/all`, {
         headers: get().getAuthHeaders(),

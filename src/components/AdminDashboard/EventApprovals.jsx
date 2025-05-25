@@ -9,6 +9,8 @@ export default function EventApprovals() {
   const [locationFilter, setLocationFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [isSpecialCommissionFilter, setIsSpecialCommissionFilter] =
+    useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
   const [sort] = useState("eventDate");
@@ -27,8 +29,20 @@ export default function EventApprovals() {
       limit,
       sort,
       status: statusFilter,
+      isSpecialCommision:
+        isSpecialCommissionFilter === ""
+          ? undefined
+          : isSpecialCommissionFilter === "true",
     });
-  }, [searchTerm, statusFilter, page, limit, sort, fetchAdminEvents]);
+  }, [
+    searchTerm,
+    statusFilter,
+    page,
+    limit,
+    sort,
+    isSpecialCommissionFilter,
+    fetchAdminEvents,
+  ]);
 
   const organizers = [
     ...new Set(events.map((event) => event?.organizerId?.name || "")),
@@ -55,6 +69,12 @@ export default function EventApprovals() {
     { value: "rejected", label: "Rejected" },
   ];
 
+  const specialCommissionOptions = [
+    { value: "", label: "All Commission Types" },
+    { value: "true", label: "Special Commission" },
+    { value: "false", label: "Standard Commission" },
+  ];
+
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -79,12 +99,23 @@ export default function EventApprovals() {
 
     const matchesStatus = statusFilter === "" || event.status === statusFilter;
 
+    // const matchesSpecialCommission = (() => {
+    //   if (isSpecialCommissionFilter === "") return true;
+    //   if (isSpecialCommissionFilter === "true")
+    //     return event.isSpecialCommission === true;
+    //   if (isSpecialCommissionFilter === "false")
+    //     return event.isSpecialCommission === false;
+    //   return true;
+    // })();
+
     return (
       matchesSearch &&
       matchesOrganizer &&
       matchesLocation &&
       matchesDateRange &&
       matchesStatus
+      //  &&
+      // matchesSpecialCommission
     );
   });
 
@@ -120,7 +151,8 @@ export default function EventApprovals() {
     organizerFilter ||
     locationFilter ||
     dateRangeFilter ||
-    statusFilter;
+    statusFilter ||
+    isSpecialCommissionFilter;
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -192,6 +224,21 @@ export default function EventApprovals() {
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
                   {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Commission Type Filter */}
+              <div className="w-full md:w-auto">
+                <select
+                  value={isSpecialCommissionFilter}
+                  onChange={(e) => setIsSpecialCommissionFilter(e.target.value)}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                >
+                  {specialCommissionOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -285,6 +332,34 @@ export default function EventApprovals() {
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove status filter</span>
+                    <svg
+                      className="h-2 w-2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 8 8"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeWidth="1.5"
+                        d="M1 1l6 6m0-6L1 7"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              )}
+              {isSpecialCommissionFilter && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                  Commission:{" "}
+                  {
+                    specialCommissionOptions.find(
+                      (opt) => opt.value === isSpecialCommissionFilter
+                    )?.label
+                  }
+                  <button
+                    onClick={() => setIsSpecialCommissionFilter("")}
+                    className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
+                  >
+                    <span className="sr-only">Remove commission filter</span>
                     <svg
                       className="h-2 w-2"
                       stroke="currentColor"
@@ -405,6 +480,12 @@ export default function EventApprovals() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Commission
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
                 <th
@@ -433,7 +514,7 @@ export default function EventApprovals() {
                         <div className="flex-shrink-0 h-16 w-24">
                           <img
                             className="h-16 w-24 rounded object-cover"
-                            src={event.eventImages?.[0] || "/placeholder.svg"}
+                            src={event.eventImages[0] || "/placeholder.svg"}
                             alt={event.eventName}
                           />
                         </div>
@@ -460,6 +541,19 @@ export default function EventApprovals() {
                       <div className="text-sm text-gray-500">
                         {event.venue?.address?.city || "N/A"}
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          event.isSpecialCommission
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {event.isSpecialCommision
+                          ? "Special Commission"
+                          : "Standard Commission"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -511,7 +605,7 @@ export default function EventApprovals() {
               ) : (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
                     No events found matching your filters.
