@@ -162,8 +162,8 @@ export default function CategoryManagement() {
         </div>
 
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-            <div className="w-16 h-16 border-4 rounded-full animate-spin bg-purple-500"></div>
+          <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+            <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
           </div>
         )}
 

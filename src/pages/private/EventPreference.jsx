@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/AuthStore";
+import toast from "react-hot-toast";
 
 export default function EventPreferences() {
   const [selectedEvents, setSelectedEvents] = useState({
@@ -13,9 +15,13 @@ export default function EventPreferences() {
     outdoor: false,
   });
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const id = searchParams.get("id");
   const navigate = useNavigate();
 
-  // Handler for checkbox changes
+  const { updatePreferences } = useAuthStore();
+
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
     setSelectedEvents({
@@ -35,6 +41,45 @@ export default function EventPreferences() {
     art: "🎨",
     food: "🍽️",
     outdoor: "🏞️",
+  };
+
+  const handleSubmit = async () => {
+    if (!hasSelections || !id) {
+      toast.error("Please select what you like");
+      return;
+    }
+
+    const selectedPreferences = Object.entries(selectedEvents)
+      .filter(([, isSelected]) => isSelected)
+      .map(([eventType]) => eventType);
+
+    try {
+      await updatePreferences({
+        userId: id,
+        preferences: selectedPreferences,
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Failed to submit preferences:", error);
+      toast.error("Something went wrong while submitting preferences.");
+    }
+  };
+
+  const handleSkip = async () => {
+    if (!id) return;
+
+    const allPreferences = Object.keys(selectedEvents);
+
+    try {
+      await updatePreferences({
+        userId: id,
+        preferences: allPreferences,
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Failed to skip preferences:", error);
+      alert("Something went wrong while skipping preferences.");
+    }
   };
 
   return (
@@ -136,32 +181,14 @@ export default function EventPreferences() {
               ? "bg-purple-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-1"
               : "bg-purple-300 text-white cursor-not-allowed"
           }`}
-          onClick={() => {
-            if (hasSelections) {
-              // Handle submit logic here
-              window.location.href = "/";
-            }
-          }}
+          onClick={handleSubmit}
           disabled={!hasSelections}
         >
           Submit Preferences
         </button>
         <button
           className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-          onClick={() => {
-            // Handle skip logic here
-            navigate("/");
-            setSelectedEvents({
-              concerts: false,
-              sports: false,
-              theater: false,
-              festivals: false,
-              conferences: false,
-              art: false,
-              food: false,
-              outdoor: false,
-            });
-          }}
+          onClick={handleSkip}
         >
           Skip for Now
         </button>

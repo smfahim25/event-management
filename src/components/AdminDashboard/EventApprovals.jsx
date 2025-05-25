@@ -8,6 +8,7 @@ export default function EventApprovals() {
   const [organizerFilter, setOrganizerFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
   const [sort] = useState("eventDate");
@@ -25,8 +26,9 @@ export default function EventApprovals() {
       page,
       limit,
       sort,
+      status: statusFilter,
     });
-  }, [searchTerm, page, limit, sort, fetchAdminEvents]);
+  }, [searchTerm, statusFilter, page, limit, sort, fetchAdminEvents]);
 
   const organizers = [
     ...new Set(events.map((event) => event?.organizerId?.name || "")),
@@ -45,6 +47,13 @@ export default function EventApprovals() {
       })
     ),
   ].filter(Boolean);
+
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "pending-approval", label: "Pending Approval" },
+    { value: "approved", label: "Approved" },
+    { value: "rejected", label: "Rejected" },
+  ];
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -68,17 +77,16 @@ export default function EventApprovals() {
       return eventDate === dateRangeFilter;
     })();
 
+    const matchesStatus = statusFilter === "" || event.status === statusFilter;
+
     return (
-      matchesSearch && matchesOrganizer && matchesLocation && matchesDateRange
+      matchesSearch &&
+      matchesOrganizer &&
+      matchesLocation &&
+      matchesDateRange &&
+      matchesStatus
     );
   });
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setOrganizerFilter("");
-    setLocationFilter("");
-    setDateRangeFilter("");
-  };
 
   const openModal = (event, status) => {
     setSelectedEvent(event);
@@ -108,26 +116,40 @@ export default function EventApprovals() {
   };
 
   const hasActiveFilters =
-    searchTerm || organizerFilter || locationFilter || dateRangeFilter;
+    searchTerm ||
+    organizerFilter ||
+    locationFilter ||
+    dateRangeFilter ||
+    statusFilter;
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-      </div>
-    );
-  }
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "pending-approval":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Event Approvals</h1>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
+        </div>
+      )}
       <div className="mt-6 bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Pending Event Approvals
+            Event Management
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Review and approve events before they are published to the platform.
+            Review and manage events with their current approval status.
           </p>
         </div>
 
@@ -162,6 +184,21 @@ export default function EventApprovals() {
             </div>
 
             <div className="flex flex-wrap gap-2 items-center">
+              {/* Status Filter */}
+              <div className="w-full md:w-auto">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                >
+                  {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="w-full md:w-auto">
                 <select
                   value={organizerFilter}
@@ -206,29 +243,6 @@ export default function EventApprovals() {
                   ))}
                 </select>
               </div>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  <svg
-                    className="mr-2 h-4 w-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Clear Filters
-                </button>
-              )}
             </div>
           </div>
 
@@ -244,6 +258,33 @@ export default function EventApprovals() {
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove search filter</span>
+                    <svg
+                      className="h-2 w-2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 8 8"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeWidth="1.5"
+                        d="M1 1l6 6m0-6L1 7"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              )}
+              {statusFilter && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                  Status:{" "}
+                  {
+                    statusOptions.find((opt) => opt.value === statusFilter)
+                      ?.label
+                  }
+                  <button
+                    onClick={() => setStatusFilter("")}
+                    className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
+                  >
+                    <span className="sr-only">Remove status filter</span>
                     <svg
                       className="h-2 w-2"
                       stroke="currentColor"
@@ -364,6 +405,12 @@ export default function EventApprovals() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Status
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Submitted
                 </th>
                 <th
@@ -414,6 +461,18 @@ export default function EventApprovals() {
                         {event.venue?.address?.city || "N/A"}
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(
+                          event.status
+                        )}`}
+                      >
+                        {event.status === "pending-approval"
+                          ? "Pending"
+                          : event.status?.charAt(0).toUpperCase() +
+                              event.status?.slice(1) || "Unknown"}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {event.createdAt
                         ? new Date(event.createdAt).toLocaleDateString()
@@ -452,7 +511,7 @@ export default function EventApprovals() {
               ) : (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
                     No events found matching your filters.

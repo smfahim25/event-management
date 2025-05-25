@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const API_BASE = `${import.meta.env.VITE_API_URL}/events`;
 
@@ -20,7 +21,7 @@ export const useEventStore = create((set, get) => ({
 
   fetchAllEvents: async ({
     searchTerm = "",
-    // eventCategory = "",
+    eventCategory = "",
     page = 1,
     limit = 10,
     sort = "eventDate",
@@ -31,7 +32,7 @@ export const useEventStore = create((set, get) => ({
         headers: get().getAuthHeaders(),
         params: {
           searchTerm,
-          // eventCategory,
+          eventCategory,
           page,
           limit,
           sort,
@@ -80,6 +81,7 @@ export const useEventStore = create((set, get) => ({
         },
       });
       set({ loading: false });
+      toast.success("Event created successfully");
       return res.data;
     } catch (err) {
       set({ error: err.message, loading: false });
@@ -94,9 +96,11 @@ export const useEventStore = create((set, get) => ({
         headers: get().getAuthHeaders(),
       });
       set({ loading: false });
+      toast.success("Event updated successfully");
       return res.data;
     } catch (err) {
       set({ error: err.message, loading: false });
+      toast.error(err.message);
       throw err;
     }
   },
@@ -136,22 +140,28 @@ export const useEventStore = create((set, get) => ({
   fetchAdminEvents: async ({
     searchTerm = "",
     page = 1,
-    limit = 50,
-    // thisWeek = true,
+    limit = 100,
     sort = "eventDate",
+    status = "",
   } = {}) => {
     set({ loading: true });
     try {
+      const params = {
+        searchTerm,
+        page,
+        limit,
+        sort,
+      };
+
+      if (status) {
+        params.status = status;
+      }
+
       const res = await axios.get(`${API_BASE}/all`, {
         headers: get().getAuthHeaders(),
-        params: {
-          searchTerm,
-          page,
-          limit,
-          // thisWeek,
-          sort,
-        },
+        params,
       });
+
       set({
         events: res.data.data || [],
         total: res.data.meta?.total || 0,

@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useSettingsStore } from "../../store/SettingsStore";
+
 const DollarSign = ({ className }) => (
   <svg
     className={className}
@@ -69,25 +72,38 @@ const PieChart = ({ className }) => (
 );
 
 const EarningsSummary = ({ data }) => {
+  const { settings, fetchSettings } = useSettingsStore();
   const sampleData = {
-    grossRevenue: 15000,
-    netEarnings: 13500,
-    totalTicketsSold: 150,
+    totalBookings: 3,
+    totalTicketsSold: 4,
+    grossRevenue: 200,
+    netEarnings: 180,
+    refundRate: 66.67,
+    totalAverageTicketPrice: 50,
     ticketTypeSales: {
-      "General Admission": 80,
-      VIP: 30,
-      "Early Bird": 40,
+      VIP: 4,
+    },
+    ticketTypeRevenue: {
+      VIP: 200,
+    },
+    ticketTypeAverages: {
+      VIP: 50,
     },
   };
 
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
   const currentData = data || sampleData;
 
-  const ticketTypes = currentData?.ticketTypeSales
-    ? Object.entries(currentData.ticketTypeSales).map(([name, count]) => ({
+  // Build ticket types array using the new data structure
+  const ticketTypes = currentData?.ticketTypeRevenue
+    ? Object.entries(currentData.ticketTypeRevenue).map(([name, revenue]) => ({
         name,
-        count,
-        revenue:
-          (currentData.grossRevenue / currentData.totalTicketsSold) * count,
+        count: currentData.ticketTypeSales?.[name] || 0,
+        revenue: revenue,
+        averagePrice: currentData.ticketTypeAverages?.[name] || 0,
       }))
     : [];
 
@@ -253,9 +269,15 @@ const EarningsSummary = ({ data }) => {
           </div>
           <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center text-xs sm:text-sm">
-              <span className="text-gray-500">Platform Fee (10%)</span>
+              <span className="text-gray-500">
+                Platform Fee ({settings?.globalCommissionRate}%)
+              </span>
               <span className="font-medium text-gray-700">
-                -${((currentData?.grossRevenue || 0) * 0.1).toFixed(2)}
+                -$
+                {(
+                  (currentData?.grossRevenue || 0) *
+                  (settings?.globalCommissionRate / 100)
+                ).toFixed(2)}
               </span>
             </div>
           </div>
@@ -308,79 +330,80 @@ const EarningsSummary = ({ data }) => {
             <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-gray-500">Avg. Ticket Price</span>
               <span className="font-medium text-gray-700">
-                $
-                {(
-                  (currentData?.grossRevenue || 0) /
-                  (currentData?.totalTicketsSold || 1)
-                ).toFixed(2)}
+                ${currentData?.totalAverageTicketPrice?.toFixed(2) || "0.00"}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white md:max-w-3xl mx-auto rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
-        <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
-          Earnings by Ticket Type
-        </h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PieChartComponent ticketTypes={ticketTypes} />
+      {ticketTypes && ticketTypes.length > 0 && (
+        <div className="bg-white md:max-w-3xl mx-auto rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+          <h4 className="text-sm sm:text-md font-medium text-gray-700 mb-4">
+            Earnings by Ticket Type
+          </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PieChartComponent ticketTypes={ticketTypes} />
 
-          {/* Legend and Stats */}
-          <div className="space-y-3 sm:space-y-4">
-            {ticketTypes.length > 0 ? (
-              ticketTypes.map((ticket, index) => {
-                const totalRevenue = ticketTypes.reduce(
-                  (sum, t) => sum + t.revenue,
-                  0
-                );
-                const percentage = (
-                  (ticket.revenue / totalRevenue) *
-                  100
-                ).toFixed(1);
-                const colors = [
-                  "#8b5cf6",
-                  "#ec4899",
-                  "#3b82f6",
-                  "#10b981",
-                  "#f59e0b",
-                ];
+            {/* Legend and Stats */}
+            <div className="space-y-3 sm:space-y-4">
+              {ticketTypes.length > 0 ? (
+                ticketTypes.map((ticket, index) => {
+                  const totalRevenue = ticketTypes.reduce(
+                    (sum, t) => sum + t.revenue,
+                    0
+                  );
+                  const percentage = (
+                    (ticket.revenue / totalRevenue) *
+                    100
+                  ).toFixed(1);
+                  const colors = [
+                    "#8b5cf6",
+                    "#ec4899",
+                    "#3b82f6",
+                    "#10b981",
+                    "#f59e0b",
+                  ];
 
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center">
-                      <div
-                        className="h-3 w-3 rounded-sm mr-3 flex-shrink-0"
-                        style={{
-                          backgroundColor: colors[index % colors.length],
-                        }}
-                      />
-                      <span className="text-xs sm:text-sm text-gray-700">
-                        {ticket.name}
-                      </span>
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center">
+                        <div
+                          className="h-3 w-3 rounded-sm mr-3 flex-shrink-0"
+                          style={{
+                            backgroundColor: colors[index % colors.length],
+                          }}
+                        />
+                        <span className="text-xs sm:text-sm text-gray-700">
+                          {ticket.name}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900">
+                          ${ticket.revenue.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {ticket.count} tickets ({percentage}%)
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Avg: ${ticket.averagePrice.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs sm:text-sm font-medium text-gray-900">
-                        ${ticket.revenue.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {ticket.count} tickets ({percentage}%)
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center text-gray-500 text-sm">
-                No ticket sales data available
-              </div>
-            )}
+                  );
+                })
+              ) : (
+                <div className="text-center text-gray-500 text-sm">
+                  No ticket sales data available
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Platform Fee Explanation */}
       <div className="bg-purple-50 rounded-xl p-4 sm:p-6 border border-purple-100">
@@ -393,10 +416,11 @@ const EarningsSummary = ({ data }) => {
               Platform Fee Explanation
             </h3>
             <p className="mt-2 text-xs sm:text-sm text-purple-700">
-              A 10% platform fee is deducted from all ticket sales. This fee
-              covers payment processing, platform maintenance, and customer
-              support. Your net earnings are automatically transferred to your
-              connected bank account according to your payout schedule.
+              A {settings?.globalCommissionRate}% platform fee is deducted from
+              all ticket sales. This fee covers payment processing, platform
+              maintenance, and customer support. Your net earnings are
+              automatically transferred to your connected bank account according
+              to your payout schedule.
             </p>
           </div>
         </div>

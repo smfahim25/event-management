@@ -55,7 +55,7 @@ function CreateEventPage() {
     tags: [],
   });
 
-  const [refundPolicies, setRefundPolicies] = useState([]);
+  const [refundPolicies, setRefundPolicies] = useState({});
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(false);
 
   const [errors, setErrors] = useState({});
@@ -271,22 +271,20 @@ function CreateEventPage() {
         }
       });
 
-      if (refundPoliciesEnabled && refundPolicies.length > 0) {
+      if (refundPoliciesEnabled && refundPolicies) {
         formDataToSend.append("refundPolicy[type]", "time-based");
-        refundPolicies[0].rules.forEach((rule, index) => {
-          formDataToSend.append(
-            `refundPolicy[rules][${index}][daysBeforeEvent]`,
-            rule.daysBeforeEvent
-          );
-          formDataToSend.append(
-            `refundPolicy[rules][${index}][refundPercentage]`,
-            rule.refundPercentage
-          );
-          formDataToSend.append(
-            `refundPolicy[rules][${index}][description]`,
-            rule.description
-          );
-        });
+        formDataToSend.append(
+          `refundPolicy[rules][daysBeforeEvent]`,
+          refundPolicies.daysBeforeEvent
+        );
+        formDataToSend.append(
+          `refundPolicy[rules][refundPercentage]`,
+          refundPolicies.refundPercentage
+        );
+        formDataToSend.append(
+          `refundPolicy[rules][description]`,
+          refundPolicies.description
+        );
       }
 
       // Append tags
@@ -1312,17 +1310,12 @@ function CreateEventPage() {
                     <RefundPolicyManager
                       eventId="new_event"
                       onSave={handleSaveRefundPolicies}
-                      initialPolicies={[
+                      initial={[
                         {
-                          type: "time-based",
-                          rules: [
-                            {
-                              daysBeforeEvent: 7,
-                              refundPercentage: 50,
-                              description:
-                                "50% refund up to 7 days before the event",
-                            },
-                          ],
+                          daysBeforeEvent: 7,
+                          refundPercentage: 50,
+                          description:
+                            "50% refund up to 7 days before the event",
                         },
                       ]}
                     />

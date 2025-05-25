@@ -74,14 +74,15 @@ function SignupPage() {
     setIsLoading(true);
 
     try {
-      await register(
+      const data = await register(
         formData.name,
         formData.email,
         formData.phone,
         formData.password
       );
-      console.log("Signup successful", formData);
-      navigate("/event-prefer");
+      if (data) {
+        navigate(`/event-prefer?id=${data?._id}`);
+      }
     } catch (error) {
       console.error("Signup failed", error);
     } finally {

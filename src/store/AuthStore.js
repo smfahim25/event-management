@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const getUserFromLocalStorage = () => {
   try {
@@ -44,6 +45,7 @@ export const useAuthStore = create((set) => ({
         throw new Error(data.message || "Registration failed");
       }
       toast.success("Registration successful");
+      return data.data;
     } catch (err) {
       set({ error: err.message });
     } finally {
@@ -241,6 +243,31 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       set({ error: err.message, loading: false });
       toast.error(err.message);
+    }
+  },
+  updatePreferences: async ({ userId, preferences }) => {
+    if (!userId) {
+      throw new Error("No user id found");
+    }
+
+    try {
+      const response = await axios.patch(
+        `${API_BASE}/users/me/preferences`,
+        {
+          userId: userId,
+          preference: preferences,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      throw error;
     }
   },
 }));

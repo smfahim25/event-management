@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useOrganizerStore } from "../../store/OrganizerStore";
-import { Trash } from "lucide-react";
+// import { Trash } from "lucide-react";
 
 export default function OrganizerApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  // Document filter removed
+
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [selectedOrganizer, setSelectedOrganizer] = useState(null);
@@ -18,7 +18,7 @@ export default function OrganizerApprovals() {
     error,
     approveOrganizer,
     rejectOrganizer,
-    deleteOrganizer,
+    // deleteOrganizer,
   } = useOrganizerStore();
 
   useEffect(() => {
@@ -46,11 +46,11 @@ export default function OrganizerApprovals() {
     }
   };
 
-  const handleDelete = async (organizerId) => {
-    if (window.confirm("Are you sure you want to delete this organizer?")) {
-      await deleteOrganizer(organizerId);
-    }
-  };
+  // const handleDelete = async (organizerId) => {
+  //   if (window.confirm("Are you sure you want to delete this organizer?")) {
+  //     await deleteOrganizer(organizerId);
+  //   }
+  // };
 
   const closeRejectModal = () => {
     setIsRejectModalOpen(false);
@@ -66,12 +66,10 @@ export default function OrganizerApprovals() {
     });
   };
 
-  // Get unique verification statuses for filter
   const verificationStatuses = [
     ...new Set(organizers.map((org) => org.verificationStatus)),
   ];
 
-  // Get unique dates for filter (using only the date part)
   const dates = [
     ...new Set(
       organizers.map((org) => {
@@ -412,12 +410,12 @@ export default function OrganizerApprovals() {
                               Reason: {organizer.rejectionReason}
                             </div>
                           )}
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(organizer.userId?._id)}
                           className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-red-200 transition-colors duration-150"
                         >
                           <Trash />
-                        </button>
+                        </button> */}
                       </td>
                     </tr>
                   ))

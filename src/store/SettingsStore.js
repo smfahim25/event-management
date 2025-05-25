@@ -104,4 +104,25 @@ export const useSettingsStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  updateCommission: async (eventId, commission) => {
+    set({ loading: true, error: null, success: false });
+
+    try {
+      console.log(eventId);
+      const response = await fetch(`${API_BASE}/events/${eventId}/commission`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...get().getHeaders() },
+        body: JSON.stringify({ platformCommission: commission }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update commission");
+      }
+
+      set({ loading: false, success: true });
+    } catch (error) {
+      set({ loading: false, error: error.message });
+    }
+  },
 }));

@@ -182,11 +182,10 @@ export default function UserProfileComponent() {
   };
 
   const isRefundable = (ticket) => {
-    if (!ticket?.eventDate || !ticket?.refundPolicy?.rules?.length)
-      return false;
+    if (!ticket?.eventDate || !ticket?.refund?.rules?.length) return false;
 
     const eventDate = new Date(ticket.eventDate);
-    const rule = ticket.refundPolicy.rules[0];
+    const rule = ticket?.refund?.rules[0];
     const daysBeforeEvent = rule.daysBeforeEvent;
 
     const now = new Date();

@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { FiCalendar, FiPlus, FiTrash2, FiInfo, FiCheck } from "react-icons/fi";
-import PropTypes from "prop-types";
+import {
+  FiCalendar,
+  FiPlus,
+  FiTrash2,
+  FiInfo,
+  FiCheck,
+  FiEdit3,
+  FiX,
+  FiSave,
+} from "react-icons/fi";
 
 const RefundPolicyManager = ({ onSave, initial }) => {
   const [policies, setPolicies] = useState([]);
@@ -11,8 +19,9 @@ const RefundPolicyManager = ({ onSave, initial }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [editingPolicy, setEditingPolicy] = useState(null);
+  const [editForm, setEditForm] = useState({});
   const initialized = useRef(false);
-  // const initialPolicyIdRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -73,13 +82,12 @@ const RefundPolicyManager = ({ onSave, initial }) => {
 
         if (isMounted) {
           setPolicies(updatedPolicies);
-          setSelectedPolicy(selectedId); // Force select the initial policy
+          setSelectedPolicy(selectedId);
           setIsLoading(false);
           onSave(updatedPolicies.find((p) => p.id === selectedId));
         }
       };
 
-      // Remove timeout for more predictable behavior
       loadPolicies();
       return () => {
         isMounted = false;
@@ -113,7 +121,6 @@ const RefundPolicyManager = ({ onSave, initial }) => {
       description: "",
     });
 
-    // If this is the first policy, select it
     if (policies.length === 0) {
       setSelectedPolicy(policy.id);
     }
@@ -123,11 +130,16 @@ const RefundPolicyManager = ({ onSave, initial }) => {
     const updatedPolicies = policies.filter((policy) => policy.id !== policyId);
     setPolicies(updatedPolicies);
 
-    // If the deleted policy was selected, select another one
     if (selectedPolicy === policyId && updatedPolicies.length > 0) {
       setSelectedPolicy(updatedPolicies[0].id);
     } else if (updatedPolicies.length === 0) {
       setSelectedPolicy(null);
+    }
+
+    // Cancel editing if the policy being edited is deleted
+    if (editingPolicy === policyId) {
+      setEditingPolicy(null);
+      setEditForm({});
     }
   };
 
@@ -135,6 +147,44 @@ const RefundPolicyManager = ({ onSave, initial }) => {
     setSelectedPolicy(policyId);
     const selected = policies.find((p) => p.id === policyId);
     onSave(selected);
+  };
+
+  const handleEditPolicy = (policy) => {
+    setEditingPolicy(policy.id);
+    setEditForm({
+      daysBeforeEvent: policy.daysBeforeEvent,
+      refundPercentage: policy.refundPercentage,
+      description: policy.description,
+    });
+  };
+
+  const handleSaveEdit = (policyId) => {
+    const updatedPolicies = policies.map((policy) =>
+      policy.id === policyId
+        ? {
+            ...policy,
+            ...editForm,
+            description:
+              editForm.description ||
+              `${editForm.refundPercentage}% refund if canceled ${editForm.daysBeforeEvent} days before the event`,
+          }
+        : policy
+    );
+
+    setPolicies(updatedPolicies);
+    setEditingPolicy(null);
+    setEditForm({});
+
+    // If the edited policy is currently selected, update the callback
+    if (selectedPolicy === policyId) {
+      const updatedPolicy = updatedPolicies.find((p) => p.id === policyId);
+      onSave(updatedPolicy);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPolicy(null);
+    setEditForm({});
   };
 
   if (isLoading) {
@@ -171,53 +221,146 @@ const RefundPolicyManager = ({ onSave, initial }) => {
             {policies.map((policy) => (
               <div
                 key={policy.id}
-                onClick={() => handleSelectPolicy(policy.id)}
-                className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                className={`border rounded-lg p-4 transition-colors ${
                   selectedPolicy === policy.id
                     ? "border-purple-500 bg-purple-50 ring-2 ring-purple-200"
                     : "border-gray-200 hover:border-purple-200 hover:bg-purple-50/30"
                 }`}
               >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${
-                        selectedPolicy === policy.id
-                          ? "border-purple-500 bg-purple-500 text-white"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      {selectedPolicy === policy.id && (
-                        <FiCheck className="w-3 h-3" />
-                      )}
+                {editingPolicy === policy.id ? (
+                  // Edit Mode
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Days Before Event
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editForm.daysBeforeEvent}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              daysBeforeEvent: Number.parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Refund Percentage
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={editForm.refundPercentage}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              refundPercentage: Number.parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-sm"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {policy.description}
-                      </p>
-                      <div className="flex items-center mt-1">
-                        <span className="text-xs text-gray-500 flex items-center">
-                          <FiCalendar className="mr-1 h-3 w-3" />
-                          {policy.daysBeforeEvent} days before event
-                        </span>
-                        <span className="mx-2 text-gray-300">|</span>
-                        <span className="text-xs text-gray-500 flex items-center">
-                          {/* <FiPercent className="mr-1 h-3 w-3" /> */}
-                          {policy.refundPercentage}% refund
-                        </span>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.description}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            description: e.target.value,
+                          })
+                        }
+                        placeholder={`${editForm.refundPercentage}% refund if canceled ${editForm.daysBeforeEvent} days before the event`}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-sm"
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={handleCancelEdit}
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                      >
+                        <FiX className="mr-1 h-3 w-3" />
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => handleSaveEdit(policy.id)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                      >
+                        <FiSave className="mr-1 h-3 w-3" />
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Display Mode
+                  <div
+                    onClick={() => handleSelectPolicy(policy.id)}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div
+                          className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${
+                            selectedPolicy === policy.id
+                              ? "border-purple-500 bg-purple-500 text-white"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {selectedPolicy === policy.id && (
+                            <FiCheck className="w-3 h-3" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {policy.description}
+                          </p>
+                          <div className="flex items-center mt-1">
+                            <span className="text-xs text-gray-500 flex items-center">
+                              <FiCalendar className="mr-1 h-3 w-3" />
+                              {policy.daysBeforeEvent} days before event
+                            </span>
+                            <span className="mx-2 text-gray-300">|</span>
+                            <span className="text-xs text-gray-500 flex items-center">
+                              {policy.refundPercentage}% refund
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPolicy(policy);
+                          }}
+                          className="text-gray-400 hover:text-purple-500 transition-colors"
+                          title="Edit policy"
+                        >
+                          <FiEdit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePolicy(policy.id);
+                          }}
+                          className="text-gray-400 hover:text-red-500 transition-colors"
+                          title="Delete policy"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeletePolicy(policy.id);
-                    }}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                )}
               </div>
             ))}
           </div>
@@ -318,10 +461,6 @@ const RefundPolicyManager = ({ onSave, initial }) => {
       </div>
     </div>
   );
-};
-RefundPolicyManager.propTypes = {
-  eventId: PropTypes.string.isRequired,
-  onSave: PropTypes.func.isRequired,
 };
 
 export default RefundPolicyManager;

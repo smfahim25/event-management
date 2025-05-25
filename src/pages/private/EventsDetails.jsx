@@ -250,7 +250,7 @@ const EventsDetails = () => {
                   {selectedEvent.description}
                 </p>
 
-                {user?.role === "organizer" && (
+                {user?.role === "user" && (
                   <div className="mt-8">
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-600 font-medium">
@@ -282,7 +282,7 @@ const EventsDetails = () => {
                 )}
               </div>
 
-              {user?.role === "organizer" && (
+              {user?.role === "user" && (
                 <div
                   className="bg-white rounded-xl shadow-sm p-8 mb-8"
                   id="tickets"

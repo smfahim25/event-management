@@ -6,8 +6,7 @@ import ProfilePage from "./pages/private/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import EventsDetails from "./pages/private/EventsDetails";
-import SuccessPage from "./pages/payment/SuccessPage";
-import CancelPage from "./pages/payment/CancelPage";
+
 import SuccessSplit from "./pages/payment/SuccessSplit";
 import ContactPage from "./pages/public/ContactPage";
 import EditEvent from "./components/EditEvent";
@@ -29,6 +28,8 @@ import CategoryManagement from "./components/AdminDashboard/CategoryManagement";
 import RequireUser from "./pages/private/RequireUser";
 import RequireOrganizer from "./pages/private/RequireOrganizer";
 import RequireAdmin from "./pages/private/RequireAdmin";
+import PaymentSuccess from "./pages/payment/PaymentSuccess";
+import PaymentFailed from "./pages/payment/PaymentFailed";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -121,8 +122,8 @@ function RoutesManager() {
       />
 
       {/* Catch-all Route */}
-      <Route path="/success" element={<SuccessPage />} />
-      <Route path="/cancel" element={<CancelPage />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-failed" element={<PaymentFailed />} />
       <Route path="/success-split" element={<SuccessSplit />} />
 
       {/* <Route path="*" element={<Navigate to="/" />} /> */}

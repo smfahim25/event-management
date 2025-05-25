@@ -50,8 +50,8 @@ const EditEvent = () => {
 
   const [previewImages, setPreviewImages] = useState([]);
   const [errors, setErrors] = useState({});
-  const [activeSection, setActiveSection] = useState("basic"); // basic, pricing, refund
-  const [refundPolicies, setRefundPolicies] = useState([]);
+  const [activeSection, setActiveSection] = useState("basic");
+  const [refundPolicies, setRefundPolicies] = useState({});
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(true);
 
   const { categories, fetchCategories } = useCategoryStore();
@@ -62,7 +62,6 @@ const EditEvent = () => {
     loading: eventLoading,
   } = useEventStore();
 
-  // Fetch event data when component mounts or eventID changes
   useEffect(() => {
     if (eventID) {
       fetchEventById(eventID);
@@ -109,17 +108,15 @@ const EditEvent = () => {
         tags: selectedEvent.tags || [],
       });
 
-      // Set the preview images if available
       if (selectedEvent.eventImages && selectedEvent.eventImages.length > 0) {
         setPreviewImages(selectedEvent.eventImages);
       }
 
-      // Set refund policies if available
       if (selectedEvent.refundPolicy) {
         setRefundPoliciesEnabled(
           selectedEvent.refundPolicy.type === "time-based"
         );
-        setRefundPolicies(selectedEvent.refundPolicy.rules || []);
+        setRefundPolicies(selectedEvent.refundPolicy.rules[0] || {});
       }
     }
   }, [selectedEvent]);
