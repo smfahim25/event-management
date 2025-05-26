@@ -51,7 +51,7 @@ const UserTicket = ({ data, isRefundable = false }) => {
     };
 
     const posterUrl =
-      data?.event?.poster ||
+      // data?.event?.poster ||
       "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 
     doc.setProperties({
@@ -228,6 +228,7 @@ const UserTicket = ({ data, isRefundable = false }) => {
 
   // Handle ticket preview
   const handlePreview = () => {
+    if (data.eventDate && new Date(data.eventDate) < new Date()) return;
     generatePdfContent((pdfUri) => {
       setPdfContent(pdfUri);
       setShowPreview(true);
