@@ -36,6 +36,7 @@ export const usePaymentStore = create((set) => ({
 
       const data = await response.json();
       set({ sessionData: data, isLoading: false });
+      return data;
     } catch (error) {
       set({ error: error.message, isLoading: false });
     }

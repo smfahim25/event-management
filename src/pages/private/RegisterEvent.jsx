@@ -14,10 +14,12 @@ import {
 import { useAuthStore } from "../../store/AuthStore";
 import { useBookingStore } from "../../store/BookingStore";
 import toast from "react-hot-toast";
+import { usePaymentStore } from "../../store/PaymentStore";
 
 const RegisterForm = ({ event, selectedTicketType, onClose }) => {
   const { user } = useAuthStore();
   const { createBooking, loading } = useBookingStore();
+  const { createCheckoutSession } = usePaymentStore();
 
   const [formData, setFormData] = useState({
     username: user?.name || "",
@@ -129,8 +131,23 @@ const RegisterForm = ({ event, selectedTicketType, onClose }) => {
     };
 
     try {
-      await createBooking(bookingData);
+      const data = await createBooking(bookingData);
 
+      if (data.success) {
+        const payment = await createCheckoutSession({
+          amount: data?.data?.paymentDetails?.totalAmount,
+          currency: data?.data?.paymentDetails?.currency,
+          userId: data?.data?.userId,
+          bookingId: data?.data?._id,
+          eventId: data?.data?.eventId,
+        });
+
+        if (payment.success) {
+          setTimeout(() => {
+            window.location.href = payment.url;
+          }, 300);
+        }
+      }
       const resetCounts = {};
       event.ticketTiers.forEach((ticket) => {
         resetCounts[ticket._id] = 0;
