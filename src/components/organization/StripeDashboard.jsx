@@ -6,12 +6,9 @@ import {
   FiArrowDown,
   FiRefreshCw,
   FiCreditCard,
-  FiSettings,
-  FiPercent,
   FiCalendar,
   FiAlertCircle,
   FiCheckCircle,
-  FiInfo,
 } from "react-icons/fi";
 
 const StripeDashboard = () => {
@@ -20,13 +17,6 @@ const StripeDashboard = () => {
   const [isPayoutProcessing, setIsPayoutProcessing] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
-  const [showRefundModal, setShowRefundModal] = useState(false);
-  const [refundPolicies, setRefundPolicies] = useState([]);
-  const [newPolicy, setNewPolicy] = useState({
-    days: 7,
-    percentage: 50,
-    description: "",
-  });
 
   // Platform commission rate
   const platformCommissionRate = 0.1; // 10%
@@ -72,31 +62,6 @@ const StripeDashboard = () => {
         payoutSchedule: "automatic", // or "manual"
         nextPayoutDate: 1715203200, // Unix timestamp
       });
-
-      // Fetch refund policies
-      setRefundPolicies([
-        {
-          id: "policy_1",
-          days: 7,
-          percentage: 50,
-          description: "50% refund if canceled 7 days before the event",
-          isDefault: true,
-        },
-        {
-          id: "policy_2",
-          days: 14,
-          percentage: 75,
-          description: "75% refund if canceled 14 days before the event",
-          isDefault: false,
-        },
-        {
-          id: "policy_3",
-          days: 30,
-          percentage: 100,
-          description: "100% refund if canceled 30 days before the event",
-          isDefault: false,
-        },
-      ]);
     }, 1000);
   }, []);
 
@@ -168,48 +133,6 @@ const StripeDashboard = () => {
     setShowConnectModal(false);
     alert("Your account has been successfully connected to Stripe!");
   };
-
-  const handleAddRefundPolicy = () => {
-    if (!newPolicy.description) {
-      setNewPolicy({
-        ...newPolicy,
-        description: `${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`,
-      });
-    }
-
-    const policy = {
-      id: `policy_${Date.now()}`,
-      days: newPolicy.days,
-      percentage: newPolicy.percentage,
-      description:
-        newPolicy.description ||
-        `${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`,
-      isDefault: refundPolicies.length === 0,
-    };
-
-    setRefundPolicies([...refundPolicies, policy]);
-    setNewPolicy({
-      days: 7,
-      percentage: 50,
-      description: "",
-    });
-  };
-
-  const handleSetDefaultPolicy = (policyId) => {
-    setRefundPolicies(
-      refundPolicies.map((policy) => ({
-        ...policy,
-        isDefault: policy.id === policyId,
-      }))
-    );
-  };
-
-  const handleDeletePolicy = (policyId) => {
-    setRefundPolicies(
-      refundPolicies.filter((policy) => policy.id !== policyId)
-    );
-  };
-
   const handlePayoutScheduleChange = (schedule) => {
     setStripeData({
       ...stripeData,
@@ -405,16 +328,6 @@ const StripeDashboard = () => {
                 )}
               </button>
             )}
-
-            <div className="mt-2 border-t border-gray-200 pt-4">
-              <button
-                onClick={() => setShowRefundModal(true)}
-                className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-800"
-              >
-                <FiSettings className="mr-2 h-4 w-4" />
-                Configure Refund Policies
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -559,180 +472,6 @@ const StripeDashboard = () => {
                 className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md text-sm font-medium"
               >
                 Connect with Stripe
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Refund Policy Modal */}
-      {showRefundModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Configure Refund Policies
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Set up refund policies for your events. These policies will be
-              applied automatically when attendees request refunds.
-            </p>
-
-            {/* Current Policies */}
-            <div className="mb-6">
-              <h4 className="text-md font-medium text-gray-700 mb-3">
-                Current Policies
-              </h4>
-              {refundPolicies.length > 0 ? (
-                <div className="space-y-3">
-                  {refundPolicies.map((policy) => (
-                    <div
-                      key={policy.id}
-                      className={`border rounded-lg p-4 ${
-                        policy.isDefault
-                          ? "border-purple-300 bg-purple-50"
-                          : "border-gray-200"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">
-                            {policy.description}
-                          </p>
-                          <div className="flex items-center mt-1">
-                            <span className="text-xs text-gray-500 flex items-center">
-                              <FiCalendar className="mr-1 h-3 w-3" />
-                              {policy.days} days before event
-                            </span>
-                            <span className="mx-2 text-gray-300">|</span>
-                            <span className="text-xs text-gray-500 flex items-center">
-                              <FiPercent className="mr-1 h-3 w-3" />
-                              {policy.percentage}% refund
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          {!policy.isDefault && (
-                            <button
-                              onClick={() => handleSetDefaultPolicy(policy.id)}
-                              className="text-xs text-purple-600 hover:text-purple-800"
-                            >
-                              Set as Default
-                            </button>
-                          )}
-                          {policy.isDefault && (
-                            <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                              Default
-                            </span>
-                          )}
-                          <button
-                            onClick={() => handleDeletePolicy(policy.id)}
-                            className="text-xs text-red-600 hover:text-red-800"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <p className="text-sm text-gray-500">
-                    No refund policies configured yet.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Add New Policy */}
-            <div className="border-t border-gray-200 pt-6">
-              <h4 className="text-md font-medium text-gray-700 mb-3">
-                Add New Policy
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label
-                    htmlFor="days"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Days Before Event
-                  </label>
-                  <input
-                    type="number"
-                    id="days"
-                    min="0"
-                    value={newPolicy.days}
-                    onChange={(e) =>
-                      setNewPolicy({
-                        ...newPolicy,
-                        days: Number.parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="percentage"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Refund Percentage
-                  </label>
-                  <input
-                    type="number"
-                    id="percentage"
-                    min="0"
-                    max="100"
-                    value={newPolicy.percentage}
-                    onChange={(e) =>
-                      setNewPolicy({
-                        ...newPolicy,
-                        percentage: Number.parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  />
-                </div>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Description (Optional)
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  value={newPolicy.description}
-                  onChange={(e) =>
-                    setNewPolicy({ ...newPolicy, description: e.target.value })
-                  }
-                  placeholder={`${newPolicy.percentage}% refund if canceled ${newPolicy.days} days before the event`}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                />
-              </div>
-              <div className="flex items-center mt-2 text-sm text-gray-500">
-                <FiInfo className="mr-2 h-4 w-4" />
-                <p>
-                  This policy will automatically apply to refund requests based
-                  on how many days before the event the request is made.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setShowRefundModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddRefundPolicy}
-                className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md text-sm font-medium"
-              >
-                Add Policy
               </button>
             </div>
           </div>
