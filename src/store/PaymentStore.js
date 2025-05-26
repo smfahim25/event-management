@@ -11,6 +11,7 @@ export const usePaymentStore = create((set) => ({
     userId,
     bookingId,
     eventId,
+    eventName,
   }) => {
     set({ isLoading: true, error: null });
 
@@ -28,6 +29,7 @@ export const usePaymentStore = create((set) => ({
             userId,
             bookingId,
             eventId,
+            eventName,
           }),
         }
       );

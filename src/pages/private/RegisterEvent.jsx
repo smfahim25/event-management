@@ -140,6 +140,7 @@ const RegisterForm = ({ event, selectedTicketType, onClose }) => {
           userId: data?.data?.userId,
           bookingId: data?.data?._id,
           eventId: data?.data?.eventId,
+          eventName: `Ticket for ${event.eventName}`,
         });
 
         if (payment.success) {
