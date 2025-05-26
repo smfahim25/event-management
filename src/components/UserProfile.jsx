@@ -97,27 +97,27 @@ export default function UserProfileComponent() {
 
       if (response && response.bookings) {
         const tickets = response.bookings.flatMap((booking) =>
-          booking.ticketDetails.map((ticket) => ({
+          booking?.ticketDetails?.map((ticket) => ({
             ...ticket,
-            bookingId: booking._id,
-            eventId: booking.eventId._id,
-            eventName: booking.eventId.eventName,
-            eventDate: booking.eventId.eventDate,
-            startTime: booking.eventId.startTime,
-            refund: booking.eventId.refundPolicy,
-            refundStatus: booking.refundDetails.status,
-            endTime: booking.eventId.endTime,
-            location: booking.eventId.venue.name,
-            ticketType: ticket.tierName,
+            bookingId: booking?._id,
+            eventId: booking?.eventId._id,
+            eventName: booking?.eventId.eventName,
+            eventDate: booking?.eventId.eventDate,
+            startTime: booking?.eventId.startTime,
+            refund: booking?.eventId.refundPolicy,
+            refundStatus: booking?.refundDetails.status,
+            endTime: booking?.eventId.endTime,
+            location: booking?.eventId.venue.name,
+            ticketType: ticket?.tierName,
             price:
-              booking.tickets.find((t) => t.tierName === ticket.tierName)
+              booking?.tickets.find((t) => t.tierName === ticket.tierName)
                 ?.price || 0,
             event: {
-              poster: booking.eventId.eventImages[0],
-              description: booking.eventId.description,
+              poster: booking?.eventId.eventImages[0],
+              description: booking?.eventId.description,
               organizer: {
-                username: booking.organizerId.name,
-                contact: booking.organizerId.phone,
+                username: booking?.organizerId.name,
+                contact: booking?.organizerId.phone,
               },
             },
           }))
@@ -652,7 +652,7 @@ export default function UserProfileComponent() {
                           </h3>
                           <span
                             className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-                              order.status === "completed"
+                              order.status === "succeeded"
                                 ? "bg-green-50 text-green-700 border-green-200"
                                 : order.status === "pending"
                                 ? "bg-yellow-50 text-yellow-700 border-yellow-200"

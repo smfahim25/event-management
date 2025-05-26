@@ -54,9 +54,9 @@ const UserTicket = ({ data, isRefundable = false }) => {
       "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 
     doc.setProperties({
-      title: `${data.eventName} Ticket`,
+      title: `${data?.eventName} Ticket`,
       subject: "Event Ticket",
-      author: data.event?.organizer?.username || "Event Organizer",
+      author: data?.event?.organizer?.username || "Event Organizer",
       keywords: "ticket, event, " + data.eventName,
       creator: "Ticket System",
     });
@@ -288,10 +288,10 @@ const UserTicket = ({ data, isRefundable = false }) => {
         <div className="relative h-40 w-full overflow-hidden">
           <img
             src={
-              data.event?.poster ||
+              data?.event?.poster ||
               "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
             }
-            alt={`${data.eventName} ticket`}
+            alt={`${data?.eventName} ticket`}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
