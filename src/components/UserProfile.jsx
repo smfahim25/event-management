@@ -718,13 +718,13 @@ export default function UserProfileComponent() {
                             <div>
                               <span className="text-blue-600">Method:</span>
                               <span className="ml-2 capitalize">
-                                {order.paymentDetails.method}
+                                {order?.paymentDetails?.method}
                               </span>
                             </div>
                             <div>
                               <span className="text-blue-600">Currency:</span>
                               <span className="ml-2">
-                                {order.paymentDetails.currency}
+                                {order?.paymentDetails?.currency}
                               </span>
                             </div>
                             <div>
@@ -732,18 +732,7 @@ export default function UserProfileComponent() {
                                 Platform Fee:
                               </span>
                               <span className="ml-2">
-                                ${order.paymentDetails.platformFee.toFixed(2)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-blue-600">
-                                Organizer Revenue:
-                              </span>
-                              <span className="ml-2">
-                                $
-                                {order.paymentDetails.organizerRevenue.toFixed(
-                                  2
-                                )}
+                                ${order?.organizerRevenue?.toFixed(2)}
                               </span>
                             </div>
                           </div>
@@ -756,7 +745,7 @@ export default function UserProfileComponent() {
                               Refund Status:
                             </h5>
                             <p className="text-sm text-orange-700 capitalize">
-                              {order.refundDetails.status}
+                              {order?.refundDetails?.status}
                             </p>
                           </div>
                         )}
@@ -765,8 +754,8 @@ export default function UserProfileComponent() {
                         <div className="pt-4 border-t flex justify-between">
                           <p className="font-bold">Total Amount</p>
                           <p className="font-bold text-lg">
-                            ${order.total.toFixed(2)}{" "}
-                            {order.paymentDetails.currency}
+                            ${order?.total?.toFixed(2)}{" "}
+                            {order?.paymentDetails?.currency}
                           </p>
                         </div>
                       </div>
