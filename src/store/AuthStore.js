@@ -45,7 +45,10 @@ export const useAuthStore = create((set) => ({
         throw new Error(data.message || "Registration failed");
       }
       toast.success(
-        "Registration successfull & Check your email for verification"
+        "Registration successfull & Check your email for verification",
+        {
+          duration: 3000,
+        }
       );
       return data.data;
     } catch (err) {
