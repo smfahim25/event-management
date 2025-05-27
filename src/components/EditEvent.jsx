@@ -52,7 +52,7 @@ const EditEvent = () => {
   const [errors, setErrors] = useState({});
   const [activeSection, setActiveSection] = useState("basic");
   const [refundPolicies, setRefundPolicies] = useState({});
-  const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(true);
+  const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(false);
 
   const { categories, fetchCategories } = useCategoryStore();
   const {
