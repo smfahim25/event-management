@@ -171,7 +171,6 @@ const EditEvent = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Special handling for price to ensure valid input
     if (name === "price") {
       const price = Number.parseFloat(value);
       if (price >= 0 || value === "") {
@@ -181,7 +180,6 @@ const EditEvent = () => {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -491,7 +489,7 @@ const EditEvent = () => {
                 >
                   <option value="">Select a category</option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
+                    <option key={category._id} value={category._id}>
                       {category.name}
                     </option>
                   ))}

@@ -88,9 +88,9 @@ function RoutesManager() {
       <Route
         path="/app/create-organizer"
         element={
-          <RequireOrganizer>
+          <RequireUser>
             <OrganizerRegistrationForm />
-          </RequireOrganizer>
+          </RequireUser>
         }
       />
 
