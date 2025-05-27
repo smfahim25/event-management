@@ -415,11 +415,11 @@ const EarningsSummary = ({ data }) => {
               Platform Fee Explanation
             </h3>
             <p className="mt-2 text-xs sm:text-sm text-purple-700">
-              A {settings?.globalCommissionRate}% platform fee is deducted from
-              all ticket sales. This fee covers payment processing, platform
-              maintenance, and customer support. Your net earnings are
-              automatically transferred to your connected bank account according
-              to your payout schedule.
+              A global {settings?.globalCommissionRate}% platform fee is
+              deducted from all ticket sales. This fee covers payment
+              processing, platform maintenance, and customer support. Your net
+              earnings are automatically transferred to your connected bank
+              account according to your payout schedule.
             </p>
           </div>
         </div>

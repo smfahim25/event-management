@@ -30,6 +30,7 @@ import RequireOrganizer from "./pages/private/RequireOrganizer";
 import RequireAdmin from "./pages/private/RequireAdmin";
 import PaymentSuccess from "./pages/payment/PaymentSuccess";
 import PaymentFailed from "./pages/payment/PaymentFailed";
+import EmailVerificationPage from "./pages/auth/VerifyEmail";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -125,6 +126,7 @@ function RoutesManager() {
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/payment-failed" element={<PaymentFailed />} />
       <Route path="/success-split" element={<SuccessSplit />} />
+      <Route path="/verify-email" element={<EmailVerificationPage />} />
 
       {/* <Route path="*" element={<Navigate to="/" />} /> */}
     </Routes>

@@ -6,66 +6,51 @@ import {
   FiArrowDown,
   FiRefreshCw,
   FiCreditCard,
-  FiAlertCircle,
-  FiCheckCircle,
 } from "react-icons/fi";
+import { usePayoutStore } from "../../store/PayoutStore";
+import { useAuthStore } from "../../store/AuthStore";
+import { useOrganizerStore } from "../../store/OrganizerStore";
+import toast from "react-hot-toast";
 
 const StripeDashboard = () => {
   const { defaultTexts } = useData();
   const [stripeData, setStripeData] = useState(null);
   const [isPayoutProcessing, setIsPayoutProcessing] = useState(false);
-  const [showConnectModal, setShowConnectModal] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
-
-  // Platform commission rate
-  const platformCommissionRate = 0.1; // 10%
+  const [earnings, setEarnings] = useState({});
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawError, setWithdrawError] = useState("");
+  const { user } = useAuthStore();
+  const { getPayouts, createPayout } = usePayoutStore();
+  const { getOrganizerEarnings } = useOrganizerStore();
 
   useEffect(() => {
-    // Simulate API call to fetch Stripe data
-    setTimeout(() => {
-      setStripeData({
-        balance: {
-          available: 1200.45,
-          pending: 350.0,
-          gross: 1500.56, // Gross amount before platform fees
-        },
-        transactions: [
-          {
-            id: "txn_1",
-            amount: 500.0,
-            grossAmount: 555.56, // Amount before platform fee
-            platformFee: 55.56, // 10% platform fee
-            created: 1715116800,
-            status: "succeeded",
-            type: "payment",
-          },
-          {
-            id: "txn_2",
-            amount: 250.0,
-            grossAmount: 277.78,
-            platformFee: 27.78,
-            created: 1715030400,
-            status: "pending",
-            type: "refund",
-          },
-          {
-            id: "txn_3",
-            amount: 450.45,
-            grossAmount: 500.5,
-            platformFee: 50.05,
-            created: 1714944000,
-            status: "succeeded",
-            type: "transfer",
-          },
-        ],
-        payoutSchedule: "manual", // or "manual"
-        nextPayoutDate: 1715203200, // Unix timestamp
-      });
-    }, 1000);
-  }, []);
+    getOrganizerEarnings().then((data) => {
+      if (data && data.earnings) {
+        setEarnings(data.earnings);
+      }
+    });
+  }, [getOrganizerEarnings]);
 
-  function formatDate(timestamp) {
-    const date = new Date(timestamp * 1000);
+  useEffect(() => {
+    const fetchStripeData = async () => {
+      try {
+        const payouts = await getPayouts(user?._id);
+        if (payouts?.data?.data) {
+          setStripeData(payouts?.data?.data);
+        } else {
+          setStripeData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching Stripe data:", error);
+        toast.error("Failed to fetch Stripe data.");
+      }
+    };
+
+    fetchStripeData();
+  }, [getPayouts, user?._id]);
+
+  function formatDate(isoString) {
+    const date = new Date(isoString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -74,10 +59,12 @@ const StripeDashboard = () => {
 
   function getStatusClass(status) {
     switch (status) {
-      case "succeeded":
+      case "completed":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
+      case "processing":
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -96,44 +83,80 @@ const StripeDashboard = () => {
     }
   }
 
-  const handlePayout = () => {
+  const handleWithdrawAmountChange = (e) => {
+    const value = e.target.value;
+    setWithdrawAmount(value);
+
+    setWithdrawError("");
+
+    const amount = parseFloat(value);
+    const availableBalance = earnings?.availableBalance || 0;
+
+    if (value && (isNaN(amount) || amount <= 0)) {
+      setWithdrawError("Please enter a valid amount");
+    } else if (amount > availableBalance) {
+      setWithdrawError("Amount cannot exceed available balance");
+    }
+  };
+
+  const handlePayout = async () => {
+    const amount = parseFloat(withdrawAmount);
+    const availableBalance = earnings?.availableBalance || 0;
+
+    if (!amount || amount <= 0) {
+      setWithdrawError("Please enter a valid amount");
+      return;
+    }
+
+    if (amount > availableBalance) {
+      setWithdrawError("Amount cannot exceed available balance");
+      return;
+    }
+
     setIsPayoutProcessing(true);
-    // Simulate payout process
-    setTimeout(() => {
-      setStripeData((prev) => ({
-        ...prev,
-        balance: {
-          ...prev.balance,
-          available: 0,
-        },
-        transactions: [
-          {
-            id: `txn_${Date.now()}`,
-            amount: prev.balance.available,
-            grossAmount: prev.balance.available,
-            platformFee: 0,
-            created: Math.floor(Date.now() / 1000),
-            status: "succeeded",
-            type: "payout",
-          },
-          ...prev.transactions,
-        ],
-      }));
+
+    try {
+      const payoutData = {
+        amount: amount,
+        currency: "USD",
+        type: "manual",
+      };
+
+      const result = await createPayout(payoutData);
+
+      if (result) {
+        setEarnings((prev) => ({
+          ...prev,
+          availableBalance: prev.availableBalance - amount,
+        }));
+
+        setWithdrawAmount("");
+      } else {
+        toast.error("Failed to process payout. Please try again.");
+      }
+    } catch (error) {
+      console.error("Payout error:", error);
+      alert("An error occurred while processing the payout. Please try again.");
+    } finally {
       setIsPayoutProcessing(false);
-      alert(
-        "Payout initiated successfully! Funds will be transferred to your bank account."
-      );
-    }, 2000);
+    }
   };
 
-  const handleConnectStripe = () => {
-    // Simulate connecting to Stripe
-    setIsConnected(true);
-    setShowConnectModal(false);
-    alert("Your account has been successfully connected to Stripe!");
+  const isWithdrawDisabled = () => {
+    const amount = parseFloat(withdrawAmount);
+    const availableBalance = earnings?.availableBalance || 0;
+
+    return (
+      isPayoutProcessing ||
+      !withdrawAmount ||
+      isNaN(amount) ||
+      amount <= 0 ||
+      amount > availableBalance ||
+      availableBalance === 0
+    );
   };
 
-  if (!stripeData) {
+  if (!earnings) {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">
@@ -167,31 +190,6 @@ const StripeDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Stripe Connect Status */}
-      {!isConnected && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <FiAlertCircle className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                Your account is not connected to Stripe. Connect your account to
-                receive payments.
-              </p>
-              <div className="mt-2">
-                <button
-                  onClick={() => setShowConnectModal(true)}
-                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
-                >
-                  Connect with Stripe
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="grid gap-6 md:grid-cols-2">
         {/* Balance Card */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
@@ -209,7 +207,7 @@ const StripeDashboard = () => {
               </p>
               <p className="flex items-center text-3xl font-bold text-green-600">
                 <FiDollarSign className="mr-1 h-6 w-6" />
-                {stripeData.balance.available.toFixed(2)}
+                {earnings?.availableBalance?.toFixed(2)}
               </p>
             </div>
             <div className="space-y-1">
@@ -218,7 +216,7 @@ const StripeDashboard = () => {
               </p>
               <p className="flex items-center text-3xl font-bold text-amber-600">
                 <FiClock className="mr-1 h-6 w-6" />
-                {stripeData.balance.pending.toFixed(2)}
+                {earnings?.pending?.toFixed(2)}
               </p>
             </div>
           </div>
@@ -227,18 +225,15 @@ const StripeDashboard = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500">Gross Sales</p>
                 <p className="text-lg font-semibold text-gray-900">
-                  ${stripeData.balance.gross.toFixed(2)}
+                  ${earnings?.grossTotal?.toFixed(2)}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">
-                  Platform Fee (10%)
+                  Platform Fee
                 </p>
                 <p className="text-lg font-semibold text-gray-900">
-                  $
-                  {(stripeData.balance.gross * platformCommissionRate).toFixed(
-                    2
-                  )}
+                  ${earnings?.totalPlatformFee?.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -267,13 +262,46 @@ const StripeDashboard = () => {
               </div>
             </div>
 
+            {/* Withdraw Amount Input */}
+            <div className="space-y-2">
+              <label
+                htmlFor="withdrawAmount"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Withdraw Amount
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiDollarSign className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="number"
+                  id="withdrawAmount"
+                  value={withdrawAmount}
+                  onChange={handleWithdrawAmountChange}
+                  placeholder="0.00"
+                  min="0"
+                  max={earnings?.availableBalance || 0}
+                  step="0.01"
+                  className={`block w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 ${
+                    withdrawError ? "border-red-300" : "border-gray-300"
+                  }`}
+                />
+              </div>
+              {withdrawError && (
+                <p className="text-sm text-red-600">{withdrawError}</p>
+              )}
+              <p className="text-xs text-gray-500">
+                Available balance: $
+                {earnings?.availableBalance?.toFixed(2) || "0.00"}
+              </p>
+            </div>
+
             <button
               onClick={handlePayout}
-              disabled={
-                isPayoutProcessing || stripeData?.balance?.available === 0
-              }
+              disabled={isWithdrawDisabled()}
               className={`mt-2 flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white transition-colors ${
-                isPayoutProcessing || stripeData?.balance?.available === 0
+                isWithdrawDisabled()
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
               }`}
@@ -316,12 +344,6 @@ const StripeDashboard = () => {
                     ?.amount || "Amount"}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Gross Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Platform Fee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   {defaultTexts?.stripeDashboard?.transactions?.table?.headers
                     ?.date || "Date"}
                 </th>
@@ -336,26 +358,20 @@ const StripeDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y bg-white">
-              {stripeData?.transactions?.length > 0 &&
-                stripeData?.transactions?.map((transaction) => (
+              {stripeData?.length > 0 &&
+                stripeData?.map((transaction) => (
                   <tr
-                    key={transaction.id}
+                    key={transaction._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                      {transaction.id}
+                      {transaction._id}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                       ${transaction?.amount?.toFixed(2)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      ${transaction?.grossAmount?.toFixed(2)}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      ${transaction?.platformFee?.toFixed(2)}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {formatDate(transaction?.created)}
+                      {formatDate(transaction?.updatedAt)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm">
                       <span
@@ -378,67 +394,6 @@ const StripeDashboard = () => {
           </table>
         </div>
       </div>
-
-      {/* Stripe Connect Modal */}
-      {showConnectModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Connect with Stripe
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Connect your account with Stripe to receive payments directly to
-              your bank account. This is a secure process handled by Stripe.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <FiCheckCircle className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-700">
-                    Secure payment processing
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <FiCheckCircle className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-700">
-                    Automatic payouts to your bank account
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <FiCheckCircle className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-700">
-                    Detailed financial reporting
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setShowConnectModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConnectStripe}
-                className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md text-sm font-medium"
-              >
-                Connect with Stripe
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

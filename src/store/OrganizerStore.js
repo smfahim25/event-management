@@ -125,6 +125,33 @@ export const useOrganizerStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  getOrganizerEarnings: async () => {
+    set({ loading: true, error: null });
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/me/earnings`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch organizer profile.");
+      }
+
+      return data.data;
+    } catch (err) {
+      set({ error: err.message });
+      toast.error(err.message);
+    } finally {
+      set({ loading: false });
+    }
+  },
 
   updateOrganizerProfile: async (formDataObj) => {
     set({ loading: true, error: null, success: false });
