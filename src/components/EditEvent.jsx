@@ -10,10 +10,12 @@ import {
   FaUsers,
   FaBox,
   FaExchangeAlt,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import RefundPolicyManager from "./organization/RefundPolicy";
 import { useEventStore } from "../store/EventStore";
 import { useCategoryStore } from "../store/CategoryStore";
+import toast from "react-hot-toast";
 
 const EditEvent = () => {
   const { eventID } = useParams();
@@ -112,7 +114,7 @@ const EditEvent = () => {
         setPreviewImages(selectedEvent.eventImages);
       }
 
-      if (selectedEvent.refundPolicy) {
+      if (selectedEvent?.refundPolicy?.rules?.length > 0) {
         setRefundPoliciesEnabled(
           selectedEvent.refundPolicy.type === "time-based"
         );
@@ -120,6 +122,111 @@ const EditEvent = () => {
       }
     }
   }, [selectedEvent]);
+
+  const validateStringInput = (value, fieldName) => {
+    if (!value || value.trim() === "") {
+      return `${fieldName} is required`;
+    }
+
+    if (/^\d+$/.test(value.trim())) {
+      return `${fieldName} cannot contain only numbers`;
+    }
+    return null;
+  };
+
+  const validateNumberInput = (value, fieldName, min = 0) => {
+    if (!value || value === "") {
+      return `${fieldName} is required`;
+    }
+
+    if (isNaN(value) || isNaN(Number.parseFloat(value))) {
+      return `${fieldName} must be a valid number`;
+    }
+    const numValue = Number.parseFloat(value);
+    if (numValue < min) {
+      return `${fieldName} must be at least ${min}`;
+    }
+    return null;
+  };
+
+  const validateFutureDate = (dateValue) => {
+    if (!dateValue) {
+      return "Date is required";
+    }
+    const selectedDate = new Date(dateValue);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return "Event date must be in the future";
+    }
+    return null;
+  };
+
+  const validateTimeRange = (startTime, endTime) => {
+    const errors = {};
+
+    if (!startTime) {
+      errors.startTime = "Start time is required";
+    }
+    if (!endTime) {
+      errors.endTime = "End time is required";
+    }
+
+    if (startTime && endTime) {
+      if (startTime === endTime) {
+        errors.endTime = "End time cannot be the same as start time";
+      } else if (startTime >= endTime) {
+        errors.endTime = "End time must be after start time";
+      }
+    }
+
+    return errors;
+  };
+
+  const validateTicketCapacity = (ticketTiers, totalCapacity) => {
+    const errors = {};
+    const totalTickets = ticketTiers.reduce((sum, tier) => {
+      const quantity = Number.parseInt(tier.quantity) || 0;
+      return sum + quantity;
+    }, 0);
+
+    const maxCapacity = Number.parseInt(totalCapacity) || 0;
+
+    if (totalTickets > maxCapacity) {
+      errors.ticketCapacity = `Total ticket quantity (${totalTickets}) cannot exceed event capacity (${maxCapacity})`;
+    }
+
+    return errors;
+  };
+
+  const validateZipCode = (zipCode) => {
+    if (!zipCode || zipCode.trim() === "") {
+      return "Zip code is required";
+    }
+
+    if (!/^[a-zA-Z0-9\s-]{3,10}$/.test(zipCode.trim())) {
+      return "Please enter a valid zip code";
+    }
+    return null;
+  };
+
+  const validateCoordinates = (latitude, longitude) => {
+    const errors = {};
+
+    if (latitude && (isNaN(latitude) || latitude < -90 || latitude > 90)) {
+      errors.latitude = "Latitude must be between -90 and 90";
+    }
+
+    if (
+      longitude &&
+      (isNaN(longitude) || longitude < -180 || longitude > 180)
+    ) {
+      errors.longitude = "Longitude must be between -180 and 180";
+    }
+
+    return errors;
+  };
 
   const handleAddPrice = () => {
     setFormData((prev) => ({
@@ -135,6 +242,11 @@ const EditEvent = () => {
     const input = tagInputRef.current;
     const trimmedValue = input?.value.trim();
     if (trimmedValue) {
+      if (/^\d+$/.test(trimmedValue)) {
+        toast.error("Tags cannot contain only numbers");
+        return;
+      }
+
       setFormData((prev) => {
         const updatedTags = [...prev.tags, trimmedValue];
         console.log("Updating tags with:", updatedTags);
@@ -152,9 +264,25 @@ const EditEvent = () => {
       ...prev,
       price: prev.price.filter((_, i) => i !== index),
     }));
+
+    const newErrors = { ...errors };
+    delete newErrors[`price_${index}_label`];
+    delete newErrors[`price_${index}_value`];
+    delete newErrors[`price_${index}_quantity`];
+    delete newErrors[`price_${index}_maxPerOrder`];
+    delete newErrors.ticketCapacity;
+    setErrors(newErrors);
   };
 
   const handlePriceChange = (index, field, value) => {
+    const errorKey = `price_${index}_${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => ({ ...prev, [errorKey]: null }));
+    }
+    if (errors.ticketCapacity) {
+      setErrors((prev) => ({ ...prev, ticketCapacity: null }));
+    }
+
     setFormData((prev) => {
       const updatedPrices = prev.price.map((price, i) =>
         i === index ? { ...price, [field]: value } : price
@@ -171,6 +299,10 @@ const EditEvent = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+
     if (name === "price") {
       const price = Number.parseFloat(value);
       if (price >= 0 || value === "") {
@@ -179,9 +311,32 @@ const EditEvent = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+  const handleStringInputChange = (e, fieldName) => {
+    const { value } = e.target;
+
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+    if (errors[fieldName]) {
+      setErrors((prev) => ({ ...prev, [fieldName]: null }));
+    }
+  };
+
+  const handleNumberInputChange = (e, fieldName) => {
+    const { value } = e.target;
+
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [fieldName]: "" }));
+      return;
+    }
+
+    if (/^\d*\.?\d*$/.test(value)) {
+      setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+      if (errors[fieldName]) {
+        setErrors((prev) => ({ ...prev, [fieldName]: null }));
+      }
     }
   };
 
@@ -193,7 +348,6 @@ const EditEvent = () => {
       );
       setPreviewImages((prev) => [...prev, ...newImages]);
 
-      // Store the actual files in formData
       setFormData((prev) => ({
         ...prev,
         poster: prev.poster
@@ -205,41 +359,114 @@ const EditEvent = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.description.trim())
-      newErrors.description = "Description is required";
-    if (!formData.date) newErrors.date = "Date is required";
-    if (!formData.venue.name.trim())
-      newErrors.venueName = "Venue name is required";
-    if (!formData.venue.address.street.trim())
-      newErrors.street = "Street is required";
-    if (!formData.venue.address.city.trim())
-      newErrors.city = "City is required";
-    if (!formData.venue.address.state.trim())
-      newErrors.state = "State is required";
-    if (!formData.venue.address.country.trim())
-      newErrors.country = "Country is required";
-    if (!formData.venue.address.zipCode.trim())
-      newErrors.zipCode = "Zip code is required";
-    if (!formData.category) newErrors.category = "Category is required";
-    if (!formData.limit || formData.limit <= 0)
-      newErrors.limit = "Valid ticket limit is required";
 
-    // Validate ticket types
+    const nameError = validateStringInput(formData.name, "Event name");
+    if (nameError) newErrors.name = nameError;
+
+    const descriptionError = validateStringInput(
+      formData.description,
+      "Description"
+    );
+    if (descriptionError) newErrors.description = descriptionError;
+
+    const venueNameError = validateStringInput(
+      formData.venue.name,
+      "Venue name"
+    );
+    if (venueNameError) newErrors.venueName = venueNameError;
+
+    const streetError = validateStringInput(
+      formData.venue.address.street,
+      "Street"
+    );
+    if (streetError) newErrors.street = streetError;
+
+    const cityError = validateStringInput(formData.venue.address.city, "City");
+    if (cityError) newErrors.city = cityError;
+
+    const stateError = validateStringInput(
+      formData.venue.address.state,
+      "State"
+    );
+    if (stateError) newErrors.state = stateError;
+
+    const countryError = validateStringInput(
+      formData.venue.address.country,
+      "Country"
+    );
+    if (countryError) newErrors.country = countryError;
+
+    const zipError = validateZipCode(formData.venue.address.zipCode);
+    if (zipError) newErrors.zipCode = zipError;
+
+    const coordErrors = validateCoordinates(
+      formData.venue.coordinates.latitude,
+      formData.venue.coordinates.longitude
+    );
+    Object.assign(newErrors, coordErrors);
+
+    const dateError = validateFutureDate(formData.date);
+    if (dateError) newErrors.date = dateError;
+
+    const timeErrors = validateTimeRange(formData.startTime, formData.endTime);
+    Object.assign(newErrors, timeErrors);
+
+    if (!formData.category) newErrors.category = "Category is required";
+
+    const capacityError = validateNumberInput(
+      formData.limit,
+      "Total capacity",
+      1
+    );
+    if (capacityError) newErrors.limit = capacityError;
+
     if (formData.price.length === 0) {
       newErrors.price = "At least one ticket type is required";
     } else {
       formData.price.forEach((price, index) => {
-        if (!price.label) {
-          newErrors[`price_${index}_label`] = "Ticket name is required";
+        const labelError = validateStringInput(price.label, "Ticket name");
+        if (labelError) {
+          newErrors[`price_${index}_label`] = labelError;
         }
-        if (!price.value) {
-          newErrors[`price_${index}_value`] = "Price is required";
+
+        const priceError = validateNumberInput(price.value, "Price", 0);
+        if (priceError) {
+          newErrors[`price_${index}_value`] = priceError;
         }
-        if (!price.quantity) {
-          newErrors[`price_${index}_quantity`] = "Quantity is required";
+
+        const quantityError = validateNumberInput(
+          price.quantity,
+          "Quantity",
+          1
+        );
+        if (quantityError) {
+          newErrors[`price_${index}_quantity`] = quantityError;
+        }
+
+        if (price.maxPerOrder && price.maxPerOrder !== "") {
+          const maxPerOrderError = validateNumberInput(
+            price.maxPerOrder,
+            "Max per order",
+            1
+          );
+          if (maxPerOrderError) {
+            newErrors[`price_${index}_maxPerOrder`] = maxPerOrderError;
+          }
+
+          const maxOrder = Number.parseInt(price.maxPerOrder);
+          const available = Number.parseInt(price.quantity);
+          if (!isNaN(maxOrder) && !isNaN(available) && maxOrder > available) {
+            newErrors[`price_${index}_maxPerOrder`] =
+              "Max per order cannot exceed available quantity";
+          }
         }
       });
+
+      const capacityErrors = validateTicketCapacity(
+        formData.price,
+        formData.limit
+      );
+      Object.assign(newErrors, capacityErrors);
     }
 
     setErrors(newErrors);
@@ -249,7 +476,10 @@ const EditEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fix all validation errors before submitting");
+      return;
+    }
 
     const formDataObj = new FormData();
 
@@ -335,9 +565,11 @@ const EditEvent = () => {
 
     try {
       await updateEvent(eventID, formDataObj);
+      toast.success("Event updated successfully!");
       navigate(`/app/eventDetails/${eventID}`);
     } catch (error) {
       console.error("Error updating event:", error);
+      toast.error("Failed to update event. Please try again.");
     }
   };
 
@@ -460,14 +692,17 @@ const EditEvent = () => {
                   type="text"
                   name="name"
                   value={formData.name}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleStringInputChange(e, "name")}
                   className={`block w-full px-4 py-3 rounded-lg border ${
                     errors.name ? "border-red-500" : "border-gray-300"
                   } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                   placeholder="Enter event name"
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  <div className="mt-1 flex items-center text-sm text-red-600">
+                    <FaExclamationCircle className="mr-1 h-4 w-4" />
+                    {errors.name}
+                  </div>
                 )}
               </div>
 
@@ -495,7 +730,10 @@ const EditEvent = () => {
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                  <div className="mt-1 flex items-center text-sm text-red-600">
+                    <FaExclamationCircle className="mr-1 h-4 w-4" />
+                    {errors.category}
+                  </div>
                 )}
               </div>
 
@@ -507,7 +745,7 @@ const EditEvent = () => {
                 <textarea
                   name="description"
                   value={formData.description}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleStringInputChange(e, "description")}
                   rows={4}
                   className={`block w-full px-4 py-3 rounded-lg border ${
                     errors.description ? "border-red-500" : "border-gray-300"
@@ -515,9 +753,10 @@ const EditEvent = () => {
                   placeholder="Describe your event"
                 />
                 {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <div className="mt-1 flex items-center text-sm text-red-600">
+                    <FaExclamationCircle className="mr-1 h-4 w-4" />
                     {errors.description}
-                  </p>
+                  </div>
                 )}
               </div>
 
@@ -534,17 +773,31 @@ const EditEvent = () => {
                     type="date"
                     name="date"
                     value={formData.date}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      const dateError = validateFutureDate(e.target.value);
+                      if (dateError) {
+                        setErrors((prev) => ({ ...prev, date: dateError }));
+                      } else {
+                        setErrors((prev) => ({ ...prev, date: null }));
+                      }
+                      setFormData((prev) => ({
+                        ...prev,
+                        date: e.target.value,
+                      }));
+                    }}
+                    min={new Date().toISOString().split("T")[0]}
                     className={`block w-full px-4 py-3 rounded-lg border ${
                       errors.date ? "border-red-500" : "border-gray-300"
                     } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                   />
                   {errors.date && (
-                    <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+                    <div className="mt-1 flex items-center text-sm text-red-600">
+                      <FaExclamationCircle className="mr-1 h-4 w-4" />
+                      {errors.date}
+                    </div>
                   )}
                 </div>
 
-                {/* Venue */}
                 {/* Time */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-6">
                   <div>
@@ -555,9 +808,31 @@ const EditEvent = () => {
                       type="time"
                       name="startTime"
                       value={formData.startTime}
-                      onChange={handleInputChange}
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      onChange={(e) => {
+                        const timeErrors = validateTimeRange(
+                          e.target.value,
+                          formData.endTime
+                        );
+                        setErrors((prev) => ({
+                          ...prev,
+                          startTime: timeErrors.startTime || null,
+                          endTime: timeErrors.endTime || prev.endTime,
+                        }));
+                        setFormData((prev) => ({
+                          ...prev,
+                          startTime: e.target.value,
+                        }));
+                      }}
+                      className={`block w-full px-4 py-3 rounded-lg border ${
+                        errors.startTime ? "border-red-500" : "border-gray-300"
+                      } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                     />
+                    {errors.startTime && (
+                      <div className="mt-1 flex items-center text-sm text-red-600">
+                        <FaExclamationCircle className="mr-1 h-4 w-4" />
+                        {errors.startTime}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -568,9 +843,31 @@ const EditEvent = () => {
                       type="time"
                       name="endTime"
                       value={formData.endTime}
-                      onChange={handleInputChange}
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                      onChange={(e) => {
+                        const timeErrors = validateTimeRange(
+                          formData.startTime,
+                          e.target.value
+                        );
+                        setErrors((prev) => ({
+                          ...prev,
+                          endTime: timeErrors.endTime || null,
+                          startTime: timeErrors.startTime || prev.startTime,
+                        }));
+                        setFormData((prev) => ({
+                          ...prev,
+                          endTime: e.target.value,
+                        }));
+                      }}
+                      className={`block w-full px-4 py-3 rounded-lg border ${
+                        errors.endTime ? "border-red-500" : "border-gray-300"
+                      } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                     />
+                    {errors.endTime && (
+                      <div className="mt-1 flex items-center text-sm text-red-600">
+                        <FaExclamationCircle className="mr-1 h-4 w-4" />
+                        {errors.endTime}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -591,6 +888,15 @@ const EditEvent = () => {
                     type="text"
                     value={formData.venue.name}
                     onChange={(e) => {
+                      const error = validateStringInput(
+                        e.target.value,
+                        "Venue name"
+                      );
+                      if (error && e.target.value) {
+                        setErrors((prev) => ({ ...prev, venueName: error }));
+                      } else {
+                        setErrors((prev) => ({ ...prev, venueName: null }));
+                      }
                       setFormData((prev) => ({
                         ...prev,
                         venue: {
@@ -599,9 +905,17 @@ const EditEvent = () => {
                         },
                       }));
                     }}
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                    className={`block w-full px-4 py-3 rounded-lg border ${
+                      errors.venueName ? "border-red-500" : "border-gray-300"
+                    } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                     placeholder="Enter venue name"
                   />
+                  {errors.venueName && (
+                    <div className="mt-1 flex items-center text-sm text-red-600">
+                      <FaExclamationCircle className="mr-1 h-4 w-4" />
+                      {errors.venueName}
+                    </div>
+                  )}
                 </div>
 
                 {/* Address */}
@@ -616,6 +930,15 @@ const EditEvent = () => {
                         placeholder="Street"
                         value={formData.venue.address.street}
                         onChange={(e) => {
+                          const error = validateStringInput(
+                            e.target.value,
+                            "Street"
+                          );
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({ ...prev, street: error }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, street: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -627,8 +950,15 @@ const EditEvent = () => {
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.street ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.street && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.street}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <input
@@ -636,6 +966,15 @@ const EditEvent = () => {
                         placeholder="City"
                         value={formData.venue.address.city}
                         onChange={(e) => {
+                          const error = validateStringInput(
+                            e.target.value,
+                            "City"
+                          );
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({ ...prev, city: error }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, city: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -647,8 +986,15 @@ const EditEvent = () => {
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.city ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.city && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.city}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <input
@@ -656,6 +1002,15 @@ const EditEvent = () => {
                         placeholder="State/Province"
                         value={formData.venue.address.state}
                         onChange={(e) => {
+                          const error = validateStringInput(
+                            e.target.value,
+                            "State"
+                          );
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({ ...prev, state: error }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, state: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -667,8 +1022,15 @@ const EditEvent = () => {
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.state ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.state && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.state}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <input
@@ -676,6 +1038,12 @@ const EditEvent = () => {
                         placeholder="Zip/Postal Code"
                         value={formData.venue.address.zipCode}
                         onChange={(e) => {
+                          const error = validateZipCode(e.target.value);
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({ ...prev, zipCode: error }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, zipCode: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -687,8 +1055,15 @@ const EditEvent = () => {
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.zipCode ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.zipCode && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.zipCode}
+                        </div>
+                      )}
                     </div>
                     <div className="md:col-span-2">
                       <input
@@ -696,6 +1071,15 @@ const EditEvent = () => {
                         placeholder="Country"
                         value={formData.venue.address.country}
                         onChange={(e) => {
+                          const error = validateStringInput(
+                            e.target.value,
+                            "Country"
+                          );
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({ ...prev, country: error }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, country: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -707,8 +1091,15 @@ const EditEvent = () => {
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.country ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.country && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.country}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -721,43 +1112,87 @@ const EditEvent = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <input
-                        type="text"
-                        placeholder="Latitude"
+                        type="number"
+                        step="any"
+                        placeholder="Latitude (-90 to 90)"
                         value={formData.venue.coordinates.latitude}
                         onChange={(e) => {
+                          const value = e.target.value;
+                          const coordErrors = validateCoordinates(
+                            value,
+                            formData.venue.coordinates.longitude
+                          );
+                          if (coordErrors.latitude) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              latitude: coordErrors.latitude,
+                            }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, latitude: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
                               ...prev.venue,
                               coordinates: {
                                 ...prev.venue.coordinates,
-                                latitude: e.target.value,
+                                latitude: value,
                               },
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.latitude ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.latitude && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.latitude}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <input
-                        type="text"
-                        placeholder="Longitude"
+                        type="number"
+                        step="any"
+                        placeholder="Longitude (-180 to 180)"
                         value={formData.venue.coordinates.longitude}
                         onChange={(e) => {
+                          const value = e.target.value;
+                          const coordErrors = validateCoordinates(
+                            formData.venue.coordinates.latitude,
+                            value
+                          );
+                          if (coordErrors.longitude) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              longitude: coordErrors.longitude,
+                            }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, longitude: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
                               ...prev.venue,
                               coordinates: {
                                 ...prev.venue.coordinates,
-                                longitude: e.target.value,
+                                longitude: value,
                               },
                             },
                           }));
                         }}
-                        className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors"
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.longitude
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
                       />
+                      {errors.longitude && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.longitude}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -797,7 +1232,7 @@ const EditEvent = () => {
                   type="number"
                   name="limit"
                   value={formData.limit}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleNumberInputChange(e, "limit")}
                   min="1"
                   className={`block w-full px-4 py-3 rounded-lg border ${
                     errors.limit ? "border-red-500" : "border-gray-300"
@@ -805,7 +1240,10 @@ const EditEvent = () => {
                   placeholder="Maximum number of attendees"
                 />
                 {errors.limit && (
-                  <p className="text-red-500 text-sm mt-1">{errors.limit}</p>
+                  <div className="mt-1 flex items-center text-sm text-red-600">
+                    <FaExclamationCircle className="mr-1 h-4 w-4" />
+                    {errors.limit}
+                  </div>
                 )}
                 <p className="text-sm text-gray-500 mt-2">
                   This is the maximum number of people who can attend your event
@@ -849,6 +1287,12 @@ const EditEvent = () => {
                     ref={tagInputRef}
                     placeholder="Add tags (e.g., music, festival)"
                     className="flex-grow rounded-l-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
                   />
                   <button
                     type="button"
@@ -858,6 +1302,10 @@ const EditEvent = () => {
                     Add
                   </button>
                 </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Press Enter or click Add to add a tag. Tags cannot contain
+                  only numbers.
+                </p>
               </div>
             </div>
 
@@ -882,8 +1330,16 @@ const EditEvent = () => {
                 </div>
 
                 {errors.price && (
-                  <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+                  <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center">
+                    <FaExclamationCircle className="mr-2 h-4 w-4" />
                     {errors.price}
+                  </div>
+                )}
+
+                {errors.ticketCapacity && (
+                  <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center">
+                    <FaExclamationCircle className="mr-2 h-4 w-4" />
+                    {errors.ticketCapacity}
                   </div>
                 )}
 
@@ -909,9 +1365,24 @@ const EditEvent = () => {
                             type="text"
                             placeholder="e.g. General Admission, VIP, Early Bird"
                             value={priceItem.label}
-                            onChange={(e) =>
-                              handlePriceChange(index, "label", e.target.value)
-                            }
+                            onChange={(e) => {
+                              const error = validateStringInput(
+                                e.target.value,
+                                "Ticket name"
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  [`price_${index}_label`]: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  [`price_${index}_label`]: null,
+                                }));
+                              }
+                              handlePriceChange(index, "label", e.target.value);
+                            }}
                             className={`w-full px-3 py-2 rounded-md border ${
                               errors[`price_${index}_label`]
                                 ? "border-red-300 bg-red-50"
@@ -932,9 +1403,25 @@ const EditEvent = () => {
                             type="number"
                             placeholder="0.00"
                             value={priceItem.value}
-                            onChange={(e) =>
-                              handlePriceChange(index, "value", e.target.value)
-                            }
+                            onChange={(e) => {
+                              const error = validateNumberInput(
+                                e.target.value,
+                                "Price",
+                                0
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  [`price_${index}_value`]: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  [`price_${index}_value`]: null,
+                                }));
+                              }
+                              handlePriceChange(index, "value", e.target.value);
+                            }}
                             min="0"
                             className={`w-full px-3 py-2 rounded-md border ${
                               errors[`price_${index}_value`]
@@ -958,13 +1445,29 @@ const EditEvent = () => {
                                 type="number"
                                 placeholder="Available tickets"
                                 value={priceItem.quantity}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  const error = validateNumberInput(
+                                    e.target.value,
+                                    "Quantity",
+                                    1
+                                  );
+                                  if (error && e.target.value) {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`price_${index}_quantity`]: error,
+                                    }));
+                                  } else {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`price_${index}_quantity`]: null,
+                                    }));
+                                  }
                                   handlePriceChange(
                                     index,
                                     "quantity",
                                     e.target.value
-                                  )
-                                }
+                                  );
+                                }}
                                 min="1"
                                 className={`w-full px-3 py-2 rounded-md border ${
                                   errors[`price_${index}_quantity`]
@@ -988,16 +1491,66 @@ const EditEvent = () => {
                             type="number"
                             placeholder="Leave blank for no limit"
                             value={priceItem.maxPerOrder || ""}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const error = validateNumberInput(
+                                  e.target.value,
+                                  "Max per order",
+                                  1
+                                );
+                                if (error) {
+                                  setErrors((prev) => ({
+                                    ...prev,
+                                    [`price_${index}_maxPerOrder`]: error,
+                                  }));
+                                } else {
+                                  const maxOrder = Number.parseInt(
+                                    e.target.value
+                                  );
+                                  const available = Number.parseInt(
+                                    priceItem.quantity
+                                  );
+                                  if (
+                                    !isNaN(maxOrder) &&
+                                    !isNaN(available) &&
+                                    maxOrder > available
+                                  ) {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`price_${index}_maxPerOrder`]:
+                                        "Max per order cannot exceed available quantity",
+                                    }));
+                                  } else {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`price_${index}_maxPerOrder`]: null,
+                                    }));
+                                  }
+                                }
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  [`price_${index}_maxPerOrder`]: null,
+                                }));
+                              }
                               handlePriceChange(
                                 index,
                                 "maxPerOrder",
                                 e.target.value
-                              )
-                            }
+                              );
+                            }}
                             min="1"
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
+                            className={`w-full px-3 py-2 rounded-md border ${
+                              errors[`price_${index}_maxPerOrder`]
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent`}
                           />
+                          {errors[`price_${index}_maxPerOrder`] && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors[`price_${index}_maxPerOrder`]}
+                            </p>
+                          )}
                           <p className="text-xs text-gray-500">
                             Optional. Limit per customer.
                           </p>
@@ -1140,12 +1693,12 @@ const EditEvent = () => {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
-                      />
+                      ></circle>
                       <path
                         className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
+                      ></path>
                     </svg>
                     Updating...
                   </span>

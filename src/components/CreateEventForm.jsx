@@ -57,7 +57,6 @@ function CreateEventPage() {
 
   const [refundPolicies, setRefundPolicies] = useState({});
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(false);
-
   const [errors, setErrors] = useState({});
   const [eventImages, setEventImages] = useState([]);
   const [activeSection, setActiveSection] = useState("basic");
@@ -67,24 +66,162 @@ function CreateEventPage() {
     fetchCategories();
   }, [fetchCategories]);
 
+  const validateStringInput = (value, fieldName) => {
+    if (!value || value.trim() === "") {
+      return `${fieldName} is required`;
+    }
+
+    if (/^\d+$/.test(value.trim())) {
+      return `${fieldName} cannot contain only numbers`;
+    }
+    return null;
+  };
+
+  const validateNumberInput = (value, fieldName, min = 0) => {
+    if (!value || value === "") {
+      return `${fieldName} is required`;
+    }
+
+    if (isNaN(value) || isNaN(Number.parseFloat(value))) {
+      return `${fieldName} must be a valid number`;
+    }
+    const numValue = Number.parseFloat(value);
+    if (numValue < min) {
+      return `${fieldName} must be at least ${min}`;
+    }
+    return null;
+  };
+
+  const validateFutureDate = (dateValue) => {
+    if (!dateValue) {
+      return "Date is required";
+    }
+    const selectedDate = new Date(dateValue);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return "Event date must be in the future";
+    }
+    return null;
+  };
+
+  const validateTimeRange = (startTime, endTime) => {
+    const errors = {};
+
+    if (!startTime) {
+      errors.startTime = "Start time is required";
+    }
+    if (!endTime) {
+      errors.endTime = "End time is required";
+    }
+
+    if (startTime && endTime) {
+      if (startTime === endTime) {
+        errors.endTime = "End time cannot be the same as start time";
+      } else if (startTime >= endTime) {
+        errors.endTime = "End time must be after start time";
+      }
+    }
+
+    return errors;
+  };
+
+  const validateTicketCapacity = (ticketTiers, totalCapacity) => {
+    const errors = {};
+    const totalTickets = ticketTiers.reduce((sum, tier) => {
+      const quantity = Number.parseInt(tier.availableQuantity) || 0;
+      return sum + quantity;
+    }, 0);
+
+    const maxCapacity = Number.parseInt(totalCapacity) || 0;
+
+    if (totalTickets > maxCapacity) {
+      errors.ticketCapacity = `Total ticket quantity (${totalTickets}) cannot exceed event capacity (${maxCapacity})`;
+    }
+
+    return errors;
+  };
+
+  const validateZipCode = (zipCode) => {
+    if (!zipCode || zipCode.trim() === "") {
+      return "Zip code is required";
+    }
+
+    if (!/^[a-zA-Z0-9\s-]{3,10}$/.test(zipCode.trim())) {
+      return "Please enter a valid zip code";
+    }
+    return null;
+  };
+
+  const validateCoordinates = (latitude, longitude) => {
+    const errors = {};
+
+    if (latitude && (isNaN(latitude) || latitude < -90 || latitude > 90)) {
+      errors.latitude = "Latitude must be between -90 and 90";
+    }
+
+    if (
+      longitude &&
+      (isNaN(longitude) || longitude < -180 || longitude > 180)
+    ) {
+      errors.longitude = "Longitude must be between -180 and 180";
+    }
+
+    return errors;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
+
+  const handleNumberInputChange = (e, fieldName) => {
+    const { value } = e.target;
+
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [fieldName]: "" }));
+      return;
+    }
+
+    if (/^\d*\.?\d*$/.test(value)) {
+      setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+      if (errors[fieldName]) {
+        setErrors((prev) => ({ ...prev, [fieldName]: null }));
+      }
+    }
+  };
+
+  const handleStringInputChange = (e, fieldName) => {
+    const { value } = e.target;
+
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+    if (errors[fieldName]) {
+      setErrors((prev) => ({ ...prev, [fieldName]: null }));
+    }
+  };
+
   const handleAddTag = () => {
     const input = tagInputRef.current;
     const trimmedValue = input?.value.trim();
     if (trimmedValue) {
+      if (/^\d+$/.test(trimmedValue)) {
+        toast.error("Tags cannot contain only numbers");
+        return;
+      }
+
       setFormData((prev) => {
         const updatedTags = [...prev.tags, trimmedValue];
-        console.log("Updating tags with:", updatedTags);
         return {
           ...prev,
           tags: updatedTags,
@@ -93,6 +230,7 @@ function CreateEventPage() {
       input.value = "";
     }
   };
+
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
@@ -127,6 +265,15 @@ function CreateEventPage() {
   };
 
   const handleTicketTierChange = (index, field, value) => {
+    // Clear related errors
+    const errorKey = `ticketTiers_${index}_${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => ({ ...prev, [errorKey]: null }));
+    }
+    if (errors.ticketCapacity) {
+      setErrors((prev) => ({ ...prev, ticketCapacity: null }));
+    }
+
     setFormData((prev) => {
       const updatedTiers = prev.ticketTiers.map((tier, i) =>
         i === index ? { ...tier, [field]: value } : tier
@@ -143,42 +290,133 @@ function CreateEventPage() {
     const newErrors = {};
 
     if (section === "basic") {
-      if (!formData.eventName) newErrors.eventName = "Event name is required";
-      if (!formData.description)
-        newErrors.description = "Description is required";
-      if (!formData.venue.name) newErrors.venueName = "Venue name is required";
-      if (!formData.venue.address.street)
-        newErrors.street = "Street is required";
-      if (!formData.venue.address.city) newErrors.city = "City is required";
-      if (!formData.venue.address.state) newErrors.state = "State is required";
-      if (!formData.venue.address.country)
-        newErrors.country = "Country is required";
-      if (!formData.venue.address.zipCode)
-        newErrors.zipCode = "Zip code is required";
-      if (!formData.eventCategory)
+      // Validate string fields
+      const eventNameError = validateStringInput(
+        formData.eventName,
+        "Event name"
+      );
+      if (eventNameError) newErrors.eventName = eventNameError;
+
+      const descriptionError = validateStringInput(
+        formData.description,
+        "Description"
+      );
+      if (descriptionError) newErrors.description = descriptionError;
+
+      const venueNameError = validateStringInput(
+        formData.venue.name,
+        "Venue name"
+      );
+      if (venueNameError) newErrors.venueName = venueNameError;
+
+      const streetError = validateStringInput(
+        formData.venue.address.street,
+        "Street"
+      );
+      if (streetError) newErrors.street = streetError;
+
+      const cityError = validateStringInput(
+        formData.venue.address.city,
+        "City"
+      );
+      if (cityError) newErrors.city = cityError;
+
+      const stateError = validateStringInput(
+        formData.venue.address.state,
+        "State"
+      );
+      if (stateError) newErrors.state = stateError;
+
+      const countryError = validateStringInput(
+        formData.venue.address.country,
+        "Country"
+      );
+      if (countryError) newErrors.country = countryError;
+
+      // Validate zip code
+      const zipError = validateZipCode(formData.venue.address.zipCode);
+      if (zipError) newErrors.zipCode = zipError;
+
+      // Validate coordinates if provided
+      const coordErrors = validateCoordinates(
+        formData.venue.coordinates.latitude,
+        formData.venue.coordinates.longitude
+      );
+      Object.assign(newErrors, coordErrors);
+
+      if (!formData.eventCategory) {
         newErrors.eventCategory = "Category is required";
+      }
     } else if (section === "datetime") {
-      if (!formData.eventDate) newErrors.eventDate = "Date is required";
-      if (!formData.startTime) newErrors.startTime = "Start time is required";
-      if (!formData.endTime) newErrors.endTime = "End time is required";
-      if (!formData.totalCapacity)
-        newErrors.totalCapacity = "Attendee limit is required";
+      // Validate future date
+      const dateError = validateFutureDate(formData.eventDate);
+      if (dateError) newErrors.eventDate = dateError;
+
+      // Validate time range
+      const timeErrors = validateTimeRange(
+        formData.startTime,
+        formData.endTime
+      );
+      Object.assign(newErrors, timeErrors);
+
+      // Validate total capacity
+      const capacityError = validateNumberInput(
+        formData.totalCapacity,
+        "Total capacity",
+        1
+      );
+      if (capacityError) newErrors.totalCapacity = capacityError;
     } else if (section === "pricing") {
       if (formData.ticketTiers.length === 0) {
         newErrors.ticketTiers = "At least one ticket type is required";
       } else {
+        // Validate each ticket tier
         formData.ticketTiers.forEach((tier, index) => {
-          if (!tier.name) {
-            newErrors[`ticketTiers_${index}_name`] = "Ticket name is required";
+          const nameError = validateStringInput(tier.name, "Ticket name");
+          if (nameError) {
+            newErrors[`ticketTiers_${index}_name`] = nameError;
           }
-          if (!tier.price) {
-            newErrors[`ticketTiers_${index}_price`] = "Price is required";
+
+          const priceError = validateNumberInput(tier.price, "Price", 0);
+          if (priceError) {
+            newErrors[`ticketTiers_${index}_price`] = priceError;
           }
-          if (!tier.availableQuantity) {
-            newErrors[`ticketTiers_${index}_availableQuantity`] =
-              "Quantity is required";
+
+          const quantityError = validateNumberInput(
+            tier.availableQuantity,
+            "Quantity",
+            1
+          );
+          if (quantityError) {
+            newErrors[`ticketTiers_${index}_availableQuantity`] = quantityError;
+          }
+
+          if (tier.maxPerOrder && tier.maxPerOrder !== "") {
+            const maxPerOrderError = validateNumberInput(
+              tier.maxPerOrder,
+              "Max per order",
+              1
+            );
+            if (maxPerOrderError) {
+              newErrors[`ticketTiers_${index}_maxPerOrder`] = maxPerOrderError;
+            }
+
+            // Check if max per order exceeds available quantity
+            const maxOrder = Number.parseInt(tier.maxPerOrder);
+            const available = Number.parseInt(tier.availableQuantity);
+            if (!isNaN(maxOrder) && !isNaN(available) && maxOrder > available) {
+              newErrors[`ticketTiers_${index}_maxPerOrder`] =
+                "Max per order cannot exceed available quantity";
+            }
           }
         });
+
+        // Validate total ticket capacity
+        const capacityErrors = validateTicketCapacity(
+          formData.ticketTiers,
+          formData.totalCapacity
+        );
+        Object.assign(newErrors, capacityErrors);
       }
     }
 
@@ -194,7 +432,7 @@ function CreateEventPage() {
     const pricingValid = validateSection("pricing");
 
     if (!basicValid || !datetimeValid || !pricingValid) {
-      toast.error("Please fill in all required fields before submitting");
+      toast.error("Please fix all validation errors before submitting");
       return;
     }
 
@@ -271,7 +509,11 @@ function CreateEventPage() {
         }
       });
 
-      if (refundPoliciesEnabled && refundPolicies) {
+      if (
+        refundPoliciesEnabled &&
+        refundPolicies &&
+        refundPolicies.daysBeforeEvent
+      ) {
         formDataToSend.append("refundPolicy[type]", "time-based");
         formDataToSend.append(
           `refundPolicy[rules][daysBeforeEvent]`,
@@ -287,16 +529,16 @@ function CreateEventPage() {
         );
       }
 
-      // Append tags
       formData.tags.forEach((tag, index) => {
         formDataToSend.append(`tags[${index}]`, tag);
       });
 
       await createEvent(formDataToSend);
-
+      toast.success("Event created successfully!");
       navigate("/app/profile");
     } catch (error) {
       console.error("Error creating event:", error);
+      toast.error("Failed to create event. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -438,7 +680,9 @@ function CreateEventPage() {
                         id="eventName"
                         name="eventName"
                         value={formData.eventName}
-                        onChange={handleChange}
+                        onChange={(e) =>
+                          handleStringInputChange(e, "eventName")
+                        }
                         placeholder="Enter a catchy name for your event"
                         className={`w-full rounded-lg border ${
                           errors.eventName
@@ -504,7 +748,9 @@ function CreateEventPage() {
                       name="description"
                       rows="4"
                       value={formData.description}
-                      onChange={handleChange}
+                      onChange={(e) =>
+                        handleStringInputChange(e, "description")
+                      }
                       placeholder="Describe your event in detail - what can attendees expect?"
                       className={`w-full rounded-lg border ${
                         errors.description
@@ -541,6 +787,18 @@ function CreateEventPage() {
                         name="venueName"
                         value={formData.venue.name}
                         onChange={(e) => {
+                          const error = validateStringInput(
+                            e.target.value,
+                            "Venue name"
+                          );
+                          if (error && e.target.value) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              venueName: error,
+                            }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, venueName: null }));
+                          }
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
@@ -550,8 +808,18 @@ function CreateEventPage() {
                           }));
                         }}
                         placeholder="Enter venue name"
-                        className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                        className={`w-full rounded-lg border ${
+                          errors.venueName
+                            ? "border-red-300 bg-red-50"
+                            : "border-purple-200 bg-white"
+                        } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                       />
+                      {errors.venueName && (
+                        <div className="mt-1 flex items-center text-sm text-red-600">
+                          <FiAlertCircle className="mr-1 h-4 w-4" />
+                          {errors.venueName}
+                        </div>
+                      )}
                     </div>
 
                     {/* Address */}
@@ -566,6 +834,21 @@ function CreateEventPage() {
                             placeholder="Street"
                             value={formData.venue.address.street}
                             onChange={(e) => {
+                              const error = validateStringInput(
+                                e.target.value,
+                                "Street"
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  street: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  street: null,
+                                }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
@@ -577,8 +860,17 @@ function CreateEventPage() {
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.street
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.street && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.street}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <input
@@ -586,6 +878,15 @@ function CreateEventPage() {
                             placeholder="City"
                             value={formData.venue.address.city}
                             onChange={(e) => {
+                              const error = validateStringInput(
+                                e.target.value,
+                                "City"
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({ ...prev, city: error }));
+                              } else {
+                                setErrors((prev) => ({ ...prev, city: null }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
@@ -597,8 +898,17 @@ function CreateEventPage() {
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.city
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.city && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.city}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <input
@@ -606,6 +916,18 @@ function CreateEventPage() {
                             placeholder="State/Province"
                             value={formData.venue.address.state}
                             onChange={(e) => {
+                              const error = validateStringInput(
+                                e.target.value,
+                                "State"
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  state: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({ ...prev, state: null }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
@@ -617,8 +939,17 @@ function CreateEventPage() {
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.state
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.state && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.state}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <input
@@ -626,6 +957,18 @@ function CreateEventPage() {
                             placeholder="Zip/Postal Code"
                             value={formData.venue.address.zipCode}
                             onChange={(e) => {
+                              const error = validateZipCode(e.target.value);
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  zipCode: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  zipCode: null,
+                                }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
@@ -637,8 +980,17 @@ function CreateEventPage() {
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.zipCode
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.zipCode && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.zipCode}
+                            </div>
+                          )}
                         </div>
                         <div className="md:col-span-2">
                           <input
@@ -646,6 +998,21 @@ function CreateEventPage() {
                             placeholder="Country"
                             value={formData.venue.address.country}
                             onChange={(e) => {
+                              const error = validateStringInput(
+                                e.target.value,
+                                "Country"
+                              );
+                              if (error && e.target.value) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  country: error,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  country: null,
+                                }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
@@ -657,8 +1024,17 @@ function CreateEventPage() {
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.country
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.country && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.country}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -671,43 +1047,95 @@ function CreateEventPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <input
-                            type="text"
-                            placeholder="Latitude"
+                            type="number"
+                            step="any"
+                            placeholder="Latitude (-90 to 90)"
                             value={formData.venue.coordinates.latitude}
                             onChange={(e) => {
+                              const value = e.target.value;
+                              const coordErrors = validateCoordinates(
+                                value,
+                                formData.venue.coordinates.longitude
+                              );
+                              if (coordErrors.latitude) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  latitude: coordErrors.latitude,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  latitude: null,
+                                }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
                                   ...prev.venue,
                                   coordinates: {
                                     ...prev.venue.coordinates,
-                                    latitude: e.target.value,
+                                    latitude: value,
                                   },
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.latitude
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.latitude && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.latitude}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <input
-                            type="text"
-                            placeholder="Longitude"
+                            type="number"
+                            step="any"
+                            placeholder="Longitude (-180 to 180)"
                             value={formData.venue.coordinates.longitude}
                             onChange={(e) => {
+                              const value = e.target.value;
+                              const coordErrors = validateCoordinates(
+                                formData.venue.coordinates.latitude,
+                                value
+                              );
+                              if (coordErrors.longitude) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  longitude: coordErrors.longitude,
+                                }));
+                              } else {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  longitude: null,
+                                }));
+                              }
                               setFormData((prev) => ({
                                 ...prev,
                                 venue: {
                                   ...prev.venue,
                                   coordinates: {
                                     ...prev.venue.coordinates,
-                                    longitude: e.target.value,
+                                    longitude: value,
                                   },
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+                            className={`w-full rounded-lg border ${
+                              errors.longitude
+                                ? "border-red-300 bg-red-50"
+                                : "border-purple-200 bg-white"
+                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
                           />
+                          {errors.longitude && (
+                            <div className="mt-1 text-xs text-red-600">
+                              {errors.longitude}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -721,7 +1149,7 @@ function CreateEventPage() {
                         Map URL (Optional)
                       </label>
                       <input
-                        type="text"
+                        type="url"
                         id="mapUrl"
                         name="mapUrl"
                         value={formData.venue.mapUrl}
@@ -734,7 +1162,7 @@ function CreateEventPage() {
                             },
                           }));
                         }}
-                        placeholder="Google Maps or other map service URL"
+                        placeholder="https://maps.google.com/..."
                         className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
                       />
                     </div>
@@ -776,6 +1204,12 @@ function CreateEventPage() {
                         type="text"
                         ref={tagInputRef}
                         placeholder="Add tags (e.g., music, festival)"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag();
+                          }
+                        }}
                         className="flex-grow rounded-l-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
                       />
                       <button
@@ -787,7 +1221,8 @@ function CreateEventPage() {
                       </button>
                     </div>
                     <p className="mt-2 text-xs text-gray-500">
-                      Press Enter or click Add to add a tag
+                      Press Enter or click Add to add a tag. Tags cannot contain
+                      only numbers.
                     </p>
                   </div>
                 </div>
@@ -819,7 +1254,7 @@ function CreateEventPage() {
                                 className="relative aspect-video rounded-lg overflow-hidden"
                               >
                                 <img
-                                  src={image.preview}
+                                  src={image.preview || "/placeholder.svg"}
                                   alt={`Event preview ${index + 1}`}
                                   className="h-full w-full object-cover"
                                 />
@@ -903,7 +1338,22 @@ function CreateEventPage() {
                       id="eventDate"
                       name="eventDate"
                       value={formData.eventDate}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        const dateError = validateFutureDate(e.target.value);
+                        if (dateError) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            eventDate: dateError,
+                          }));
+                        } else {
+                          setErrors((prev) => ({ ...prev, eventDate: null }));
+                        }
+                        setFormData((prev) => ({
+                          ...prev,
+                          eventDate: e.target.value,
+                        }));
+                      }}
+                      min={new Date().toISOString().split("T")[0]}
                       className={`w-full rounded-lg border ${
                         errors.eventDate
                           ? "border-red-300 bg-red-50"
@@ -933,7 +1383,21 @@ function CreateEventPage() {
                         id="startTime"
                         name="startTime"
                         value={formData.startTime}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                          const timeErrors = validateTimeRange(
+                            e.target.value,
+                            formData.endTime
+                          );
+                          setErrors((prev) => ({
+                            ...prev,
+                            startTime: timeErrors.startTime || null,
+                            endTime: timeErrors.endTime || prev.endTime,
+                          }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            startTime: e.target.value,
+                          }));
+                        }}
                         className={`w-full rounded-lg border ${
                           errors.startTime
                             ? "border-red-300 bg-red-50"
@@ -961,7 +1425,21 @@ function CreateEventPage() {
                         id="endTime"
                         name="endTime"
                         value={formData.endTime}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                          const timeErrors = validateTimeRange(
+                            formData.startTime,
+                            e.target.value
+                          );
+                          setErrors((prev) => ({
+                            ...prev,
+                            endTime: timeErrors.endTime || null,
+                            startTime: timeErrors.startTime || prev.startTime,
+                          }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            endTime: e.target.value,
+                          }));
+                        }}
                         className={`w-full rounded-lg border ${
                           errors.endTime
                             ? "border-red-300 bg-red-50"
@@ -991,7 +1469,9 @@ function CreateEventPage() {
                       id="totalCapacity"
                       name="totalCapacity"
                       value={formData.totalCapacity}
-                      onChange={handleChange}
+                      onChange={(e) =>
+                        handleNumberInputChange(e, "totalCapacity")
+                      }
                       min="1"
                       placeholder="Maximum number of attendees"
                       className={`w-full rounded-lg border ${
@@ -1060,6 +1540,13 @@ function CreateEventPage() {
                     </div>
                   )}
 
+                  {errors.ticketCapacity && (
+                    <div className="mb-4 flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                      <FiAlertCircle className="mr-2 h-4 w-4" />
+                      {errors.ticketCapacity}
+                    </div>
+                  )}
+
                   {formData.ticketTiers.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-200 bg-white py-10">
                       <div className="mb-3 rounded-full bg-purple-100 p-3">
@@ -1109,13 +1596,28 @@ function CreateEventPage() {
                                 type="text"
                                 placeholder="e.g. VIP, Early Bird, General"
                                 value={tier.name}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  const error = validateStringInput(
+                                    e.target.value,
+                                    "Ticket name"
+                                  );
+                                  if (error && e.target.value) {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`ticketTiers_${index}_name`]: error,
+                                    }));
+                                  } else {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`ticketTiers_${index}_name`]: null,
+                                    }));
+                                  }
                                   handleTicketTierChange(
                                     index,
                                     "name",
                                     e.target.value
-                                  )
-                                }
+                                  );
+                                }}
                                 className={`w-full rounded-lg border ${
                                   errors[`ticketTiers_${index}_name`]
                                     ? "border-red-300 bg-red-50"
@@ -1140,13 +1642,29 @@ function CreateEventPage() {
                                   type="number"
                                   placeholder="0.00"
                                   value={tier.price}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    const error = validateNumberInput(
+                                      e.target.value,
+                                      "Price",
+                                      0
+                                    );
+                                    if (error && e.target.value) {
+                                      setErrors((prev) => ({
+                                        ...prev,
+                                        [`ticketTiers_${index}_price`]: error,
+                                      }));
+                                    } else {
+                                      setErrors((prev) => ({
+                                        ...prev,
+                                        [`ticketTiers_${index}_price`]: null,
+                                      }));
+                                    }
                                     handleTicketTierChange(
                                       index,
                                       "price",
                                       e.target.value
-                                    )
-                                  }
+                                    );
+                                  }}
                                   min="0"
                                   step="0.01"
                                   className={`w-full rounded-lg border ${
@@ -1174,13 +1692,31 @@ function CreateEventPage() {
                                   type="number"
                                   placeholder="Number of tickets"
                                   value={tier.availableQuantity}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    const error = validateNumberInput(
+                                      e.target.value,
+                                      "Quantity",
+                                      1
+                                    );
+                                    if (error && e.target.value) {
+                                      setErrors((prev) => ({
+                                        ...prev,
+                                        [`ticketTiers_${index}_availableQuantity`]:
+                                          error,
+                                      }));
+                                    } else {
+                                      setErrors((prev) => ({
+                                        ...prev,
+                                        [`ticketTiers_${index}_availableQuantity`]:
+                                          null,
+                                      }));
+                                    }
                                     handleTicketTierChange(
                                       index,
                                       "availableQuantity",
                                       e.target.value
-                                    )
-                                  }
+                                    );
+                                  }}
                                   min="1"
                                   className={`w-full rounded-lg border ${
                                     errors[
@@ -1211,16 +1747,69 @@ function CreateEventPage() {
                                 type="number"
                                 placeholder="Leave blank for no limit"
                                 value={tier.maxPerOrder || ""}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    const error = validateNumberInput(
+                                      e.target.value,
+                                      "Max per order",
+                                      1
+                                    );
+                                    if (error) {
+                                      setErrors((prev) => ({
+                                        ...prev,
+                                        [`ticketTiers_${index}_maxPerOrder`]:
+                                          error,
+                                      }));
+                                    } else {
+                                      const maxOrder = Number.parseInt(
+                                        e.target.value
+                                      );
+                                      const available = Number.parseInt(
+                                        tier.availableQuantity
+                                      );
+                                      if (
+                                        !isNaN(maxOrder) &&
+                                        !isNaN(available) &&
+                                        maxOrder > available
+                                      ) {
+                                        setErrors((prev) => ({
+                                          ...prev,
+                                          [`ticketTiers_${index}_maxPerOrder`]:
+                                            "Max per order cannot exceed available quantity",
+                                        }));
+                                      } else {
+                                        setErrors((prev) => ({
+                                          ...prev,
+                                          [`ticketTiers_${index}_maxPerOrder`]:
+                                            null,
+                                        }));
+                                      }
+                                    }
+                                  } else {
+                                    setErrors((prev) => ({
+                                      ...prev,
+                                      [`ticketTiers_${index}_maxPerOrder`]:
+                                        null,
+                                    }));
+                                  }
                                   handleTicketTierChange(
                                     index,
                                     "maxPerOrder",
                                     e.target.value
-                                  )
-                                }
+                                  );
+                                }}
                                 min="1"
-                                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                className={`w-full rounded-lg border ${
+                                  errors[`ticketTiers_${index}_maxPerOrder`]
+                                    ? "border-red-300 bg-red-50"
+                                    : "border-gray-200 bg-gray-50"
+                                } px-3 py-2.5 text-gray-900 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                               />
+                              {errors[`ticketTiers_${index}_maxPerOrder`] && (
+                                <div className="mt-1 text-xs text-red-600">
+                                  {errors[`ticketTiers_${index}_maxPerOrder`]}
+                                </div>
+                              )}
                               <p className="mt-1 text-xs text-gray-500">
                                 Limit how many tickets of this type a single
                                 customer can purchase. Leave blank for no limit.

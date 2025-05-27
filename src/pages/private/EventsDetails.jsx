@@ -14,6 +14,7 @@ import {
   FaTrash,
   FaTag,
   FaUsers,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoLocationOutline } from "react-icons/io5";
@@ -29,10 +30,13 @@ const EventsDetails = () => {
   const { defaultTexts } = useData();
   const [showMap, setShowMap] = useState(false);
   const [selectedTicketType, setSelectedTicketType] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     selectedEvent,
     fetchEventById,
+    deleteEvent,
     loading: eventLoading,
     error: eventError,
   } = useEventStore();
@@ -95,6 +99,29 @@ const EventsDetails = () => {
       0
     );
     return (totalSold / selectedEvent.totalCapacity) * 100;
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteEvent(eventID);
+      // Navigate back to events list or dashboard after successful deletion
+      navigate("/app/events");
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      // Handle error (show toast, etc.)
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
   };
 
   if (eventLoading) {
@@ -447,19 +474,10 @@ const EventsDetails = () => {
                 {showMap && (
                   <div className="mt-4 rounded-lg overflow-hidden shadow-md w-full h-[300px]">
                     <iframe
-                      src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(
-                        selectedEvent.venue?.address?.street +
-                          selectedEvent.venue?.address?.city +
-                          selectedEvent.venue?.address?.state
-                      )}`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen=""
+                      src={selectedEvent.venue?.mapUrl}
+                      width="600"
+                      height="450"
                       loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Event Location"
-                      className="rounded-lg"
                     ></iframe>
                   </div>
                 )}
@@ -611,7 +629,10 @@ const EventsDetails = () => {
                         {defaultTexts.eventDetails.editEventButton}
                       </button>
 
-                      <button className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
+                      <button
+                        onClick={handleDeleteClick}
+                        className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors duration-200"
+                      >
                         <FaTrash className="mr-2" />
                         Delete Event
                       </button>
@@ -623,6 +644,60 @@ const EventsDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <FaExclamationTriangle className="text-red-600" size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Delete Event
+                </h3>
+                <p className="text-sm text-gray-500">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete {selectedEvent.eventName}? This
+              will permanently remove the event and all associated data.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <FaTrash className="mr-2" />
+                    Delete Event
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {user.role === "user" && (
         <div id="register-form">
           <RegisterForm

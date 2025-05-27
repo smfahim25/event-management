@@ -156,7 +156,7 @@ export default function Dashboard() {
 
           <PendingApprovalCard
             title="Event Approvals"
-            count={dashboardData?.pendingRefunds}
+            count={dashboardData?.pendingEvents}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
