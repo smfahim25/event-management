@@ -572,7 +572,7 @@ const EditEvent = () => {
 
     try {
       await updateEvent(eventID, formDataObj);
-      toast.success("Event updated successfully!");
+
       navigate(`/app/eventDetails/${eventID}`);
     } catch (error) {
       console.error("Error updating event:", error);

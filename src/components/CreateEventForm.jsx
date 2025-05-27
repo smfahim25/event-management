@@ -68,12 +68,11 @@ function CreateEventPage() {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Validation helper functions
   const validateStringInput = (value, fieldName) => {
     if (!value || value.trim() === "") {
       return `${fieldName} is required`;
     }
-    // Check if the value contains only numbers (invalid for string fields)
+
     if (/^\d+$/.test(value.trim())) {
       return `${fieldName} cannot contain only numbers`;
     }
@@ -84,7 +83,7 @@ function CreateEventPage() {
     if (!value || value === "") {
       return `${fieldName} is required`;
     }
-    // Check if the value is not a valid number
+
     if (isNaN(value) || isNaN(Number.parseFloat(value))) {
       return `${fieldName} must be a valid number`;
     }
@@ -101,7 +100,7 @@ function CreateEventPage() {
     }
     const selectedDate = new Date(dateValue);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       return "Event date must be in the future";
@@ -367,6 +366,9 @@ function CreateEventPage() {
         1
       );
       if (capacityError) newErrors.totalCapacity = capacityError;
+      if (eventImages.length === 0) {
+        newErrors.eventImages = "At least one event image is required";
+      }
     } else if (section === "pricing") {
       if (formData.ticketTiers.length === 0) {
         newErrors.ticketTiers = "At least one ticket type is required";
