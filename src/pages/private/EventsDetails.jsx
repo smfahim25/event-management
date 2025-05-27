@@ -478,6 +478,7 @@ const EventsDetails = () => {
                       width="600"
                       height="450"
                       loading="lazy"
+                      className="w-full"
                     ></iframe>
                   </div>
                 )}
