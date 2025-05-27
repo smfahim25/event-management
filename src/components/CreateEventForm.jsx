@@ -21,6 +21,7 @@ import RefundPolicyManager from "./organization/RefundPolicy";
 import { useEventStore } from "../store/EventStore";
 import { useCategoryStore } from "../store/CategoryStore";
 import toast from "react-hot-toast";
+import { FaTrash } from "react-icons/fa";
 
 function CreateEventPage() {
   const navigate = useNavigate();
@@ -61,16 +62,18 @@ function CreateEventPage() {
   const [eventImages, setEventImages] = useState([]);
   const [activeSection, setActiveSection] = useState("basic");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
+  // Validation helper functions
   const validateStringInput = (value, fieldName) => {
     if (!value || value.trim() === "") {
       return `${fieldName} is required`;
     }
-
+    // Check if the value contains only numbers (invalid for string fields)
     if (/^\d+$/.test(value.trim())) {
       return `${fieldName} cannot contain only numbers`;
     }
@@ -81,7 +84,7 @@ function CreateEventPage() {
     if (!value || value === "") {
       return `${fieldName} is required`;
     }
-
+    // Check if the value is not a valid number
     if (isNaN(value) || isNaN(Number.parseFloat(value))) {
       return `${fieldName} must be a valid number`;
     }
@@ -98,7 +101,7 @@ function CreateEventPage() {
     }
     const selectedDate = new Date(dateValue);
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
 
     if (selectedDate < today) {
       return "Event date must be in the future";
@@ -147,7 +150,7 @@ function CreateEventPage() {
     if (!zipCode || zipCode.trim() === "") {
       return "Zip code is required";
     }
-
+    // Allow alphanumeric zip codes (for international support)
     if (!/^[a-zA-Z0-9\s-]{3,10}$/.test(zipCode.trim())) {
       return "Please enter a valid zip code";
     }
@@ -169,6 +172,11 @@ function CreateEventPage() {
     }
 
     return errors;
+  };
+
+  const extractSrcFromIframe = (htmlString) => {
+    const srcMatch = htmlString.match(/src=["']([^"']+)["']/i);
+    return srcMatch ? srcMatch[1] : htmlString;
   };
 
   const handleChange = (e) => {
@@ -265,7 +273,6 @@ function CreateEventPage() {
   };
 
   const handleTicketTierChange = (index, field, value) => {
-    // Clear related errors
     const errorKey = `ticketTiers_${index}_${field}`;
     if (errors[errorKey]) {
       setErrors((prev) => ({ ...prev, [errorKey]: null }));
@@ -290,7 +297,6 @@ function CreateEventPage() {
     const newErrors = {};
 
     if (section === "basic") {
-      // Validate string fields
       const eventNameError = validateStringInput(
         formData.eventName,
         "Event name"
@@ -333,11 +339,9 @@ function CreateEventPage() {
       );
       if (countryError) newErrors.country = countryError;
 
-      // Validate zip code
       const zipError = validateZipCode(formData.venue.address.zipCode);
       if (zipError) newErrors.zipCode = zipError;
 
-      // Validate coordinates if provided
       const coordErrors = validateCoordinates(
         formData.venue.coordinates.latitude,
         formData.venue.coordinates.longitude
@@ -348,18 +352,15 @@ function CreateEventPage() {
         newErrors.eventCategory = "Category is required";
       }
     } else if (section === "datetime") {
-      // Validate future date
       const dateError = validateFutureDate(formData.eventDate);
       if (dateError) newErrors.eventDate = dateError;
 
-      // Validate time range
       const timeErrors = validateTimeRange(
         formData.startTime,
         formData.endTime
       );
       Object.assign(newErrors, timeErrors);
 
-      // Validate total capacity
       const capacityError = validateNumberInput(
         formData.totalCapacity,
         "Total capacity",
@@ -370,7 +371,6 @@ function CreateEventPage() {
       if (formData.ticketTiers.length === 0) {
         newErrors.ticketTiers = "At least one ticket type is required";
       } else {
-        // Validate each ticket tier
         formData.ticketTiers.forEach((tier, index) => {
           const nameError = validateStringInput(tier.name, "Ticket name");
           if (nameError) {
@@ -401,7 +401,6 @@ function CreateEventPage() {
               newErrors[`ticketTiers_${index}_maxPerOrder`] = maxPerOrderError;
             }
 
-            // Check if max per order exceeds available quantity
             const maxOrder = Number.parseInt(tier.maxPerOrder);
             const available = Number.parseInt(tier.availableQuantity);
             if (!isNaN(maxOrder) && !isNaN(available) && maxOrder > available) {
@@ -411,7 +410,6 @@ function CreateEventPage() {
           }
         });
 
-        // Validate total ticket capacity
         const capacityErrors = validateTicketCapacity(
           formData.ticketTiers,
           formData.totalCapacity
@@ -534,7 +532,7 @@ function CreateEventPage() {
       });
 
       await createEvent(formDataToSend);
-      toast.success("Event created successfully!");
+
       navigate("/app/profile");
     } catch (error) {
       console.error("Error creating event:", error);
@@ -1146,25 +1144,38 @@ function CreateEventPage() {
                         htmlFor="mapUrl"
                         className="mb-2 flex items-center text-sm font-medium text-gray-700"
                       >
-                        Map URL (Optional)
+                        Embed Map URL (Optional)
+                        <button
+                          type="button"
+                          onClick={() => setShowMapModal(true)}
+                          className="ml-2 text-purple-600 hover:text-purple-800 text-xs underline"
+                        >
+                          How to get embed URL?
+                        </button>
                       </label>
                       <input
-                        type="url"
+                        type="text"
                         id="mapUrl"
                         name="mapUrl"
                         value={formData.venue.mapUrl}
                         onChange={(e) => {
+                          const value = e.target.value;
+                          const extractedSrc = extractSrcFromIframe(value);
                           setFormData((prev) => ({
                             ...prev,
                             venue: {
                               ...prev.venue,
-                              mapUrl: e.target.value,
+                              mapUrl: extractedSrc,
                             },
                           }));
                         }}
-                        placeholder="https://maps.google.com/..."
+                        placeholder="Paste Google Maps embed code or direct URL"
                         className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
                       />
+                      <p className="mt-1 text-xs text-gray-500">
+                        You can paste the full embed code from Google Maps -
+                        we&#39;ll extract the URL automatically
+                      </p>
                     </div>
                   </div>
 
@@ -2165,6 +2176,113 @@ function CreateEventPage() {
           </form>
         </div>
       </div>
+      {/* Map Instructions Modal */}
+      {showMapModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  How to Get Google Maps Embed URL
+                </h3>
+                <button
+                  onClick={() => setShowMapModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <FaTrash className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">
+                    Step-by-Step Instructions:
+                  </h4>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
+                    <li>
+                      Go to{" "}
+                      <a
+                        href="https://maps.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Google Maps
+                      </a>
+                    </li>
+                    <li>Search for your venue location</li>
+                    <li>Click the &quot;Share&quot; button</li>
+                    <li>Select &quot;Embed a map&quot; tab</li>
+                    <li>Copy the entire HTML code provided</li>
+                    <li>
+                      Paste it in the Map URL field - we&apos;ll extract the URL
+                      automatically
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Visual Guide:
+                  </h4>
+                  <img
+                    src="/map.jpeg"
+                    alt="Google Maps embed instructions"
+                    className="w-full rounded-lg border"
+                  />
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Example of what to copy:
+                  </h4>
+                  <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-x-auto">
+                    {
+                      '<iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>'
+                    }
+                  </div>
+                </div>
+
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-green-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="text-sm font-medium text-green-800">
+                        Pro Tip
+                      </h4>
+                      <p className="text-sm text-green-700 mt-1">
+                        You can paste the entire embed code - our system will
+                        automatically extract just the URL part you need!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => setShowMapModal(false)}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Got it!
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
