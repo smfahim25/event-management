@@ -558,36 +558,36 @@ export default function AttendeeTable({ eventId }) {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {booking.user?.name || "N/A"}
+                            {booking?.user?.name || "N/A"}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {booking.user?.email || "N/A"}
+                            {booking?.user?.email || "N/A"}
                           </div>
-                          {booking.user?.phone && (
+                          {booking?.user?.phone && (
                             <div className="text-xs text-gray-500">
-                              {booking.user.phone}
+                              {booking?.user.phone}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {booking.orderNumber || "N/A"}
+                      {booking?.orderNumber || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {booking.event?.name || "N/A"}
+                      {booking?.event?.name || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.organizer?.organizerName || "N/A"}
+                          {booking?.organizer?.organizerName || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {booking.organizer?.organizerEmail || "N/A"}
+                          {booking?.organizer?.organizerEmail || "N/A"}
                         </div>
-                        {booking.organizer?.organizerPhone && (
+                        {booking?.organizer?.organizerPhone && (
                           <div className="text-xs text-gray-500">
-                            {booking.organizer.organizerPhone}
+                            {booking?.organizer?.organizerPhone}
                           </div>
                         )}
                       </div>
@@ -596,20 +596,20 @@ export default function AttendeeTable({ eventId }) {
                       {booking.totalTickets || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {booking.paymentDetails?.currency || "$"}
-                      {booking.paymentDetails?.totalAmount?.toFixed(2) ||
+                      {booking?.paymentDetails?.currency || "$"}
+                      {booking?.paymentDetails?.totalAmount?.toFixed(2) ||
                         "0.00"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getPaymentStatusBadge(booking.paymentDetails?.status)}
+                      {getPaymentStatusBadge(booking?.paymentDetails?.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getRefundStatusBadge(
-                        booking.refundDetails?.status || "none"
+                        booking?.refundDetails?.status || "none"
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(booking.createdAt)}
+                      {formatDate(booking?.createdAt)}
                     </td>
                   </tr>
                 ))}

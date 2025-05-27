@@ -257,32 +257,32 @@ export default function AttendeeTable({ eventId }) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBookings.map((booking) => (
+                {filteredBookings?.map((booking) => (
                   <tr key={booking._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-800 font-medium">
-                            {booking.user.name.charAt(0)}
+                            {booking?.user?.name?.charAt(0)}
                           </div>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {booking.user.name}
+                            {booking?.user?.name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {booking.user.email}
+                            {booking?.user?.email}
                           </div>
                           {booking.user.phone && (
                             <div className="text-xs text-gray-500">
-                              {booking.user.phone}
+                              {booking?.user?.phone}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {booking.orderNumber}
+                      {booking?.orderNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {booking.event?.name || "N/A"}
@@ -291,19 +291,19 @@ export default function AttendeeTable({ eventId }) {
                       {booking.totalTickets}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      ${booking.paymentDetails.totalAmount.toFixed(2)}{" "}
-                      {booking.paymentDetails.currency}
+                      ${booking?.paymentDetails?.totalAmount?.toFixed(2)}{" "}
+                      {booking?.paymentDetails?.currency}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getPaymentStatusBadge(booking.paymentDetails.status)}
+                      {getPaymentStatusBadge(booking?.paymentDetails?.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getRefundStatusBadge(
-                        booking.refundDetails?.status || "none"
+                        booking?.refundDetails?.status || "none"
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(booking.createdAt)}
+                      {formatDate(booking?.createdAt)}
                     </td>
                   </tr>
                 ))}

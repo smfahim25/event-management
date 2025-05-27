@@ -652,7 +652,7 @@ export default function UserProfileComponent() {
                           </h3>
                           <span
                             className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-                              order.status === "succeeded"
+                              order.status === "success"
                                 ? "bg-green-50 text-green-700 border-green-200"
                                 : order.status === "pending"
                                 ? "bg-yellow-50 text-yellow-700 border-yellow-200"
@@ -699,11 +699,11 @@ export default function UserProfileComponent() {
                                 <p className="font-medium">{item.tierName}</p>
                                 <p className="text-sm text-gray-500">
                                   Qty: {item.quantity} × $
-                                  {item.price.toFixed(2)}
+                                  {item?.price?.toFixed(2)}
                                 </p>
                               </div>
                               <p className="font-medium">
-                                ${item.totalPrice.toFixed(2)}
+                                ${item?.totalPrice?.toFixed(2)}
                               </p>
                             </div>
                           ))}
@@ -732,7 +732,19 @@ export default function UserProfileComponent() {
                                 Platform Fee:
                               </span>
                               <span className="ml-2">
-                                ${order?.organizerRevenue?.toFixed(2)}
+                                $
+                                {order?.paymentDetails?.platformFee?.toFixed(2)}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-blue-600">
+                                Organizer Revenue:
+                              </span>
+                              <span className="ml-2">
+                                $
+                                {order?.paymentDetails?.organizerRevenue?.toFixed(
+                                  2
+                                )}
                               </span>
                             </div>
                           </div>
