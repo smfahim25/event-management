@@ -350,6 +350,9 @@ function CreateEventPage() {
       if (!formData.eventCategory) {
         newErrors.eventCategory = "Category is required";
       }
+      if (eventImages.length === 0) {
+        newErrors.eventImages = "At least one event image is required";
+      }
     } else if (section === "datetime") {
       const dateError = validateFutureDate(formData.eventDate);
       if (dateError) newErrors.eventDate = dateError;
@@ -366,9 +369,6 @@ function CreateEventPage() {
         1
       );
       if (capacityError) newErrors.totalCapacity = capacityError;
-      if (eventImages.length === 0) {
-        newErrors.eventImages = "At least one event image is required";
-      }
     } else if (section === "pricing") {
       if (formData.ticketTiers.length === 0) {
         newErrors.ticketTiers = "At least one ticket type is required";
@@ -1313,6 +1313,11 @@ function CreateEventPage() {
                       )}
                     </div>
                   </div>
+                  {errors.eventImages && (
+                    <div className="mt-1 text-xs text-red-600">
+                      {errors.eventImages}
+                    </div>
+                  )}
                 </div>
               </div>
 
