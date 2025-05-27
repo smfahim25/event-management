@@ -44,7 +44,9 @@ export const useAuthStore = create((set) => ({
         toast.error(data.message || "Registration failed");
         throw new Error(data.message || "Registration failed");
       }
-      toast.success("Registration successful");
+      toast.success(
+        "Registration successfull & Check your email for verification"
+      );
       return data.data;
     } catch (err) {
       set({ error: err.message });

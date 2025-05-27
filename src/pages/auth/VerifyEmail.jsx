@@ -49,13 +49,13 @@ const EmailVerificationPage = () => {
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
       console.log(response);
-      // Simulate different responses for demo
+
       setTimeout(() => {
         const randomOutcome = Math.random();
         if (randomOutcome > 0.3) {
