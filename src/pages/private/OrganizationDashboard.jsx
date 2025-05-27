@@ -262,16 +262,7 @@ const OrganizerDashboard = () => {
             >
               Overview
             </button>
-            <button
-              onClick={() => handleTabChange("earnings")}
-              className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
-                activeTab === "earnings"
-                  ? "border-purple-500 text-purple-600"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              }`}
-            >
-              Earnings
-            </button>
+
             <button
               onClick={() => handleTabChange("payouts")}
               className={`border-b-2 px-1 py-4 text-xs sm:text-sm font-medium whitespace-nowrap ${
@@ -442,12 +433,6 @@ const OrganizerDashboard = () => {
                 <EarningsSummary data={dashboardData} />
               </div>
             </div>
-          </div>
-        )}
-
-        {activeTab === "earnings" && (
-          <div className="space-y-6 sm:space-y-8">
-            <EarningsSummary eventId={selectedEvent} />
           </div>
         )}
 

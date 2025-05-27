@@ -136,7 +136,6 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
             >
               <option value="user">User</option>
               <option value="organizer">Organizer</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
 

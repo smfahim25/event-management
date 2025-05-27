@@ -97,7 +97,6 @@ const EarningsSummary = ({ data }) => {
 
   const currentData = data || sampleData;
 
-  // Build ticket types array using the new data structure
   const ticketTypes = currentData?.ticketTypeRevenue
     ? Object.entries(currentData.ticketTypeRevenue).map(([name, revenue]) => ({
         name,
