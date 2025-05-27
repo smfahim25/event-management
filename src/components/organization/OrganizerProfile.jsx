@@ -110,7 +110,6 @@ const OrganizerProfile = () => {
     }
   }, [user, organizerProfile]);
 
-  // Fetch events created by organizer
   const fetchCreatedEvents = async () => {
     try {
       await fetchOrganizerEvents();
@@ -776,7 +775,7 @@ const OrganizerProfile = () => {
               {events.length > 0 ? (
                 <div className="flex flex-wrap gap-5">
                   {events.map((event) => (
-                    <EventCard key={event.id} {...event} />
+                    <EventCard key={event._id} {...event} />
                   ))}
                 </div>
               ) : (

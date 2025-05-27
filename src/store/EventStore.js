@@ -161,8 +161,6 @@ export const useEventStore = create((set, get) => ({
         params.isSpecialCommision = isSpecialCommision;
       }
 
-      console.log(params);
-
       const res = await axios.get(`${API_BASE}/all`, {
         headers: get().getAuthHeaders(),
         params,

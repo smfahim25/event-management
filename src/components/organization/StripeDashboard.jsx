@@ -22,6 +22,7 @@ const StripeDashboard = () => {
   const { user } = useAuthStore();
   const { getPayouts, createPayout } = usePayoutStore();
   const { getOrganizerEarnings } = useOrganizerStore();
+  const [call, setCall] = useState(false);
 
   useEffect(() => {
     getOrganizerEarnings().then((data) => {
@@ -29,7 +30,7 @@ const StripeDashboard = () => {
         setEarnings(data.earnings);
       }
     });
-  }, [getOrganizerEarnings]);
+  }, [getOrganizerEarnings, call]);
 
   useEffect(() => {
     const fetchStripeData = async () => {
@@ -129,7 +130,7 @@ const StripeDashboard = () => {
           ...prev,
           availableBalance: prev.availableBalance - amount,
         }));
-
+        setCall(true);
         setWithdrawAmount("");
       } else {
         toast.error("Failed to process payout. Please try again.");

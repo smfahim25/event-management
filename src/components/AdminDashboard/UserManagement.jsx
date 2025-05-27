@@ -29,7 +29,6 @@ export default function UserManagement() {
   }, [getAllUsers]);
 
   const filteredUsers = useMemo(() => {
-    console.log("Recomputing filtered users...", users);
     if (!Array.isArray(users?.users) || users?.users.length === 0) return [];
 
     return users?.users?.filter((user) => {
@@ -260,7 +259,7 @@ export default function UserManagement() {
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <tr
-                      key={user.id}
+                      key={user._id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">

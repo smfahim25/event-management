@@ -453,7 +453,7 @@ const OrganizerDashboard = () => {
               {events.length > 0 ? (
                 <div className="flex flex-wrap gap-5 items-center">
                   {events.map((event) => (
-                    <EventCard key={event.id} {...event} />
+                    <EventCard key={event._id} {...event} />
                   ))}
                 </div>
               ) : (
