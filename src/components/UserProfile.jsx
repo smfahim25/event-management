@@ -709,47 +709,6 @@ export default function UserProfileComponent() {
                           ))}
                         </div>
 
-                        {/* Payment Details */}
-                        <div className="mb-4 p-3 bg-purple-100 rounded-md">
-                          <h5 className="font-medium text-blue-900 mb-2">
-                            Payment Details:
-                          </h5>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <span className="text-blue-600">Method:</span>
-                              <span className="ml-2 capitalize">
-                                {order?.paymentDetails?.method}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-blue-600">Currency:</span>
-                              <span className="ml-2">
-                                {order?.paymentDetails?.currency}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-blue-600">
-                                Platform Fee:
-                              </span>
-                              <span className="ml-2">
-                                $
-                                {order?.paymentDetails?.platformFee?.toFixed(2)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-blue-600">
-                                Organizer Revenue:
-                              </span>
-                              <span className="ml-2">
-                                $
-                                {order?.paymentDetails?.organizerRevenue?.toFixed(
-                                  2
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
                         {/* Refund Status */}
                         {order.refundDetails.status !== "none" && (
                           <div className="mb-4 p-3 bg-orange-50 rounded-md">
