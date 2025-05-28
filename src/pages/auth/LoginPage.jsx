@@ -57,7 +57,7 @@ function LoginPage() {
       const user = await login(formData.email, formData.password);
       if (user?.data?.isPreviouslyLoggedIn) {
         window.location.href = "/";
-      } else {
+      } else if (user?.data?.isPreviouslyLoggedIn === false) {
         navigate(`/event-prefer?id=${user?.data?._id}`);
       }
     } catch (error) {

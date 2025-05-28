@@ -60,7 +60,13 @@ export const useOrganizerStore = create((set, get) => ({
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to create organizer.");
       }
-      toast.success("Organizer created successfully");
+      toast.success(
+        "Organizer request success. Your request may take up to 24 hours to be approved.",
+        {
+          duration: 7000,
+        }
+      );
+
       set({ success: true });
     } catch (err) {
       set({ error: err.message });
