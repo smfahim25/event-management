@@ -195,7 +195,7 @@ function AdminProfile() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                         >
                           {loading ? "Saving..." : "Save Changes"}
                         </button>
