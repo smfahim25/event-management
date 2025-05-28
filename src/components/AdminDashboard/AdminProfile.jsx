@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -10,7 +9,6 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { useAuthStore } from "../../store/AuthStore";
-import { Password } from "phosphor-react";
 
 function AdminProfile() {
   const [passwordData, setPasswordData] = useState({
@@ -85,7 +83,7 @@ function AdminProfile() {
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           {/* Profile Header */}
-          <div className="bg-purple-600 px-6 py-4">
+          <div className="bg-indigo-600 px-6 py-4">
             <h1 className="text-2xl font-bold text-white">My Profile</h1>
           </div>
 
@@ -213,7 +211,7 @@ function AdminProfile() {
                       <button
                         type="button"
                         onClick={() => setEditMode(true)}
-                        className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
                         Edit Profile
                       </button>
@@ -304,7 +302,7 @@ function AdminProfile() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                         >
                           {loading ? "Updating..." : "Update Password"}
                         </button>
@@ -326,7 +324,7 @@ function AdminProfile() {
                     </p>
                     <button
                       onClick={() => setIsChangingPassword(true)}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                       Change Password
                     </button>
