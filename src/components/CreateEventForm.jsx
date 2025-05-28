@@ -1042,7 +1042,7 @@ function CreateEventPage() {
                     {/* Coordinates */}
                     <div className="mb-4">
                       <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Coordinates (Optional)
+                        Map Location (Optional)
                       </label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
