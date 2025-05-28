@@ -7,6 +7,7 @@ import {
   FiDownload,
   FiMenu,
   FiX,
+  FiPlus,
 } from "react-icons/fi";
 import StripeDashboard from "../../components/organization/StripeDashboard";
 import EarningsSummary from "../../components/organization/OrganizationSummary";
@@ -17,6 +18,7 @@ import AttendeeTable from "../../components/organization/AttendeeList";
 import Nav from "../../components/Nav";
 import { useBookingStore } from "../../store/BookingStore";
 import RefundTable from "../../components/organization/RefundTable";
+import { useNavigate } from "react-router-dom";
 
 const OrganizerDashboard = () => {
   const { defaultTexts } = useData();
@@ -26,6 +28,7 @@ const OrganizerDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const { events, fetchOrganizerEvents } = useEventStore();
   const { exportBookings, getOrganizerDashboard } = useBookingStore();
@@ -180,6 +183,15 @@ const OrganizerDashboard = () => {
                     </>
                   )}
                 </button>
+                <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
+                  <button
+                    onClick={() => navigate("/app/create-event")}
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white h-10 px-4 py-2"
+                  >
+                    <FiPlus className="mr-2 h-4 w-4" />
+                    {profilePage.createEventButton || "Create Event"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -245,6 +257,15 @@ const OrganizerDashboard = () => {
               </>
             )}
           </button>
+          <div className="flex justify-center sm:justify-end mt-6 sm:mt-0">
+            <button
+              onClick={() => navigate("/app/create-event")}
+              className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium shadow-sm  bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white h-10 px-4 py-2"
+            >
+              <FiPlus className="mr-2 h-4 w-4" />
+              {profilePage.createEventButton || "Create Event"}
+            </button>
+          </div>
         </div>
       )}
 

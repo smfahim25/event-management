@@ -47,7 +47,7 @@ export const useAuthStore = create((set) => ({
       toast.success(
         "Registration successfull & Check your email for verification",
         {
-          duration: 3000,
+          duration: 6000,
         }
       );
       return data.data;

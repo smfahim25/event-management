@@ -3,65 +3,98 @@ import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import { FaUserAlt } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import CustomUserButton from "./ui/CustomUserButton";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
 import { useAuthStore } from "../store/AuthStore";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const Nav = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const navRef = useRef(null);
+  const sidebarRef = useRef(null); // Add ref for sidebar
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { defaultTexts } = useData();
   const location = useLocation();
   const isProfilePage = location.pathname === "/app/profile";
+  const isDashboardPage = location.pathname === "/dashboard";
+  const isMyticketPage = location.pathname === "/app/my-tickets";
 
   useEffect(() => {
-    if (isProfilePage && navRef.current) {
-      gsap.to(navRef.current, {
-        backgroundColor: "rgb(0,0,0,0.7)",
-        duration: 0.6,
-      });
-      return;
-    }
+    const handleScroll = () => {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 100);
+    };
 
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: document.body,
-      start: "100vh -100vh",
-      onEnter: () =>
-        gsap.to(navRef.current, {
-          backgroundColor: "rgb(0,0,0,0.7)",
-          duration: 0.6,
-        }),
-      onLeaveBack: () =>
-        gsap.to(navRef.current, {
-          backgroundColor: "rgba(0,0,0,0.1)",
-          duration: 0.6,
-        }),
-    });
+    window.addEventListener("scroll", handleScroll);
 
-    // Cleanup function
     return () => {
-      if (scrollTrigger) {
-        scrollTrigger.kill();
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Click outside to close sidebar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isMenuOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest(".hamburger-button") // Don't close if clicking hamburger
+      ) {
+        setIsMenuOpen(false);
       }
     };
-  }, [isProfilePage]);
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  // Prevent body scroll when sidebar is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
+
+  const getNavbarClasses = () => {
+    if (isProfilePage || isDashboardPage || isMyticketPage) {
+      return "bg-black text-white";
+    }
+
+    if (isScrolled) {
+      return "bg-black text-white";
+    } else {
+      return "bg-white/30 text-white";
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav
       ref={navRef}
-      className={`nav w-full z-40 text-white ${
-        isProfilePage ? "bg-black" : "bg-black/30"
-      } h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0`}
+      className={`nav w-full z-40 ${getNavbarClasses()} h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm`}
     >
       <div
         onClick={() => {
@@ -75,175 +108,174 @@ const Nav = () => {
         <h2>{defaultTexts.nav.logo}</h2>
       </div>
 
-      {/* Overlay for Dark Background when Menu is Open */}
+      {/* Backdrop Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
-          onClick={toggleMenu}
-        ></div>
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeMenu}
+        />
       )}
 
-      {/* Sidebar Drawer */}
+      {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-[#0c0311]/30 text-white transform ${
+        ref={sidebarRef}
+        className={`fixed top-0 right-0 h-full w-64 bg-black transform ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out lg:hidden z-50`}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
-          {/* Profile Icon */}
-          <div className="profile h-10 w-10 rounded-full bg-black/40 flex items-center justify-center">
+        {/* Header Section */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-black">
+          <div className="profile h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
             {user ? (
               <CustomUserButton />
             ) : (
               <a href="/login">
-                <FaUserAlt />
+                <FaUserAlt className="text-gray-600" />
               </a>
             )}
           </div>
 
-          {/* Close Icon */}
-          <button onClick={toggleMenu} className="text-2xl text-white">
+          <button
+            onClick={closeMenu}
+            className="text-2xl text-white hover:text-gray-300"
+          >
             <RiCloseLine />
           </button>
         </div>
 
-        {/* Menu Items for mobo*/}
-        <ul className="flex flex-col gap-6 font-semibold text-lg px-6 mt-8 ">
-          <li
-            className="cursor-pointer"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/");
-            }}
-          >
-            {defaultTexts.nav.menuItems[0]}
-          </li>
-          <li
-            className="cursor-pointer"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/app/events");
-            }}
-          >
-            {defaultTexts.nav.menuItems[1]}
-          </li>
+        {/* Menu Items Section */}
+        <div className="bg-black/50 py-4">
+          <ul className="flex flex-col gap-6 font-semibold text-lg px-6 text-white">
+            <li
+              className="cursor-pointer hover:text-blue-600 transition-colors"
+              onClick={() => {
+                closeMenu();
+                navigate("/");
+              }}
+            >
+              {defaultTexts.nav.menuItems[0]}
+            </li>
 
-          {user?.role === "user" && (
-            <>
+            <li
+              className="cursor-pointer hover:text-blue-600 transition-colors"
+              onClick={() => {
+                closeMenu();
+                navigate("/app/events");
+              }}
+            >
+              {defaultTexts.nav.menuItems[1]}
+            </li>
+
+            {user?.role === "user" && (
               <li
-                style={{
-                  cursor: "pointer",
-                }}
+                className="cursor-pointer hover:text-blue-600 transition-colors"
                 onClick={() => {
+                  closeMenu();
                   navigate("/app/profile");
                 }}
               >
                 {defaultTexts.nav.menuItems[3]}
               </li>
-            </>
-          )}
+            )}
 
-          <li
-            className="cursor-pointer"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/contact-us");
-            }}
-          >
-            {defaultTexts.nav.menuItems[2]}
-          </li>
-          {user?.role === "organizer" && (
+            {user?.role === "user" && (
+              <li
+                className="cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => {
+                  closeMenu();
+                  navigate("/app/my-tickets");
+                }}
+              >
+                My Tickets
+              </li>
+            )}
+
             <li
-              className="cursor-pointer"
+              className="cursor-pointer hover:text-blue-600 transition-colors"
               onClick={() => {
-                setIsMenuOpen(false);
-                navigate("/dashboard");
+                closeMenu();
+                navigate("/contact-us");
               }}
             >
-              {defaultTexts.nav.menuItems[4]}
+              {defaultTexts.nav.menuItems[2]}
             </li>
-          )}
-          {user && (
-            <li
-              className="cursor-pointer"
-              onClick={() => {
-                setIsMenuOpen(false);
-                navigate("/app/profile");
-              }}
-            >
-              profile
-            </li>
-          )}
-          {user && (
-            <li
-              className="cursor-pointer"
-              onClick={() => {
-                setIsMenuOpen(false);
-                logout();
-                navigate("/");
-              }}
-            >
-              Logout
-            </li>
-          )}
-        </ul>
+
+            {user?.role === "organizer" && (
+              <li
+                className="cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => {
+                  closeMenu();
+                  navigate("/dashboard");
+                }}
+              >
+                {defaultTexts.nav.menuItems[4]}
+              </li>
+            )}
+
+            {user && (
+              <li
+                className="cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => {
+                  closeMenu();
+                  navigate("/app/profile");
+                }}
+              >
+                Profile
+              </li>
+            )}
+
+            {user && (
+              <li
+                className="cursor-pointer hover:text-red-600 transition-colors"
+                onClick={() => {
+                  closeMenu();
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
 
       {/* Desktop Menu */}
       <ul className="hidden lg:flex justify-center gap-4 lg:gap-6 xl:gap-10 font-semibold text-lg">
         <li
-          style={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            navigate("/");
-          }}
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => navigate("/")}
         >
           {defaultTexts.nav.menuItems[0]}
         </li>
+
         <li
-          style={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            navigate("/app/events");
-          }}
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => navigate("/app/events")}
         >
           {defaultTexts.nav.menuItems[1]}
         </li>
 
         {user?.role === "user" && (
-          <>
-            <li
-              style={{
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                navigate("/app/profile");
-              }}
-            >
-              {defaultTexts.nav.menuItems[3]}
-            </li>
-          </>
+          <li
+            className="cursor-pointer hover:text-blue-600 transition-colors"
+            onClick={() => navigate("/app/profile")}
+          >
+            {defaultTexts.nav.menuItems[3]}
+          </li>
         )}
 
         <li
-          style={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            navigate("/contact-us");
-          }}
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => navigate("/contact-us")}
         >
           {defaultTexts.nav.menuItems[2]}
         </li>
+
         {user?.role === "organizer" && (
           <li
-            className="cursor-pointer"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/dashboard");
-            }}
+            className="cursor-pointer hover:text-blue-600 transition-colors"
+            onClick={() => navigate("/dashboard")}
           >
             {defaultTexts.nav.menuItems[4]}
           </li>
@@ -251,24 +283,41 @@ const Nav = () => {
       </ul>
 
       <div className="flex gap-3 md:gap-4 lg:gap-5">
-        <div className="">
+        <div>
           <LanguageDropdown />
         </div>
 
         {/* Hamburger Icon for Mobile */}
         <button
-          className="sm:block lg:hidden text-white text-3xl"
+          className={`hamburger-button sm:block lg:hidden text-3xl ${
+            isProfilePage || isDashboardPage || isScrolled
+              ? "text-white"
+              : "text-white"
+          } hover:text-gray-300 transition-colors`}
           onClick={toggleMenu}
         >
           {!isMenuOpen && <RiMenu3Line />}
         </button>
+
         {/* Profile Icon for Desktop */}
-        <div className="profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-black/40 hidden lg:flex items-center justify-center">
+        <div
+          className={`profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full ${
+            isProfilePage || isDashboardPage || isScrolled
+              ? "bg-white/20"
+              : "bg-gray-100"
+          } hidden lg:flex items-center justify-center`}
+        >
           {user ? (
             <CustomUserButton />
           ) : (
             <a href="/login">
-              <FaUserAlt />
+              <FaUserAlt
+                className={`${
+                  isProfilePage || isDashboardPage || isScrolled
+                    ? "text-white"
+                    : "text-gray-600"
+                }`}
+              />
             </a>
           )}
         </div>

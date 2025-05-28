@@ -25,19 +25,31 @@ export const useEventStore = create((set, get) => ({
     page = 1,
     limit = 10,
     sort = "eventDate",
+    thisMonth,
+    thisWeek,
+    today,
   }) => {
     set({ loading: true });
+
+    // Build params dynamically
+    const params = {
+      searchTerm,
+      eventCategory,
+      page,
+      limit,
+      sort,
+    };
+
+    if (thisMonth) params.thisMonth = true;
+    if (thisWeek) params.thisWeek = true;
+    if (today) params.today = true;
+
     try {
       const res = await axios.get(`${API_BASE}`, {
         headers: get().getAuthHeaders(),
-        params: {
-          searchTerm,
-          eventCategory,
-          page,
-          limit,
-          sort,
-        },
+        params,
       });
+
       set({
         events: res.data.data || [],
         total: res.data.meta?.total || 0,

@@ -2,23 +2,13 @@ import { useState, useEffect } from "react";
 import { FiCreditCard, FiMail } from "react-icons/fi";
 import { PiTicket } from "react-icons/pi";
 import { useData } from "../context/DataContext";
-import Modal from "./ui/Modal";
-import UserTicket from "./ui/UserTicket";
 import { FaEdit, FaSave } from "react-icons/fa";
 import { FileText, MapPin, Phone, User, X } from "phosphor-react";
 import { FaUserCheck } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/AuthStore";
 import { useBookingStore } from "../store/BookingStore";
-import toast from "react-hot-toast";
-
-const mockRefundPolicies = {
-  event101: { policy: "Non-refundable", deadline: null },
-  event102: {
-    policy: "Refundable up to 3 days before event",
-    deadline: "2025-06-07",
-  },
-};
+import EventGroupedTickets from "./ui/EventGroupedTickets";
 
 export default function UserProfileComponent() {
   const { defaultTexts } = useData();
@@ -37,8 +27,6 @@ export default function UserProfileComponent() {
   const [boughtTickets, setBoughtTickets] = useState([]);
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
-  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dataFetched, setDataFetched] = useState(false);
   const [pagination, setPagination] = useState({
@@ -170,17 +158,6 @@ export default function UserProfileComponent() {
     }
   };
 
-  const handleRequestRefund = (ticket) => {
-    setSelectedTicket(ticket);
-    setIsRefundModalOpen(true);
-  };
-
-  const submitRefundRequest = () => {
-    toast.success(`Refund request submitted for ${selectedTicket.eventName}`);
-    setIsRefundModalOpen(false);
-    setSelectedTicket(null);
-  };
-
   const isRefundable = (ticket) => {
     if (!ticket?.eventDate || !ticket?.refund?.rules?.length) return false;
 
@@ -284,40 +261,6 @@ export default function UserProfileComponent() {
           </div>
         </div>
       </div>
-
-      <Modal
-        isOpen={isRefundModalOpen}
-        onClose={() => setIsRefundModalOpen(false)}
-      >
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-4">Request Refund</h2>
-          <p className="mb-4">
-            You are requesting a refund for:{" "}
-            <strong>{selectedTicket?.eventName}</strong>
-          </p>
-          <p className="mb-4">
-            Refund Policy:{" "}
-            <strong>
-              {selectedTicket &&
-                mockRefundPolicies[selectedTicket.eventId]?.policy}
-            </strong>
-          </p>
-          <div className="flex justify-end gap-2 mt-6">
-            <button
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              onClick={() => setIsRefundModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-              onClick={submitRefundRequest}
-            >
-              Submit Request
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       <div className="w-full">
         <div className="flex space-x-1 rounded-md bg-muted p-1 mb-4">
@@ -560,7 +503,7 @@ export default function UserProfileComponent() {
                 {profilePage.ticketsSection?.title || "My Tickets"}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Access your purchased tickets
+                Access your purchased tickets organized by event
               </p>
             </div>
             <div className="p-6 pt-0">
@@ -572,17 +515,10 @@ export default function UserProfileComponent() {
                 </div>
               ) : boughtTickets.length > 0 ? (
                 <>
-                  <div className="flex items-center flex-wrap gap-5">
-                    {boughtTickets.map((ticket, index) => (
-                      <div key={index} className="relative">
-                        <UserTicket
-                          data={ticket}
-                          isRefundable={isRefundable(ticket)}
-                          onRequestRefund={handleRequestRefund}
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <EventGroupedTickets
+                    boughtTickets={boughtTickets}
+                    isRefundable={isRefundable}
+                  />
 
                   {/* Pagination controls */}
                   <div className="mt-6 flex items-center justify-between">

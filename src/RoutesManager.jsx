@@ -31,6 +31,7 @@ import RequireAdmin from "./pages/private/RequireAdmin";
 import PaymentSuccess from "./pages/payment/PaymentSuccess";
 import PaymentFailed from "./pages/payment/PaymentFailed";
 import EmailVerificationPage from "./pages/auth/VerifyEmail";
+import TicketPage from "./pages/private/TicketPage";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -57,6 +58,14 @@ function RoutesManager() {
         element={
           <RequireUser>
             <ProfilePage />
+          </RequireUser>
+        }
+      />
+      <Route
+        path="/app/my-tickets"
+        element={
+          <RequireUser>
+            <TicketPage />
           </RequireUser>
         }
       />

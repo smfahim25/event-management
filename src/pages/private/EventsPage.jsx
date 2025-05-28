@@ -4,7 +4,7 @@ import Nav from "../../components/Nav";
 import img from "../../assets/eventPage.jpg";
 import { useData } from "../../context/DataContext";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { FiTag } from "react-icons/fi";
+import { FiTag, FiCalendar } from "react-icons/fi";
 import { useEventStore } from "../../store/EventStore";
 import { useCategoryStore } from "../../store/CategoryStore";
 import { FileSearch2 } from "lucide-react";
@@ -12,6 +12,7 @@ import { FileSearch2 } from "lucide-react";
 function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [timeFilter, setTimeFilter] = useState("");
   const [page, setPage] = useState(1);
   const [limit /*setLimit*/] = useState(10);
   const { defaultTexts } = useData();
@@ -30,7 +31,6 @@ function EventsPage() {
     loading: categoriesLoading,
   } = useCategoryStore();
 
-  // Calculate total pages
   const totalPages = Math.ceil(total / limit);
 
   useEffect(() => {
@@ -43,16 +43,24 @@ function EventsPage() {
       fetchAllEvents({
         searchTerm: searchQuery,
         eventCategory: selectedCategory,
+        today: timeFilter === "today",
+        thisWeek: timeFilter === "thisWeek",
+        thisMonth: timeFilter === "thisMonth",
         page,
         limit,
       });
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, selectedCategory, page, limit, fetchAllEvents]);
+  }, [searchQuery, selectedCategory, timeFilter, page, limit, fetchAllEvents]);
 
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
+    setPage(1);
+  };
+
+  const handleTimeFilterChange = (e) => {
+    setTimeFilter(e.target.value);
     setPage(1);
   };
 
@@ -101,7 +109,7 @@ function EventsPage() {
           >
             <div className="flex-grow w-full md:w-64">
               <label
-                htmlFor="eventCategory"
+                htmlFor="eventSearch"
                 className="mb-2 flex items-center text-sm font-medium text-gray-700"
               >
                 <FileSearch2 className="mr-2 h-4 w-4 text-purple-500" />
@@ -112,6 +120,7 @@ function EventsPage() {
                 <FaSearch className="absolute left-4 top-6 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
+                  id="eventSearch"
                   placeholder={
                     defaultTexts.eventCard.searchPlaceholder ||
                     "Search events..."
@@ -147,6 +156,28 @@ function EventsPage() {
                 ))}
               </select>
             </div>
+
+            <div className="w-full md:w-64">
+              <label
+                htmlFor="timeFilter"
+                className="mb-2 flex items-center text-sm font-medium text-gray-700"
+              >
+                <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
+                Time Period
+              </label>
+              <select
+                id="timeFilter"
+                name="timeFilter"
+                value={timeFilter}
+                onChange={handleTimeFilterChange}
+                className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+              >
+                <option value="">All Time</option>
+                <option value="today">Today</option>
+                <option value="thisWeek">This Week</option>
+                <option value="thisMonth">This Month</option>
+              </select>
+            </div>
           </form>
         </div>
 
@@ -164,7 +195,9 @@ function EventsPage() {
 
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {searchQuery || selectedCategory ? "Search Results" : "All Events"}
+            {searchQuery || selectedCategory || timeFilter
+              ? "Search Results"
+              : "All Events"}
             {total > 0 && (
               <span className="text-sm text-gray-500 ml-2">
                 (Page {page} of {totalPages} - {total} total events)

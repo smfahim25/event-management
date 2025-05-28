@@ -177,9 +177,9 @@ export default function EventCard({
               {defaultTexts?.eventCard?.organizedBy || "Organized by"}{" "}
               <span
                 className="text-[#E167FF] inline-block max-w-[100px] truncate align-bottom"
-                title={organizerId?.name}
+                title={organizerId?.organizerProfile?.organizationName}
               >
-                {organizerId?.name}
+                {organizerId?.organizerProfile?.organizationName}
               </span>
             </span>
           </div>

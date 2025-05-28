@@ -98,7 +98,7 @@ const EventsDetails = () => {
       (sum, tier) => sum + tier.sold,
       0
     );
-    return (totalSold / selectedEvent.totalCapacity) * 100;
+    return (totalSold / selectedEvent.totalTickets) * 100;
   };
 
   const handleDeleteClick = () => {
@@ -276,40 +276,9 @@ const EventsDetails = () => {
                 <p className="text-gray-700 leading-relaxed mb-6">
                   {selectedEvent.description}
                 </p>
-
-                {user?.role === "user" && (
-                  <div className="mt-8">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-600 font-medium">
-                        Tickets Remaining
-                      </span>
-                      <span className="text-gray-800 font-bold">
-                        {selectedEvent.totalCapacity -
-                          selectedEvent.ticketTiers.reduce(
-                            (sum, tier) => sum + tier.sold,
-                            0
-                          )}{" "}
-                        of {selectedEvent.totalCapacity}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-purple-600 h-2.5 rounded-full"
-                        style={{ width: `${calculateProgress()}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      {selectedEvent.ticketTiers.reduce(
-                        (sum, tier) => sum + tier.sold,
-                        0
-                      )}{" "}
-                      tickets sold
-                    </p>
-                  </div>
-                )}
               </div>
 
-              {user?.role === "user" && (
+              {user?.role === "organizer" && (
                 <div
                   className="bg-white rounded-xl shadow-sm p-8 mb-8"
                   id="tickets"
@@ -339,8 +308,8 @@ const EventsDetails = () => {
                                 size={14}
                               />
                               <span>
-                                {ticket.availableQuantity - ticket.sold}{" "}
-                                remaining ({ticket.sold} sold)
+                                {ticket.availableQuantity} remaining (
+                                {ticket.sold} sold)
                               </span>
                             </div>
                           </div>
@@ -529,7 +498,7 @@ const EventsDetails = () => {
                             {defaultTexts.eventDetails.totalTickets}
                           </span>
                           <span className="font-semibold">
-                            {selectedEvent.totalCapacity}
+                            {selectedEvent.totalTickets}
                           </span>
                         </div>
 
@@ -550,7 +519,7 @@ const EventsDetails = () => {
                             {defaultTexts.eventDetails.ticketsRemaining}
                           </span>
                           <span className="font-semibold">
-                            {selectedEvent.totalCapacity -
+                            {selectedEvent.totalTickets -
                               selectedEvent.ticketTiers.reduce(
                                 (sum, tier) => sum + tier.sold,
                                 0
