@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/AuthStore";
 
 function LoginPage() {
@@ -13,6 +13,7 @@ function LoginPage() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +54,12 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      const user = await login(formData.email, formData.password);
+      if (user?.data?.isPreviouslyLoggedIn) {
+        window.location.href = "/";
+      } else {
+        navigate(`/event-prefer?id=${user?.data?._id}`);
+      }
     } catch (error) {
       console.error("Login failed", error);
     } finally {
@@ -61,7 +67,6 @@ function LoginPage() {
     }
   };
 
-  // Show auth error from the store if present
   const formError = authError || errors.form;
 
   return (

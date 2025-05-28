@@ -82,10 +82,9 @@ export const useAuthStore = create((set) => ({
       toast.success("Login successful");
       if (role === "admin" || role === "superAdmin") {
         window.location.href = "/admin";
-      } else {
-        window.location.href = "/";
       }
       set({ user: userData, loading: false });
+      return result;
     } catch (err) {
       set({ error: err.message, loading: false });
       toast.error(err.message);

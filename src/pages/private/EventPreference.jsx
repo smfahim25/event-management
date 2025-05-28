@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/AuthStore";
 import toast from "react-hot-toast";
 
@@ -18,7 +18,6 @@ export default function EventPreferences() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id");
-  const navigate = useNavigate();
 
   const { updatePreferences } = useAuthStore();
 
@@ -58,7 +57,7 @@ export default function EventPreferences() {
         userId: id,
         preferences: selectedPreferences,
       });
-      navigate("/login");
+      window.location.href = "/";
     } catch (error) {
       console.error("Failed to submit preferences:", error);
       toast.error("Something went wrong while submitting preferences.");
@@ -75,7 +74,7 @@ export default function EventPreferences() {
         userId: id,
         preferences: allPreferences,
       });
-      navigate("/login");
+      window.location.href = "/";
     } catch (error) {
       console.error("Failed to skip preferences:", error);
       alert("Something went wrong while skipping preferences.");

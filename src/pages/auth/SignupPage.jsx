@@ -81,7 +81,7 @@ function SignupPage() {
         formData.password
       );
       if (data) {
-        navigate(`/event-prefer?id=${data?._id}`);
+        navigate(`/signup-success`);
       }
     } catch (error) {
       console.error("Signup failed", error);

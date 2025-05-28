@@ -32,6 +32,7 @@ import PaymentSuccess from "./pages/payment/PaymentSuccess";
 import PaymentFailed from "./pages/payment/PaymentFailed";
 import EmailVerificationPage from "./pages/auth/VerifyEmail";
 import TicketPage from "./pages/private/TicketPage";
+import SignupSuccess from "./pages/auth/SignupSuccess";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -136,6 +137,7 @@ function RoutesManager() {
       <Route path="/payment-failed" element={<PaymentFailed />} />
       <Route path="/success-split" element={<SuccessSplit />} />
       <Route path="/verify-email" element={<EmailVerificationPage />} />
+      <Route path="/signup-success" element={<SignupSuccess />} />
 
       {/* <Route path="*" element={<Navigate to="/" />} /> */}
     </Routes>
