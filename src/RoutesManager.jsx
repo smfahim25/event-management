@@ -33,6 +33,7 @@ import PaymentFailed from "./pages/payment/PaymentFailed";
 import EmailVerificationPage from "./pages/auth/VerifyEmail";
 import TicketPage from "./pages/private/TicketPage";
 import SignupSuccess from "./pages/auth/SignupSuccess";
+import AdminProfile from "./components/AdminDashboard/AdminProfile";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -122,6 +123,7 @@ function RoutesManager() {
         <Route path="refunds" element={<RefundResolution />} />
         <Route path="content" element={<ContentManagement />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="profile" element={<AdminProfile />} />
       </Route>
       <Route
         path="/dashboard"
