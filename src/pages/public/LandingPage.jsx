@@ -5,8 +5,14 @@ import Events from "../../components/Events";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
 import Marquee from "../../components/Marquee";
+import { useSettingsStore } from "../../store/SettingsStore";
+import { useEffect } from "react";
 
 function LandingPage() {
+  const { sliders: heroslider, fetchSliders } = useSettingsStore();
+  useEffect(() => {
+    fetchSliders();
+  }, []);
   return (
     <>
       <div>
@@ -22,7 +28,7 @@ function LandingPage() {
         </div>
         <div className="relative z-30 ">
           <Nav />
-          <Hero />
+          <Hero sliders={heroslider} />
           <Info />
           <Marquee />
           <InfoSecond />

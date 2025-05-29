@@ -11,6 +11,7 @@ export const useSettingsStore = create((set, get) => ({
   settings: null,
   policy: null,
   adminStats: null,
+  sliders: [],
 
   setLoading: (value) => set({ loading: value }),
   setError: (error) => set({ error }),
@@ -104,11 +105,11 @@ export const useSettingsStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   updateCommission: async (eventId, commission) => {
     set({ loading: true, error: null, success: false });
 
     try {
-      console.log(eventId);
       const response = await fetch(`${API_BASE}/events/${eventId}/commission`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...get().getHeaders() },
@@ -123,6 +124,80 @@ export const useSettingsStore = create((set, get) => ({
       set({ loading: false, success: true });
     } catch (error) {
       set({ loading: false, error: error.message });
+    }
+  },
+
+  fetchSliders: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/settings/sliders`, {
+        headers: get().getHeaders(),
+      });
+      const data = await res.json();
+      set({ sliders: data.data });
+      return data.data;
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  createSlider: async (formData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/settings/create-slider`, {
+        method: "POST",
+        headers: get().getHeaders(),
+        body: formData,
+      });
+      const data = await res.json();
+      toast.success("Slider created successfully");
+      await get().fetchSliders();
+      return data;
+    } catch (err) {
+      set({ error: err.message });
+      toast.error("Failed to create slider");
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateSlider: async (id, formData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/settings/sliders/${id}`, {
+        method: "PATCH",
+        headers: get().getHeaders(),
+        body: formData,
+      });
+      const data = await res.json();
+      await get().fetchSliders();
+      return data;
+    } catch (err) {
+      set({ error: err.message });
+      toast.error("Failed to update slider");
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  deleteSlider: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/settings/sliders/${id}`, {
+        method: "DELETE",
+        headers: get().getHeaders(),
+      });
+      const data = await res.json();
+      toast.success("Slider deleted successfully");
+      await get().fetchSliders();
+      return data;
+    } catch (err) {
+      set({ error: err.message });
+      toast.error("Failed to delete slider");
+    } finally {
+      set({ loading: false });
     }
   },
 }));

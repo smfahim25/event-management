@@ -5,7 +5,7 @@ import Carousel from "./ui/Carousel";
 import { useNavigate } from "react-router-dom";
 import { useData } from "../context/DataContext";
 
-const Hero = () => {
+const Hero = ({ sliders }) => {
   const navigate = useNavigate();
   const { defaultTexts } = useData();
 
@@ -13,7 +13,7 @@ const Hero = () => {
     <>
       <section className="w-full h-screen bg-black/60 relative">
         <div className="absolute w-full h-full overflow-hidden mix-blend-overlay">
-          <Carousel />
+          <Carousel sliders={sliders} />
         </div>
         <div className="absolute bottom-20 left-12 flex flex-col text-white">
           <div className="mb-12">

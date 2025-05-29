@@ -14,7 +14,8 @@ export default function SettingsPage() {
 
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryFiles, setGalleryFiles] = useState([]);
-  const [galleryImageIndexes, setGalleryImageIndexes] = useState([]);
+  const [galleryTitles, setGalleryTitles] = useState([]);
+  const [galleryPositions, setGalleryPositions] = useState([]);
 
   const [bannerImages, setBannerImages] = useState([null, null]);
   const [bannerFiles, setBannerFiles] = useState([null, null]);
@@ -24,14 +25,58 @@ export default function SettingsPage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [sliders, setSliders] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sliderToDelete, setSliderToDelete] = useState(null);
 
-  const { settings, fetchSettings, updateSettings } = useSettingsStore();
+  const {
+    settings,
+    sliders: heroslider,
+    fetchSettings,
+    updateSettings,
+    fetchSliders,
+    createSlider,
+    updateSlider,
+    deleteSlider,
+  } = useSettingsStore();
+
+  const generateRandomTitle = () => {
+    const adjectives = [
+      "Amazing",
+      "Beautiful",
+      "Creative",
+      "Delightful",
+      "Elegant",
+      "Fantastic",
+      "Gorgeous",
+      "Inspiring",
+      "Joyful",
+      "Lovely",
+    ];
+    const nouns = [
+      "Slider",
+      "Image",
+      "Banner",
+      "Display",
+      "Showcase",
+      "Presentation",
+      "Exhibit",
+      "Feature",
+      "Highlight",
+      "Preview",
+    ];
+
+    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${randomAdj} ${randomNoun}`;
+  };
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
         setIsLoading(true);
         await fetchSettings();
+        await fetchSliders();
       } catch (error) {
         console.error("Failed to fetch settings:", error);
       } finally {
@@ -40,7 +85,28 @@ export default function SettingsPage() {
     };
 
     loadSettings();
-  }, [fetchSettings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (heroslider) {
+      setSliders(heroslider);
+
+      if (heroslider && heroslider.length > 0) {
+        const images = heroslider.map((slider) => slider.image);
+        const titles = heroslider.map(
+          (slider) => slider.title || generateRandomTitle()
+        );
+        const positions = heroslider.map(
+          (slider) => slider.position || heroslider.indexOf(slider) + 1
+        );
+
+        setGalleryImages(images);
+        setGalleryTitles(titles);
+        setGalleryPositions(positions);
+      }
+    }
+  }, [heroslider]);
 
   useEffect(() => {
     if (settings) {
@@ -57,14 +123,6 @@ export default function SettingsPage() {
         setIsLogoUploaded(true);
       }
 
-      if (settings.galleryImages) {
-        setGalleryImages(settings.galleryImages);
-      }
-
-      if (settings.galleryImageIndexes) {
-        setGalleryImageIndexes(settings.galleryImageIndexes);
-      }
-
       if (settings.bannerImages) {
         setBannerImages(settings.bannerImages);
       }
@@ -75,7 +133,6 @@ export default function SettingsPage() {
     }
   }, [settings]);
 
-  // Company Logo Handler (Single Image)
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -94,40 +151,85 @@ export default function SettingsPage() {
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      const newGalleryFiles = [...galleryFiles, ...files];
-      setGalleryFiles(newGalleryFiles);
+      const newGalleryFiles = [...galleryFiles];
+      const newGalleryImages = [...galleryImages];
+      const newGalleryTitles = [...galleryTitles];
+      const newGalleryPositions = [...galleryPositions];
 
-      const startIndex =
-        galleryImageIndexes.length > 0
-          ? Math.max(...galleryImageIndexes) + 1
-          : 1;
-      const newIndexes = [...galleryImageIndexes];
+      // Find the highest current position to start numbering new images
+      const highestPosition = Math.max(...galleryPositions, 0);
 
       files.forEach((file, index) => {
-        newIndexes.push(startIndex + index);
+        newGalleryFiles.push(file);
+        newGalleryTitles.push(generateRandomTitle());
+        newGalleryPositions.push(highestPosition + index + 1);
+
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
-            setGalleryImages((prev) => [...prev, e.target.result]);
+            newGalleryImages.push(e.target.result);
+            setGalleryImages([...newGalleryImages]);
           }
         };
         reader.readAsDataURL(file);
       });
 
-      setGalleryImageIndexes(newIndexes);
+      setGalleryFiles(newGalleryFiles);
+      setGalleryTitles(newGalleryTitles);
+      setGalleryPositions(newGalleryPositions);
     }
   };
 
-  const removeGalleryImage = (index) => {
-    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
-    setGalleryFiles((prev) => prev.filter((_, i) => i !== index));
-    setGalleryImageIndexes((prev) => prev.filter((_, i) => i !== index));
+  const confirmDeleteSlider = (index) => {
+    setSliderToDelete(index);
+    setShowDeleteModal(true);
   };
 
-  const updateGalleryImageIndex = (imageIndex, newEventIndex) => {
-    const updatedIndexes = [...galleryImageIndexes];
-    updatedIndexes[imageIndex] = parseInt(newEventIndex) || 0;
-    setGalleryImageIndexes(updatedIndexes);
+  const handleDeleteSlider = async () => {
+    if (sliderToDelete !== null) {
+      try {
+        if (sliders[sliderToDelete]?._id) {
+          await deleteSlider(sliders[sliderToDelete]._id);
+        }
+
+        const newGalleryImages = [...galleryImages];
+        const newGalleryFiles = [...galleryFiles];
+        const newGalleryTitles = [...galleryTitles];
+        const newGalleryPositions = [...galleryPositions];
+        const newSliders = [...sliders];
+
+        newGalleryImages.splice(sliderToDelete, 1);
+        newGalleryFiles.splice(sliderToDelete, 1);
+        newGalleryTitles.splice(sliderToDelete, 1);
+        newGalleryPositions.splice(sliderToDelete, 1);
+        newSliders.splice(sliderToDelete, 1);
+
+        setGalleryImages(newGalleryImages);
+        setGalleryFiles(newGalleryFiles);
+        setGalleryTitles(newGalleryTitles);
+        setGalleryPositions(newGalleryPositions);
+        setSliders(newSliders);
+      } catch (error) {
+        console.error("Failed to delete slider:", error);
+      } finally {
+        setShowDeleteModal(false);
+        setSliderToDelete(null);
+      }
+    }
+  };
+
+  const updateGalleryTitle = (index, newTitle) => {
+    const newTitles = [...galleryTitles];
+    newTitles[index] = newTitle;
+    setGalleryTitles(newTitles);
+  };
+
+  const updateGalleryPosition = (index, newPosition) => {
+    const position = Math.max(1, parseInt(newPosition) || 1);
+
+    const newPositions = [...galleryPositions];
+    newPositions[index] = position;
+    setGalleryPositions(newPositions);
   };
 
   const handleBannerChange = (e, index) => {
@@ -181,40 +283,75 @@ export default function SettingsPage() {
     try {
       setIsSaving(true);
 
-      const formData = new FormData();
-
-      formData.append("companyName", companyName);
-      formData.append("taxAlias", taxAlias);
-      formData.append("taxPercentage", taxPercentage);
-      formData.append("daysBeforeProductExpiry", daysBeforeProductExpiry);
-      formData.append("address", address);
+      const settingsFormData = new FormData();
+      settingsFormData.append("companyName", companyName);
+      settingsFormData.append("taxAlias", taxAlias);
+      settingsFormData.append("taxPercentage", taxPercentage);
+      settingsFormData.append(
+        "daysBeforeProductExpiry",
+        daysBeforeProductExpiry
+      );
+      settingsFormData.append("address", address);
 
       if (logoFile) {
-        formData.append("companyLogo", logoFile);
+        settingsFormData.append("companyLogo", logoFile);
       }
-
-      // Append gallery images with their indexes
-      galleryFiles.forEach((file, index) => {
-        if (file) {
-          formData.append(`galleryImage_${index}`, file);
-          formData.append(
-            `galleryImageIndex_${index}`,
-            galleryImageIndexes[index] || 0
-          );
-        }
-      });
 
       bannerFiles.forEach((file, index) => {
         if (file) {
-          formData.append(`bannerImage_${index}`, file);
+          settingsFormData.append(`bannerImage_${index}`, file);
         }
       });
 
       if (certificateFile) {
-        formData.append("certificateImage", certificateFile);
+        settingsFormData.append("certificateImage", certificateFile);
       }
 
-      await updateSettings(formData);
+      await updateSettings(settingsFormData);
+
+      const maxLength = Math.max(
+        galleryFiles.length,
+        sliders?.length || 0,
+        galleryImages.length
+      );
+
+      for (let i = 0; i < maxLength; i++) {
+        if (!galleryFiles[i] && (!sliders[i] || !galleryTitles[i])) {
+          continue;
+        }
+
+        const formData = new FormData();
+
+        if (galleryFiles[i]) {
+          formData.append("image", galleryFiles[i]);
+        }
+
+        if (galleryPositions[i] !== undefined) {
+          formData.append("position", galleryPositions[i].toString());
+        }
+
+        if (galleryTitles[i]) {
+          formData.append("title", galleryTitles[i]);
+        } else if (!galleryFiles[i]) {
+          formData.append("title", generateRandomTitle());
+        }
+
+        if (i < sliders?.length && sliders[i]?._id) {
+          if (
+            galleryFiles[i] ||
+            galleryTitles[i] ||
+            galleryPositions[i] !== undefined
+          ) {
+            await updateSlider(sliders[i]._id, formData);
+          }
+        } else if (galleryFiles[i]) {
+          await createSlider(formData);
+        }
+      }
+
+      // Fetch updated sliders
+      const updatedSliders = await fetchSliders();
+      setSliders(updatedSliders);
     } catch (error) {
       console.error("Failed to save settings:", error);
       alert("Failed to save settings. Please try again.");
@@ -238,6 +375,33 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this slider image?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteSlider}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
@@ -455,7 +619,7 @@ export default function SettingsPage() {
         {/* Gallery Images Section (Multiple Images) */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Hero Images (Multiple Upload with Postion number)
+            Slider Images
           </h2>
 
           <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 mb-4">
@@ -474,10 +638,7 @@ export default function SettingsPage() {
                 ></path>
               </svg>
               <p className="text-sm text-gray-500 mb-2">
-                Upload multiple images for your hero section
-              </p>
-              <p className="text-xs text-gray-400 mb-4">
-                Set display order for each image using the event index
+                Upload multiple images for your slider section
               </p>
               <label className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-md cursor-pointer hover:bg-green-200 transition-colors">
                 <svg
@@ -493,7 +654,7 @@ export default function SettingsPage() {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   ></path>
                 </svg>
-                Add Images
+                Add Slider Images
                 <input
                   type="file"
                   multiple
@@ -509,7 +670,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-700">
-                  Uploaded Images
+                  Slider Images
                 </h3>
                 <span className="text-sm text-gray-500">
                   {galleryImages.length} image
@@ -527,11 +688,11 @@ export default function SettingsPage() {
                       <div className="relative group flex-shrink-0">
                         <img
                           src={image}
-                          alt={`Gallery ${index + 1}`}
+                          alt={`Slider ${index + 1}`}
                           className="w-full sm:w-32 h-32 object-cover rounded-lg border"
                         />
                         <button
-                          onClick={() => removeGalleryImage(index)}
+                          onClick={() => confirmDeleteSlider(index)}
                           className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                         >
                           <svg
@@ -553,135 +714,42 @@ export default function SettingsPage() {
                       <div className="flex-1 space-y-3">
                         <div>
                           <h4 className="font-medium text-gray-800 mb-1">
-                            Image {index + 1}
+                            Slider {index + 1}
                           </h4>
-                          <p className="text-sm text-gray-500">
-                            Set the display order for this image
-                          </p>
                         </div>
 
-                        <div className="flex items-center space-x-3">
-                          <label className="text-sm font-medium text-gray-600 min-w-0">
-                            Event Index:
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Title:
                           </label>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="number"
-                              min="0"
-                              max="999"
-                              value={galleryImageIndexes[index] || 0}
-                              onChange={(e) =>
-                                updateGalleryImageIndex(index, e.target.value)
-                              }
-                              className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                              placeholder="0"
-                            />
-                            <span className="text-xs text-gray-400">
-                              (0 = first)
-                            </span>
-                          </div>
+                          <input
+                            type="text"
+                            value={galleryTitles[index] || ""}
+                            onChange={(e) =>
+                              updateGalleryTitle(index, e.target.value)
+                            }
+                            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                            placeholder="Slider title"
+                          />
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-sm text-gray-500">
-                            <svg
-                              className="h-4 w-4 mr-1"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m4 0H4m15 0v16a2 2 0 01-2 2H7a2 2 0 01-2-2V4h14z"
-                              ></path>
-                            </svg>
-                            Display Order: #{galleryImageIndexes[index] || 0}
-                          </div>
-
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() =>
-                                updateGalleryImageIndex(
-                                  index,
-                                  Math.max(
-                                    0,
-                                    (galleryImageIndexes[index] || 0) - 1
-                                  )
-                                )
-                              }
-                              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                              title="Move up in order"
-                            >
-                              <svg
-                                className="h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M5 15l7-7 7 7"
-                                ></path>
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() =>
-                                updateGalleryImageIndex(
-                                  index,
-                                  (galleryImageIndexes[index] || 0) + 1
-                                )
-                              }
-                              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                              title="Move down in order"
-                            >
-                              <svg
-                                className="h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M19 9l-7 7-7-7"
-                                ></path>
-                              </svg>
-                            </button>
-                          </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Position:
+                          </label>
+                          <input
+                            type="number"
+                            defaultValue={galleryPositions[index] || index + 1}
+                            onChange={(e) =>
+                              updateGalleryPosition(index, e.target.value)
+                            }
+                            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          />
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {/* Summary Section */}
-              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                <h4 className="font-medium text-green-800 mb-2">
-                  Display Order Summary
-                </h4>
-                <div className="text-sm text-green-700">
-                  {galleryImages
-                    .map((_, index) => ({
-                      imageNumber: index + 1,
-                      eventIndex: galleryImageIndexes[index] || 0,
-                    }))
-                    .sort((a, b) => a.eventIndex - b.eventIndex)
-                    .map((item, sortedIndex) => (
-                      <span
-                        key={item.imageNumber}
-                        className="inline-block mr-3 mb-1"
-                      >
-                        #{sortedIndex + 1}: Image {item.imageNumber} (Index:{" "}
-                        {item.eventIndex})
-                      </span>
-                    ))}
-                </div>
               </div>
             </div>
           )}
