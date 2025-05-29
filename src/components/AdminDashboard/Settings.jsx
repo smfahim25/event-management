@@ -255,15 +255,6 @@ export default function SettingsPage() {
     }
   };
 
-  const removeBannerImage = (index) => {
-    const newBannerImages = [...bannerImages];
-    const newBannerFiles = [...bannerFiles];
-    newBannerImages[index] = null;
-    newBannerFiles[index] = null;
-    setBannerImages(newBannerImages);
-    setBannerFiles(newBannerFiles);
-  };
-
   const handleCertificateChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -276,11 +267,6 @@ export default function SettingsPage() {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const removeCertificateImage = () => {
-    setCertificateImage(null);
-    setCertificateFile(null);
   };
 
   const handleSaveChanges = async () => {
@@ -779,31 +765,6 @@ export default function SettingsPage() {
                   {index === 0 ? "First Info Image" : "Second Info Image"}
                 </h3>
 
-                {(bannerImages[index] ||
-                  (settings &&
-                    settings[
-                      `info${index === 0 ? "First" : "Second"}Image`
-                    ])) && (
-                  <button
-                    onClick={() => removeBannerImage(index)}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                )}
-
                 {bannerImages[index] ? (
                   <div className="mb-4">
                     <img
@@ -884,27 +845,6 @@ export default function SettingsPage() {
           </h2>
 
           <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 relative">
-            {certificateImage && (
-              <button
-                onClick={removeCertificateImage}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            )}
-
             {certificateImage ? (
               <div className="flex flex-col items-center">
                 <img

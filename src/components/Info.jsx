@@ -87,7 +87,7 @@ const Info = ({ settings }) => {
             className="absolute z-30 bottom-0 right-0 rounded-[50px] md:w-[20vw] md:h-[20vw] w-[50vw] h-[50vw] overflow-hidden"
           >
             <img
-              src={settings?.infoFirstImage || img2}
+              src={settings?.infoSecondImage || img2}
               alt=""
               className="object-cover h-full w-full"
             />
