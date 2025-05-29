@@ -278,7 +278,7 @@ const EventsDetails = () => {
                 </p>
               </div>
 
-              {user?.role === "organizer" && (
+              {user?.role === "user" && (
                 <div
                   className="bg-white rounded-xl shadow-sm p-8 mb-8"
                   id="tickets"
