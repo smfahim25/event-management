@@ -452,6 +452,21 @@ const EventsDetails = () => {
                   </div>
                 )}
 
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-8">
+                    Refund Policy
+                  </h3>
+                  {selectedEvent?.refundPolicy?.rules.length > 0 ? (
+                    <div className="text-gray-500">
+                      {selectedEvent?.refundPolicy?.rules[0]?.description}
+                    </div>
+                  ) : (
+                    <div className="text-gray-500">
+                      No refund policy for this event
+                    </div>
+                  )}
+                </div>
+
                 <div className="mt-8 pt-8 border-t border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">
                     Organizer

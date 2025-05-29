@@ -207,7 +207,7 @@ export default function OrganizerRegistrationForm() {
           </div>
 
           {/* Social Media */}
-          <div>
+          {/* <div>
             <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
               Social Media
             </h2>
@@ -284,7 +284,7 @@ export default function OrganizerRegistrationForm() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Address */}
           <div>
