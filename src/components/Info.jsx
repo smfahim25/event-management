@@ -7,7 +7,7 @@ import { useData } from "../context/DataContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Info = () => {
+const Info = ({ settings }) => {
   const img1Ref = useRef(null);
   const img2Ref = useRef(null);
   const { defaultTexts } = useData();
@@ -75,14 +75,22 @@ const Info = () => {
             ref={img1Ref}
             className="absolute z-20 top-0 left-0 rounded-[50px] md:w-[20vw] md:h-[20vw] w-[50vw] h-[50vw] overflow-hidden"
           >
-            <img src={img1} alt="" className="object-cover h-full w-full" />
+            <img
+              src={settings?.infoFirstImage || img1}
+              alt=""
+              className="object-cover h-full w-full"
+            />
           </div>
           <div className="absolute z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-black rounded-[50px] md:w-[20vw] md:h-[20vw] w-[50vw] h-[50vw]"></div>
           <div
             ref={img2Ref}
             className="absolute z-30 bottom-0 right-0 rounded-[50px] md:w-[20vw] md:h-[20vw] w-[50vw] h-[50vw] overflow-hidden"
           >
-            <img src={img2} alt="" className="object-cover h-full w-full" />
+            <img
+              src={settings?.infoFirstImage || img2}
+              alt=""
+              className="object-cover h-full w-full"
+            />
           </div>
         </div>
 

@@ -9,9 +9,15 @@ import { useSettingsStore } from "../../store/SettingsStore";
 import { useEffect } from "react";
 
 function LandingPage() {
-  const { sliders: heroslider, fetchSliders } = useSettingsStore();
+  const {
+    settings,
+    sliders: heroslider,
+    fetchSliders,
+    fetchSettings,
+  } = useSettingsStore();
   useEffect(() => {
     fetchSliders();
+    fetchSettings();
   }, []);
   return (
     <>
@@ -29,9 +35,9 @@ function LandingPage() {
         <div className="relative z-30 ">
           <Nav />
           <Hero sliders={heroslider} />
-          <Info />
+          <Info settings={settings} />
           <Marquee />
-          <InfoSecond />
+          <InfoSecond settings={settings} />
           <Events />
           <Footer />
         </div>

@@ -6,7 +6,7 @@ import { useData } from "../context/DataContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const InfoSecond = () => {
+const InfoSecond = ({ settings }) => {
   const box1Ref = useRef(null);
   const box2Ref = useRef(null);
 
@@ -94,7 +94,11 @@ const InfoSecond = () => {
             className=" absolute z-10 top-0 left-0  border border-black rounded-[50px] md:w-[30vw] md:h-[15vw] w-[70vw] h-[40vw]"
           ></div>
           <div className=" absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-[50px] md:w-[30vw] md:h-[15vw] w-[70vw] h-[40vw] overflow-hidden">
-            <img src={img3} alt="" className=" object-cover h-full w-full" />
+            <img
+              src={settings?.marqueeImage || img3}
+              alt=""
+              className=" object-cover h-full w-full"
+            />
           </div>
           <div
             ref={box2Ref}

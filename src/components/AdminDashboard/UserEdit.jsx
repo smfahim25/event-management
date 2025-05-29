@@ -9,9 +9,9 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
     name: user.name || "",
     email: user.email || "",
     status: user.isVerified ? "true" : "false",
-    role: user.role || "user",
+    role: isNewUser ? "user" : user.role,
     image: user.image || "",
-    password: user.password || "",
+    password: isNewUser ? "" : "",
   });
 
   const handleChange = (e) => {
@@ -30,9 +30,11 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
       ...formData,
       isVerified: formData.status === "true",
     };
-    // if (!isNewUser) {
-    //   delete finalData.password;
-    // }
+
+    if (!isNewUser && !formData.password.trim()) {
+      delete finalData.password;
+    }
+
     try {
       if (isNewUser) {
         await createUser(finalData);
@@ -164,7 +166,12 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
-              Password
+              Password{" "}
+              {!isNewUser && (
+                <span className="text-sm text-gray-500">
+                  (leave empty to keep current password)
+                </span>
+              )}
             </label>
             <input
               type="password"
@@ -173,41 +180,10 @@ export default function UserEditModal({ user, isNewUser = false, onClose }) {
               value={formData.password}
               onChange={handleChange}
               disabled={loading}
-              required
+              required={isNewUser} // Only required for new users
+              placeholder={isNewUser ? "" : "Enter new password to change"}
               className="mt-1 h-[40px] px-2 block w-full shadow-sm sm:text-sm border-purple-300 border-2 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Profile Image URL
-            </label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              disabled={loading}
-              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-purple-300 border-2 h-[40px] rounded-md px-2"
-              placeholder="https://example.com/profile.jpg"
-            />
-            {formData.image && (
-              <div className="mt-2">
-                <img
-                  src={formData.image}
-                  alt="Profile Preview"
-                  className="h-20 w-20 rounded-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/placeholder.svg";
-                  }}
-                />
-              </div>
-            )}
           </div>
 
           <div className="mt-6 flex justify-end space-x-3">

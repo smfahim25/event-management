@@ -123,12 +123,16 @@ export default function SettingsPage() {
         setIsLogoUploaded(true);
       }
 
-      if (settings.bannerImages) {
-        setBannerImages(settings.bannerImages);
+      // Initialize banner images from settings
+      if (settings.infoFirstImage || settings.infoSecondImage) {
+        setBannerImages([
+          settings.infoFirstImage || null,
+          settings.infoSecondImage || null,
+        ]);
       }
 
-      if (settings.certificateImage) {
-        setCertificateImage(settings.certificateImage);
+      if (settings.marqueeImage) {
+        setCertificateImage(settings.marqueeImage);
       }
     }
   }, [settings]);
@@ -299,12 +303,16 @@ export default function SettingsPage() {
 
       bannerFiles.forEach((file, index) => {
         if (file) {
-          settingsFormData.append(`bannerImage_${index}`, file);
+          if (index === 0) {
+            settingsFormData.append("infoFirstImage", file);
+          } else if (index === 1) {
+            settingsFormData.append("infoSecondImage", file);
+          }
         }
       });
 
       if (certificateFile) {
-        settingsFormData.append("certificateImage", certificateFile);
+        settingsFormData.append("marqueeImage", certificateFile);
       }
 
       await updateSettings(settingsFormData);
@@ -758,7 +766,7 @@ export default function SettingsPage() {
         {/* Banner Images Section (Two Images) */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Inspire Images (Two Images)
+            Info Images
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -768,10 +776,14 @@ export default function SettingsPage() {
                 className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 relative"
               >
                 <h3 className="text-md font-medium text-gray-700 mb-4">
-                  Banner {index + 1}
+                  {index === 0 ? "First Info Image" : "Second Info Image"}
                 </h3>
 
-                {bannerImages[index] && (
+                {(bannerImages[index] ||
+                  (settings &&
+                    settings[
+                      `info${index === 0 ? "First" : "Second"}Image`
+                    ])) && (
                   <button
                     onClick={() => removeBannerImage(index)}
                     className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
@@ -796,7 +808,22 @@ export default function SettingsPage() {
                   <div className="mb-4">
                     <img
                       src={bannerImages[index]}
-                      alt={`Banner ${index + 1}`}
+                      alt={
+                        index === 0 ? "First Info Image" : "Second Info Image"
+                      }
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                  </div>
+                ) : settings &&
+                  settings[`info${index === 0 ? "First" : "Second"}Image`] ? (
+                  <div className="mb-4">
+                    <img
+                      src={
+                        settings[`info${index === 0 ? "First" : "Second"}Image`]
+                      }
+                      alt={
+                        index === 0 ? "First Info Image" : "Second Info Image"
+                      }
                       className="w-full h-32 object-cover rounded-lg"
                     />
                   </div>
@@ -833,7 +860,11 @@ export default function SettingsPage() {
                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                     ></path>
                   </svg>
-                  {bannerImages[index] ? "Change Image" : "Upload Image"}
+                  {bannerImages[index] ||
+                  (settings &&
+                    settings[`info${index === 0 ? "First" : "Second"}Image`])
+                    ? "Change Image"
+                    : "Upload Image"}
                   <input
                     type="file"
                     accept="image/*"
@@ -849,7 +880,7 @@ export default function SettingsPage() {
         {/* Certificate Image Section (Single Image) */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Participate Image (Single Upload)
+            Marquee Image (Single Upload)
           </h2>
 
           <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 relative">
@@ -878,7 +909,15 @@ export default function SettingsPage() {
               <div className="flex flex-col items-center">
                 <img
                   src={certificateImage}
-                  alt="Certificate"
+                  alt="Marquee"
+                  className="max-h-64 max-w-full object-contain mb-4 rounded-lg"
+                />
+              </div>
+            ) : settings?.marqueeImage ? (
+              <div className="flex flex-col items-center">
+                <img
+                  src={settings.marqueeImage}
+                  alt="Marquee"
                   className="max-h-64 max-w-full object-contain mb-4 rounded-lg"
                 />
               </div>
@@ -916,7 +955,9 @@ export default function SettingsPage() {
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   ></path>
                 </svg>
-                {certificateImage ? "Change" : "Upload"}
+                {certificateImage || settings?.marqueeImage
+                  ? "Change"
+                  : "Upload"}
                 <input
                   type="file"
                   accept="image/*"

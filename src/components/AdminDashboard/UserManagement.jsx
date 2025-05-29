@@ -13,11 +13,20 @@ export default function UserManagement() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        await getAllUsers();
+        await getAllUsers({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm,
+          role: roleFilter !== "All" ? roleFilter : undefined,
+          status: statusFilter !== "All" ? statusFilter : undefined,
+        });
       } catch (err) {
         setError(err.message || "Failed to fetch users");
       } finally {
@@ -26,26 +35,37 @@ export default function UserManagement() {
     };
 
     fetchUsers();
-  }, [getAllUsers]);
+  }, [
+    getAllUsers,
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    roleFilter,
+    statusFilter,
+  ]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter, statusFilter]);
 
   const filteredUsers = useMemo(() => {
     if (!Array.isArray(users?.users) || users?.users.length === 0) return [];
+    return users.users;
+  }, [users]);
 
-    return users?.users?.filter((user) => {
-      const matchesSearch =
-        (user.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (user.email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
-
-      const matchesRole = roleFilter === "All" || user.role === roleFilter;
-
-      const matchesStatus =
-        statusFilter === "All" ||
-        (statusFilter === "Verified" && user.isVerified) ||
-        (statusFilter === "Unverified" && !user.isVerified);
-
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [users, searchTerm, roleFilter, statusFilter]);
+  const paginationMeta = useMemo(() => {
+    return (
+      users?.meta || {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPage: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      }
+    );
+  }, [users]);
 
   const handleEditUser = (user) => {
     setEditingUser(user);
@@ -67,7 +87,13 @@ export default function UserManagement() {
     setError(null);
     setLoading(true);
     try {
-      await getAllUsers();
+      await getAllUsers({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        role: roleFilter !== "All" ? roleFilter : undefined,
+        status: statusFilter !== "All" ? statusFilter : undefined,
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -75,10 +101,52 @@ export default function UserManagement() {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setItemsPerPage(newLimit);
+    setCurrentPage(1);
+  };
+
+  const renderPaginationNumbers = () => {
+    const { totalPage } = paginationMeta;
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPage, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+            i === currentPage
+              ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return pages;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">User</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          User Management
+        </h1>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRefresh}
@@ -161,7 +229,7 @@ export default function UserManagement() {
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
-                All Users ({filteredUsers.length})
+                All Users ({paginationMeta.total})
               </h3>
               <div className="mt-3 sm:mt-0 flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
                 <div className="flex rounded-md shadow-sm">
@@ -216,6 +284,36 @@ export default function UserManagement() {
               </div>
             </div>
           </div>
+
+          {/* Items per page selector */}
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, paginationMeta.total)} of{" "}
+                {paginationMeta.total} results
+              </div>
+              <div className="flex items-center space-x-2">
+                <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
+                  Items per page:
+                </label>
+                <select
+                  id="itemsPerPage"
+                  value={itemsPerPage}
+                  onChange={(e) =>
+                    handleItemsPerPageChange(Number(e.target.value))
+                  }
+                  className="block w-20 pl-3 pr-8 py-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -313,9 +411,6 @@ export default function UserManagement() {
                         >
                           Edit
                         </button>
-                        <button className="text-red-600 hover:text-red-900">
-                          {user.status === "blocked" ? "Unblock" : "Block"}
-                        </button>
                       </td>
                     </tr>
                   ))
@@ -332,18 +427,89 @@ export default function UserManagement() {
               </tbody>
             </table>
           </div>
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">{filteredUsers.length}</span> of{" "}
-                  <span className="font-medium">{filteredUsers.length}</span>{" "}
-                  results
-                </p>
+
+          {/* Pagination */}
+          {paginationMeta.totalPage > 1 && (
+            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!paginationMeta.hasPreviousPage}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!paginationMeta.hasNextPage}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing page{" "}
+                    <span className="font-medium">{currentPage}</span> of{" "}
+                    <span className="font-medium">
+                      {paginationMeta.totalPage}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={!paginationMeta.hasPreviousPage}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="sr-only">Previous</span>
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+
+                    {renderPaginationNumbers()}
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={!paginationMeta.hasNextPage}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="sr-only">Next</span>
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
