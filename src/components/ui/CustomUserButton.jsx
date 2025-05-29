@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/AuthStore";
 import { User } from "phosphor-react";
 import { LuLogOut } from "react-icons/lu";
-import { TicketsPlane } from "lucide-react";
+import { LayoutDashboard, TicketsPlane } from "lucide-react";
 
 function CustomUserButton() {
   const pfp = "https://placehold.co/100x100";
@@ -87,6 +87,17 @@ function CustomUserButton() {
             >
               <TicketsPlane size={16} className="mr-2 text-indigo-500" />
               <span>My Tickets</span>
+            </button>
+          )}
+          {(user.role === "admin" || user.role === "superAdmin") && (
+            <button
+              className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors duration-150"
+              onClick={() => {
+                navigate("/admin");
+              }}
+            >
+              <LayoutDashboard size={16} className="mr-2 text-indigo-500" />
+              <span>Admin Dashboard</span>
             </button>
           )}
           <button
