@@ -10,6 +10,7 @@ import {
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/AuthStore";
+import { ArrowLeft } from "lucide-react";
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -124,7 +125,13 @@ function SignupPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all">
           <div className="h-2 bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500"></div>
-
+          <Link
+            to={"/"}
+            className="flex items-center gap-2 mt-3 ml-2 text-gray-500"
+          >
+            <ArrowLeft />
+            Back home
+          </Link>
           <div className="px-8 pt-8 pb-6">
             <div className="text-center mb-8">
               <h2 className="text-6xl qwigley-regular">Sign Up</h2>

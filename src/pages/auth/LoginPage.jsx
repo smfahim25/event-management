@@ -56,10 +56,15 @@ function LoginPage() {
 
     try {
       const user = await login(formData.email, formData.password);
-      if (user?.data?.isPreviouslyLoggedIn) {
-        window.location.href = "/";
-      } else if (user?.data?.isPreviouslyLoggedIn === false) {
-        navigate(`/event-prefer?id=${user?.data?._id}`);
+      // console.log(user);
+      if (user?.data?.role === "user" || user?.data?.role === "organizer") {
+        if (user?.data?.isPreviouslyLoggedIn) {
+          window.location.href = "/";
+        } else if (user?.data?.isPreviouslyLoggedIn === false) {
+          navigate(`/event-prefer?id=${user?.data?._id}`);
+        }
+      } else {
+        window.location.href = "/admin";
       }
     } catch (error) {
       console.error("Login failed", error);
