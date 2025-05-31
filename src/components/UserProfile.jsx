@@ -226,7 +226,6 @@ export default function UserProfileComponent() {
               <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-purple-100 shadow-md flex-shrink-0">
                 <img
                   src={
-                    profile.imageUrl ||
                     "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
                   }
                   alt={profile.fullName}

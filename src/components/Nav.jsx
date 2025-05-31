@@ -77,7 +77,7 @@ const Nav = () => {
     }
 
     if (isScrolled) {
-      return "bg-black text-white";
+      return "bg-white/80 text-black";
     } else {
       return "bg-white/30 text-white";
     }

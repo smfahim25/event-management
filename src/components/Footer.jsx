@@ -29,7 +29,7 @@ const Footer = () => {
                 <ul className="space-y-2">
                   <li>
                     <a
-                      href="#"
+                      href="/"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[0]}
@@ -37,7 +37,7 @@ const Footer = () => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="/app/events"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[1]}
@@ -45,7 +45,7 @@ const Footer = () => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="/contact-us"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[2]}
@@ -62,23 +62,16 @@ const Footer = () => {
                 <ul className="space-y-2">
                   <li>
                     <a
-                      href="#"
+                      href="/app/profile"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.userLinks.items[0]}
                     </a>
                   </li>
+
                   <li>
                     <a
-                      href="#"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
-                    >
-                      {defaultTexts.footer.userLinks.items[1]}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
+                      href="/app/my-tickets"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.userLinks.items[2]}
