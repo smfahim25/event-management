@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useEventStore } from "../../store/EventStore";
 import EventApprovalModal from "./EventApprovalModal";
 import EventDetailsModal from "./EventDetailsModal";
+import { useNavigate } from "react-router-dom";
 
 export default function EventApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +19,8 @@ export default function EventApprovals() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [initialStatus, setInitialStatus] = useState("approved");
+
+  const navigate = useNavigate();
 
   const { events, loading, fetchAdminEvents, updateEventStatus } =
     useEventStore();
@@ -575,10 +578,18 @@ export default function EventApprovals() {
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <div className="flex justify-center items-center space-x-3">
                         <button
-                          className="text-indigo-600 hover:text-indigo-900 font-medium"
+                          className="text-indigo-600 hover:text-indigo-900 font-medium border-2 p-1 rounded-lg"
                           onClick={() => openEventDetails(event)}
                         >
                           View Details
+                        </button>
+                        <button
+                          className="text-indigo-600 hover:text-indigo-900 font-medium border-2 p-1 rounded-lg"
+                          onClick={() =>
+                            navigate(`/app/edit-Event/${event?._id}`)
+                          }
+                        >
+                          Edit
                         </button>
 
                         {event?.status !== "approved" &&

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useOrganizerStore } from "../../store/OrganizerStore";
-// import { Trash } from "lucide-react";
 
 export default function OrganizerApprovals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -18,16 +19,22 @@ export default function OrganizerApprovals() {
     error,
     approveOrganizer,
     rejectOrganizer,
-    // deleteOrganizer,
+    meta,
   } = useOrganizerStore();
 
   useEffect(() => {
-    getOrganizers();
-  }, []);
+    getOrganizers({
+      page: currentPage,
+      limit: itemsPerPage,
+    });
+  }, [currentPage, itemsPerPage, dateFilter]);
 
   const handleApprove = async (organizerId) => {
     await approveOrganizer(organizerId);
-    await getOrganizers();
+    await getOrganizers({
+      page: currentPage,
+      limit: itemsPerPage,
+    });
   };
 
   const openRejectModal = (organizer) => {
@@ -40,23 +47,24 @@ export default function OrganizerApprovals() {
     if (selectedOrganizer && rejectionReason.trim()) {
       await rejectOrganizer(selectedOrganizer.userId?._id, rejectionReason);
       setIsRejectModalOpen(false);
-      await getOrganizers();
+      await getOrganizers({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        status: statusFilter,
+        date: dateFilter,
+      });
       setSelectedOrganizer(null);
       setRejectionReason("");
     }
   };
-
-  // const handleDelete = async (organizerId) => {
-  //   if (window.confirm("Are you sure you want to delete this organizer?")) {
-  //     await deleteOrganizer(organizerId);
-  //   }
-  // };
 
   const closeRejectModal = () => {
     setIsRejectModalOpen(false);
     setSelectedOrganizer(null);
     setRejectionReason("");
   };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -79,33 +87,207 @@ export default function OrganizerApprovals() {
     ),
   ];
 
-  const filteredOrganizers = organizers.filter((organizer) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      organizer.organizationName
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      organizer.userId?.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      organizer.userId?.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "" || organizer.verificationStatus === statusFilter;
-
-    const orgDate = new Date(organizer.createdAt).toISOString().split("T")[0];
-    const matchesDate = dateFilter === "" || orgDate === dateFilter;
-
-    return matchesSearch && matchesStatus && matchesDate;
-  });
-
   const clearFilters = () => {
     setSearchTerm("");
     setStatusFilter("");
     setDateFilter("");
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (limit) => {
+    setItemsPerPage(limit);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleDateFilterChange = (value) => {
+    setDateFilter(value);
+    setCurrentPage(1);
   };
 
   const hasActiveFilters = searchTerm || statusFilter || dateFilter;
+
+  const PaginationComponent = () => {
+    if (!meta || meta.totalPage <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const maxVisiblePages = 5;
+      const { totalPage } = meta;
+
+      if (totalPage <= maxVisiblePages) {
+        for (let i = 1; i <= totalPage; i++) {
+          pages.push(i);
+        }
+      } else {
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPage, currentPage + 2);
+
+        if (startPage > 1) {
+          pages.push(1);
+          if (startPage > 2) pages.push("...");
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          pages.push(i);
+        }
+
+        if (endPage < totalPage) {
+          if (endPage < totalPage - 1) pages.push("...");
+          pages.push(totalPage);
+        }
+      }
+
+      return pages;
+    };
+
+    return (
+      <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div className="flex-1 flex justify-between sm:hidden">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={!meta.hasPreviousPage}
+            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+              meta.hasPreviousPage
+                ? "text-gray-700 bg-white hover:bg-gray-50"
+                : "text-gray-400 bg-gray-100 cursor-not-allowed"
+            }`}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={!meta.hasNextPage}
+            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+              meta.hasNextPage
+                ? "text-gray-700 bg-white hover:bg-gray-50"
+                : "text-gray-400 bg-gray-100 cursor-not-allowed"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div className="flex items-center space-x-4">
+            <p className="text-sm text-gray-700">
+              Showing{" "}
+              <span className="font-medium">
+                {(currentPage - 1) * itemsPerPage + 1}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium">
+                {Math.min(currentPage * itemsPerPage, meta.total)}
+              </span>{" "}
+              of <span className="font-medium">{meta.total}</span> results
+            </p>
+
+            <div className="flex items-center space-x-2">
+              <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
+                Items per page:
+              </label>
+              <select
+                id="itemsPerPage"
+                value={itemsPerPage}
+                onChange={(e) =>
+                  handleItemsPerPageChange(Number(e.target.value))
+                }
+                className="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <nav
+              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={!meta.hasPreviousPage}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                  meta.hasPreviousPage
+                    ? "text-gray-500 hover:bg-gray-50"
+                    : "text-gray-300 cursor-not-allowed"
+                }`}
+              >
+                <svg
+                  className="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              {getPageNumbers().map((page, index) => (
+                <button
+                  key={index}
+                  onClick={() => page !== "..." && handlePageChange(page)}
+                  disabled={page === "..."}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    page === currentPage
+                      ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                      : page === "..."
+                      ? "bg-white border-gray-300 text-gray-500 cursor-default"
+                      : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={!meta.hasNextPage}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                  meta.hasNextPage
+                    ? "text-gray-500 hover:bg-gray-50"
+                    : "text-gray-300 cursor-not-allowed"
+                }`}
+              >
+                <svg
+                  className="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -147,7 +329,7 @@ export default function OrganizerApprovals() {
                 name="search"
                 id="search"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
                 placeholder="Search organizers..."
               />
@@ -157,7 +339,7 @@ export default function OrganizerApprovals() {
               <div className="w-full md:w-auto">
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  onChange={(e) => handleStatusFilterChange(e.target.value)}
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
                   <option value="">All Statuses</option>
@@ -172,7 +354,7 @@ export default function OrganizerApprovals() {
               <div className="w-full md:w-auto">
                 <select
                   value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
+                  onChange={(e) => handleDateFilterChange(e.target.value)}
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
                   <option value="">All Dates</option>
@@ -217,7 +399,7 @@ export default function OrganizerApprovals() {
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                   Search: {searchTerm}
                   <button
-                    onClick={() => setSearchTerm("")}
+                    onClick={() => handleSearchChange("")}
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove search filter</span>
@@ -241,7 +423,7 @@ export default function OrganizerApprovals() {
                   Status:{" "}
                   {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                   <button
-                    onClick={() => setStatusFilter("")}
+                    onClick={() => handleStatusFilterChange("")}
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove status filter</span>
@@ -264,7 +446,7 @@ export default function OrganizerApprovals() {
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                   Date: {new Date(dateFilter).toLocaleDateString()}
                   <button
-                    onClick={() => setDateFilter("")}
+                    onClick={() => handleDateFilterChange("")}
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove date filter</span>
@@ -297,141 +479,140 @@ export default function OrganizerApprovals() {
             <p>Error loading organizers: {error}</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Organizer
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Organization Name
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Application Date
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Status
-                  </th>
-                  <th scope="col" className="relative px-6 py-3">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrganizers.length > 0 ? (
-                  filteredOrganizers.map((organizer) => (
-                    <tr
-                      key={organizer._id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <img
-                              className="h-10 w-10 rounded-full object-cover"
-                              src={organizer.logo || "/placeholder.svg"}
-                              alt=""
-                            />
+                      Organizer
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Organization Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Application Date
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th scope="col" className="relative px-6 py-3">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {organizers.length > 0 ? (
+                    organizers.map((organizer) => (
+                      <tr
+                        key={organizer._id}
+                        className="hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              <img
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={organizer.logo || "/placeholder.svg"}
+                                alt=""
+                              />
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {organizer.userId?.name || "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {organizer.userId?.email || "N/A"}
+                              </div>
+                            </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {organizer.userId?.name || "N/A"}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {organizer.userId?.email || "N/A"}
-                            </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {organizer.organizationName}
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {organizer.organizationName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {organizer.website}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {formatDate(organizer.createdAt)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            organizer.verificationStatus === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : organizer.verificationStatus === "approved"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {organizer.verificationStatus
-                            .charAt(0)
-                            .toUpperCase() +
-                            organizer.verificationStatus.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center gap-3">
-                        {organizer.verificationStatus === "pending" && (
-                          <>
-                            <button
-                              onClick={() =>
-                                handleApprove(organizer.userId?._id)
-                              }
-                              className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-1 hover:bg-green-200 transition-colors duration-150"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => openRejectModal(organizer)}
-                              className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150"
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {organizer.verificationStatus === "rejected" &&
-                          organizer.rejectionReason && (
-                            <div className="text-xs text-gray-500">
-                              Reason: {organizer.rejectionReason}
-                            </div>
+                          <div className="text-sm text-gray-500">
+                            {organizer.website}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {formatDate(organizer.createdAt)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              organizer.verificationStatus === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : organizer.verificationStatus === "approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {organizer.verificationStatus
+                              .charAt(0)
+                              .toUpperCase() +
+                              organizer.verificationStatus.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center gap-3">
+                          {organizer.verificationStatus === "pending" && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleApprove(organizer.userId?._id)
+                                }
+                                className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mr-1 hover:bg-green-200 transition-colors duration-150"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => openRejectModal(organizer)}
+                                className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-150"
+                              >
+                                Reject
+                              </button>
+                            </>
                           )}
-                        {/* <button
-                          onClick={() => handleDelete(organizer.userId?._id)}
-                          className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium mr-2 hover:bg-red-200 transition-colors duration-150"
-                        >
-                          <Trash />
-                        </button> */}
+                          {organizer.verificationStatus === "rejected" &&
+                            organizer.rejectionReason && (
+                              <div className="text-xs text-gray-500">
+                                Reason: {organizer.rejectionReason}
+                              </div>
+                            )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
+                        No organizers found matching your filters.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-4 text-center text-sm text-gray-500"
-                    >
-                      No organizers found matching your filters.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Component */}
+            <PaginationComponent />
+          </>
         )}
       </div>
 

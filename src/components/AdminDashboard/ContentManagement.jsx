@@ -15,6 +15,7 @@ export default function ContentManagement() {
 
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [currentDocType, setCurrentDocType] = useState("privacyPolicy");
 
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
@@ -28,11 +29,13 @@ export default function ContentManagement() {
     effectiveDate: "",
   });
 
+  // Initial data fetch
   useEffect(() => {
     fetchFaqs();
-    fetchPolicy();
-  }, [fetchFaqs, fetchPolicy]);
+    fetchPolicy(currentDocType);
+  }, [fetchFaqs, fetchPolicy, currentDocType]);
 
+  // Update form when policy data arrives
   useEffect(() => {
     if (policy) {
       const policyData = policy[0];
@@ -41,12 +44,12 @@ export default function ContentManagement() {
         : "";
 
       setLegalDoc({
-        page: policyData.page || "privacyPolicy",
+        page: policyData.page || currentDocType,
         content: policyData.content || "",
         effectiveDate: formattedDate,
       });
     }
-  }, [policy]);
+  }, [policy, currentDocType]);
 
   const handleFaqInputChange = (e) => {
     const { name, value } = e.target;
@@ -135,6 +138,9 @@ export default function ContentManagement() {
 
   const handleLegalDocChange = (e) => {
     const { name, value } = e.target;
+    if (name === "page") {
+      setCurrentDocType(value);
+    }
     setLegalDoc((prev) => ({
       ...prev,
       [name]: value,
@@ -175,6 +181,14 @@ export default function ContentManagement() {
   const getExistingCategories = () => {
     const categories = faqs.map((faq) => faq.category).filter((cat) => cat);
     return [...new Set(categories)].sort();
+  };
+
+  const getDocumentTypeName = (type) => {
+    const typeNames = {
+      privacyPolicy: "Privacy Policy",
+      termsConditions: "Terms and Conditions",
+    };
+    return typeNames[type] || type;
   };
 
   const existingCategories = getExistingCategories();
@@ -486,19 +500,22 @@ export default function ContentManagement() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label
-                    htmlFor="type"
+                    htmlFor="page"
                     className="block text-sm font-semibold text-gray-700"
                   >
                     Document Type
                   </label>
                   <select
-                    id="type"
-                    name="type"
-                    value={legalDoc.type}
+                    id="page"
+                    name="page"
+                    value={legalDoc.page}
                     onChange={handleLegalDocChange}
                     className="w-full h-12 px-4 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                   >
                     <option value="privacyPolicy">Privacy Policy</option>
+                    <option value="termsConditions">
+                      Terms and Conditions
+                    </option>
                   </select>
                 </div>
 
@@ -528,8 +545,7 @@ export default function ContentManagement() {
                     <div className="space-y-1">
                       <p className="text-xs text-gray-600">
                         <span className="font-medium">Type:</span>{" "}
-                        {policy[0].page?.charAt(0).toUpperCase() +
-                          policy[0].page?.slice(1) || "Not Set"}
+                        {getDocumentTypeName(policy[0].page) || "Not Set"}
                       </p>
                       <p className="text-xs text-gray-600">
                         <span className="font-medium">Last Updated:</span>{" "}

@@ -114,7 +114,7 @@ const Footer = () => {
                 <ul className="space-y-2">
                   <li>
                     <a
-                      href="#"
+                      href="/privacy"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.legal.items[0]}
@@ -122,7 +122,7 @@ const Footer = () => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="/terms"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
                       {defaultTexts.footer.legal.items[1]}

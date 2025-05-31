@@ -35,6 +35,8 @@ import TicketPage from "./pages/private/TicketPage";
 import SignupSuccess from "./pages/auth/SignupSuccess";
 import AdminProfile from "./components/AdminDashboard/AdminProfile";
 import NewsletterSubscribers from "./components/AdminDashboard/NewLetter";
+import PrivacyPolicyPage from "./pages/public/Privacy";
+import TermsConditionPage from "./pages/public/Terms";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -142,6 +144,8 @@ function RoutesManager() {
       <Route path="/success-split" element={<SuccessSplit />} />
       <Route path="/verify-email" element={<EmailVerificationPage />} />
       <Route path="/signup-success" element={<SignupSuccess />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsConditionPage />} />
 
       {/* <Route path="*" element={<Navigate to="/" />} /> */}
     </Routes>

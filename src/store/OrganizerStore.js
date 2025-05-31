@@ -10,6 +10,7 @@ export const useOrganizerStore = create((set, get) => ({
   success: false,
   organizers: [],
   organizer: null,
+  meta: null,
 
   createOrganizer: async (formDataObj) => {
     set({ loading: true, error: null, success: false });
@@ -76,13 +77,20 @@ export const useOrganizerStore = create((set, get) => ({
     }
   },
 
-  getOrganizers: async () => {
+  getOrganizers: async (params = {}) => {
     set({ loading: true, error: null });
     try {
       const token = Cookies.get("accessToken");
       if (!token) throw new Error("Unauthorized. Please login first.");
 
-      const res = await fetch(API_BASE, {
+      const { page = 1, limit = 20 } = params;
+
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      const res = await fetch(`${API_BASE}?${queryParams.toString()}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,7 +103,10 @@ export const useOrganizerStore = create((set, get) => ({
         throw new Error(data.message || "Failed to fetch organizers.");
       }
 
-      set({ organizers: data.data });
+      set({
+        organizers: data.data,
+        meta: data.meta,
+      });
     } catch (err) {
       set({ error: err.message });
       toast.error(err.message);
