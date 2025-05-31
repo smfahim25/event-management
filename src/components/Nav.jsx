@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import { FaUserAlt } from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CustomUserButton from "./ui/CustomUserButton";
 import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
@@ -73,7 +73,7 @@ const Nav = () => {
 
   const getNavbarClasses = () => {
     if (isProfilePage || isDashboardPage || isMyticketPage) {
-      return "bg-black text-white";
+      return "bg-white/80 text-black";
     }
 
     if (isScrolled) {
@@ -301,7 +301,7 @@ const Nav = () => {
 
         {/* Profile Icon for Desktop */}
         <div
-          className={`profile h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full ${
+          className={`profile border-2 border-gray-600 h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full ${
             isProfilePage || isDashboardPage || isScrolled
               ? "bg-white/20"
               : "bg-gray-100"
@@ -310,15 +310,15 @@ const Nav = () => {
           {user ? (
             <CustomUserButton />
           ) : (
-            <a href="/login">
+            <Link to="/login">
               <FaUserAlt
                 className={`${
                   isProfilePage || isDashboardPage || isScrolled
-                    ? "text-white"
+                    ? "text-gray-600"
                     : "text-gray-600"
                 }`}
               />
-            </a>
+            </Link>
           )}
         </div>
       </div>

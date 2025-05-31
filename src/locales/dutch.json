@@ -37,7 +37,11 @@
     "seats": "Zitplaatsen",
     "upcoming": "Aanstaande",
     "all": "Alle",
-    "seemore": "Meer zien"
+    "seemore": "Meer zien",
+    "find": "Evenementen zoeken",
+    "category": "Evenementcategorie",
+    "city": "Stad",
+    "time": "Tijdsperiode"
   },
   "footer": {
     "companyName": "Les sorties de Diane",
@@ -126,7 +130,20 @@
     "editEventButton": "Evenement bewerken",
     "manageTicketsButton": "Tickets beheren",
     "viewTicketButton": "Ticket bekijken",
-    "registerButton": "Registreer voor evenement"
+    "registerButton": "Registreer voor evenement",
+    "details": "Details",
+    "tickets": "Tickets",
+    "organizer": "Organisator",
+    "aboutevent": "Over dit evenement",
+    "eventDetails": "Evenementdetails",
+    "location": "Locatie",
+    "datetime": "Datum en tijd",
+    "refund": "Restitutiebeleid",
+    "showmap": "Kaart weergeven",
+    "hidemap": "Kaart verbergen",
+    "ticketType": "Tickettypes",
+    "ticketBreak": "Verdeling van tickettypes",
+    "delete": "Evenement verwijderen"
   },
   "stripeDashboard": {
     "title": "Dashboard",

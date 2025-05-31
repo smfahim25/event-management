@@ -6,8 +6,6 @@ import {
   FaRegCalendar,
   FaRegClock,
   FaPlayCircle,
-  FaShare,
-  FaHeart,
   FaTicketAlt,
   FaChartBar,
   FaEdit,
@@ -164,13 +162,13 @@ const EventsDetails = () => {
       <Nav />
       <div>
         <div className="relative h-[50vh] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10 "></div>
           <img
             src={selectedEvent.eventImages?.[0] || "/placeholder.svg"}
             alt="Event Poster"
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-0 left-0 w-full h-full flex items-center z-20">
+          <div className="absolute top-0 left-0 w-full h-full flex items-center z-20 bg-black/50">
             <div className="container mx-auto px-6">
               <div className="max-w-3xl">
                 <div className="inline-flex items-center bg-purple-600 text-white px-3 py-1 rounded-full mb-3 shadow-lg">
@@ -224,29 +222,19 @@ const EventsDetails = () => {
                   onClick={() => scrollToSection("details")}
                   className="text-gray-700 hover:text-purple-600 font-medium"
                 >
-                  Details
+                  {defaultTexts.eventDetails.details}
                 </button>
                 <button
                   onClick={() => scrollToSection("tickets")}
                   className="text-gray-700 hover:text-purple-600 font-medium"
                 >
-                  Tickets
+                  {defaultTexts.eventDetails.tickets}
                 </button>
                 <button
                   onClick={() => scrollToSection("organizer")}
                   className="text-gray-700 hover:text-purple-600 font-medium"
                 >
-                  Organizer
-                </button>
-              </div>
-              <div className="flex items-center space-x-4">
-                <button className="flex items-center text-gray-700 hover:text-purple-600">
-                  <FaShare className="mr-2" />
-                  <span className="hidden sm:inline">Share</span>
-                </button>
-                <button className="flex items-center text-gray-700 hover:text-purple-600">
-                  <FaHeart className="mr-2" />
-                  <span className="hidden sm:inline">Save</span>
+                  {defaultTexts.eventDetails.organizer}
                 </button>
               </div>
             </div>
@@ -271,7 +259,7 @@ const EventsDetails = () => {
                 </div>
 
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  About This Event
+                  {defaultTexts.eventDetails.aboutevent}
                 </h2>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   {selectedEvent.description}
@@ -284,7 +272,7 @@ const EventsDetails = () => {
                   id="tickets"
                 >
                   <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    Ticket Types
+                    {defaultTexts.eventDetails.ticketType}
                   </h2>
 
                   <div className="space-y-4">
@@ -348,13 +336,13 @@ const EventsDetails = () => {
                 id="organizer"
               >
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Event Details
+                  {defaultTexts.eventDetails.eventDetails}
                 </h2>
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                      Date & Time
+                      {defaultTexts.eventDetails.datetime}
                     </h3>
                     <div className="flex items-start mb-4">
                       <FaRegCalendar
@@ -398,7 +386,7 @@ const EventsDetails = () => {
 
                   <div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                      Location
+                      {defaultTexts.eventDetails.location}
                     </h3>
                     <div className="flex items-start">
                       <IoLocationOutline
@@ -426,11 +414,13 @@ const EventsDetails = () => {
                           >
                             {showMap ? (
                               <>
-                                Hide Map <IoIosArrowUp className="ml-1" />
+                                {defaultTexts.eventDetails.hidemap}{" "}
+                                <IoIosArrowUp className="ml-1" />
                               </>
                             ) : (
                               <>
-                                Show Map <IoIosArrowDown className="ml-1" />
+                                {defaultTexts.eventDetails.showmap}{" "}
+                                <IoIosArrowDown className="ml-1" />
                               </>
                             )}
                           </button>
@@ -454,7 +444,7 @@ const EventsDetails = () => {
 
                 <div>
                   <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-8">
-                    Refund Policy
+                    {defaultTexts.eventDetails.refund}
                   </h3>
                   {selectedEvent?.refundPolicy?.rules.length > 0 ? (
                     <div className="text-gray-500">
@@ -469,7 +459,7 @@ const EventsDetails = () => {
 
                 <div className="mt-8 pt-8 border-t border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                    Organizer
+                    {defaultTexts.eventDetails.organizer}
                   </h3>
                   <div className="flex items-start">
                     <VscOrganization
@@ -558,7 +548,7 @@ const EventsDetails = () => {
 
                     <div className="bg-gray-50 rounded-lg p-6">
                       <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                        Ticket Types Breakdown
+                        {defaultTexts.eventDetails.ticketBreak}
                       </h4>
                       <div className="space-y-4">
                         {selectedEvent.ticketTiers.map((ticket, index) => (
@@ -619,7 +609,7 @@ const EventsDetails = () => {
                         className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors duration-200"
                       >
                         <FaTrash className="mr-2" />
-                        Delete Event
+                        {defaultTexts.eventDetails.delete}
                       </button>
                     </div>
                   </div>
@@ -674,7 +664,7 @@ const EventsDetails = () => {
                 ) : (
                   <>
                     <FaTrash className="mr-2" />
-                    Delete Event
+                    {defaultTexts.eventDetails.delete}
                   </>
                 )}
               </button>

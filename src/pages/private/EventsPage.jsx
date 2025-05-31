@@ -4,15 +4,84 @@ import Nav from "../../components/Nav";
 import img from "../../assets/eventPage.jpg";
 import { useData } from "../../context/DataContext";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { FiTag, FiCalendar } from "react-icons/fi";
+import { FiTag, FiCalendar, FiMapPin } from "react-icons/fi";
 import { useEventStore } from "../../store/EventStore";
 import { useCategoryStore } from "../../store/CategoryStore";
 import { FileSearch2 } from "lucide-react";
+
+const europeanCities = [
+  "Amsterdam",
+  "Athens",
+  "Barcelona",
+  "Berlin",
+  "Bern",
+  "Bratislava",
+  "Brussels",
+  "Bucharest",
+  "Budapest",
+  "Copenhagen",
+  "Dublin",
+  "Edinburgh",
+  "Helsinki",
+  "Lisbon",
+  "Ljubljana",
+  "London",
+  "Luxembourg",
+  "Madrid",
+  "Oslo",
+  "Paris",
+  "Prague",
+  "Reykjavik",
+  "Riga",
+  "Rome",
+  "Stockholm",
+  "Tallinn",
+  "Vienna",
+  "Vilnius",
+  "Warsaw",
+  "Zagreb",
+  "Zurich",
+  "Milan",
+  "Florence",
+  "Venice",
+  "Naples",
+  "Munich",
+  "Hamburg",
+  "Cologne",
+  "Frankfurt",
+  "Stuttgart",
+  "Manchester",
+  "Birmingham",
+  "Liverpool",
+  "Glasgow",
+  "Bristol",
+  "Lyon",
+  "Marseille",
+  "Nice",
+  "Toulouse",
+  "Bordeaux",
+  "Seville",
+  "Valencia",
+  "Bilbao",
+  "Porto",
+  "Krakow",
+  "Gdansk",
+  "Wroclaw",
+  "Poznan",
+  "Antwerp",
+  "Ghent",
+  "Rotterdam",
+  "The Hague",
+  "Utrecht",
+  "Gothenburg",
+  "Malmo",
+].sort();
 
 function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [timeFilter, setTimeFilter] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [page, setPage] = useState(1);
   const [limit /*setLimit*/] = useState(10);
   const { defaultTexts } = useData();
@@ -35,7 +104,13 @@ function EventsPage() {
 
   useEffect(() => {
     fetchCategories();
-    fetchAllEvents({ searchTerm: "", eventCategory: "", page, limit });
+    fetchAllEvents({
+      searchTerm: "",
+      eventCategory: "",
+      city: "",
+      page,
+      limit,
+    });
   }, []);
 
   useEffect(() => {
@@ -43,6 +118,7 @@ function EventsPage() {
       fetchAllEvents({
         searchTerm: searchQuery,
         eventCategory: selectedCategory,
+        city: selectedCity,
         today: timeFilter === "today",
         thisWeek: timeFilter === "thisWeek",
         thisMonth: timeFilter === "thisMonth",
@@ -52,7 +128,15 @@ function EventsPage() {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, selectedCategory, timeFilter, page, limit, fetchAllEvents]);
+  }, [
+    searchQuery,
+    selectedCategory,
+    selectedCity,
+    timeFilter,
+    page,
+    limit,
+    fetchAllEvents,
+  ]);
 
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
@@ -61,6 +145,11 @@ function EventsPage() {
 
   const handleTimeFilterChange = (e) => {
     setTimeFilter(e.target.value);
+    setPage(1);
+  };
+
+  const handleCityChange = (e) => {
+    setSelectedCity(e.target.value);
     setPage(1);
   };
 
@@ -104,16 +193,16 @@ function EventsPage() {
       <div className="px-6 py-8 -mt-6 relative z-20 max-w-7xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-4 mb-8">
           <form
-            className="flex flex-col md:flex-row items-center gap-4"
+            className="flex flex-col lg:flex-row items-center gap-4"
             onSubmit={(e) => e.preventDefault()}
           >
-            <div className="flex-grow w-full md:w-64">
+            <div className="flex-grow w-full lg:w-64">
               <label
                 htmlFor="eventSearch"
                 className="mb-2 flex items-center text-sm font-medium text-gray-700"
               >
                 <FileSearch2 className="mr-2 h-4 w-4 text-purple-500" />
-                Find Events
+                {defaultTexts.events.find}
               </label>
 
               <div className="relative">
@@ -132,13 +221,13 @@ function EventsPage() {
               </div>
             </div>
 
-            <div className="w-full md:w-64">
+            <div className="w-full lg:w-56">
               <label
                 htmlFor="eventCategory"
                 className="mb-2 flex items-center text-sm font-medium text-gray-700"
               >
                 <FiTag className="mr-2 h-4 w-4 text-purple-500" />
-                Event Category
+                {defaultTexts.events.category}
               </label>
               <select
                 id="eventCategory"
@@ -157,13 +246,37 @@ function EventsPage() {
               </select>
             </div>
 
-            <div className="w-full md:w-64">
+            <div className="w-full lg:w-56">
+              <label
+                htmlFor="cityFilter"
+                className="mb-2 flex items-center text-sm font-medium text-gray-700"
+              >
+                <FiMapPin className="mr-2 h-4 w-4 text-purple-500" />
+                {defaultTexts.events.city}
+              </label>
+              <select
+                id="cityFilter"
+                name="cityFilter"
+                value={selectedCity}
+                onChange={handleCityChange}
+                className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
+              >
+                <option value="">All Cities</option>
+                {europeanCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="w-full lg:w-56">
               <label
                 htmlFor="timeFilter"
                 className="mb-2 flex items-center text-sm font-medium text-gray-700"
               >
                 <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
-                Time Period
+                {defaultTexts.events.time}
               </label>
               <select
                 id="timeFilter"
@@ -195,7 +308,7 @@ function EventsPage() {
 
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {searchQuery || selectedCategory || timeFilter
+            {searchQuery || selectedCategory || selectedCity || timeFilter
               ? "Search Results"
               : "All Events"}
             {total > 0 && (

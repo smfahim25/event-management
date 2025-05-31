@@ -1,14 +1,43 @@
+import { useState } from "react";
 import { useData } from "../context/DataContext";
+import useNewsletterStore from "../store/newsLetterStore";
+import toast from "react-hot-toast";
 
 const Footer = () => {
   const { defaultTexts } = useData();
+  const { subscribe } = useNewsletterStore();
+
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await subscribe(email);
+
+      setEmail("");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to subscribe. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="bg-[#3D004D] text-white py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto">
-        {/* Main Content */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-12">
-          {/* Left Section - Company Name */}
           <div className="w-full lg:w-auto lg:flex-shrink-0">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#E167FF] qwigley-regular leading-tight">
               {defaultTexts.footer.companyName}
@@ -18,10 +47,8 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Center Section - Navigation Links */}
           <div className="w-full lg:flex-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-base">
-              {/* Quick Links */}
               <div>
                 <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.quickLinks.title}
@@ -54,7 +81,6 @@ const Footer = () => {
                 </ul>
               </div>
 
-              {/* User Links */}
               <div>
                 <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.userLinks.title}
@@ -107,7 +133,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Right Section - Social Media & Newsletter */}
           <div className="w-full lg:w-auto lg:flex-shrink-0 lg:min-w-[280px]">
             {/* Social Media */}
             <div className="mb-6">
@@ -136,12 +161,11 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Newsletter */}
             <div>
               <h3 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
                 Newsletter
               </h3>
-              <form className="space-y-3">
+              <form className="space-y-3" onSubmit={handleSubmit}>
                 <label
                   htmlFor="newsletter"
                   className="block text-sm sm:text-base text-white"
@@ -153,13 +177,20 @@ const Footer = () => {
                     type="email"
                     id="newsletter"
                     placeholder="Email address"
-                    className="flex-1 p-3 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#E167FF] text-sm sm:text-base"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
+                    className="flex-1 p-3 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#E167FF] text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    required
                   />
                   <button
                     type="submit"
-                    className="px-4 sm:px-5 py-3 bg-[#E167FF] text-white rounded-md hover:bg-white hover:text-[#3D004D] transition-colors duration-200 font-medium text-sm sm:text-base whitespace-nowrap"
+                    disabled={isSubmitting}
+                    className="px-4 sm:px-5 py-3 bg-[#E167FF] text-white rounded-md hover:bg-white hover:text-[#3D004D] transition-colors duration-200 font-medium text-sm sm:text-base whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {defaultTexts.footer.newsletter.buttonText}
+                    {isSubmitting
+                      ? "Subscribing..."
+                      : defaultTexts.footer.newsletter.buttonText}
                   </button>
                 </div>
               </form>
@@ -167,7 +198,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-8 sm:mt-10 lg:mt-12 pt-6 text-center">
           <p className="text-xs sm:text-sm lg:text-base text-white">
             © {new Date().getFullYear()} {defaultTexts.footer.copyright}

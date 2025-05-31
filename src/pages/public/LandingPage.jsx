@@ -24,7 +24,7 @@ function LandingPage() {
       <div>
         <div className=" relative z-[1] ">
           <div className="absolute w-[45vw] h-[45vw] bg-[#7BA5FF] rounded-full blur-3xl opacity-20 top-[115vh] left-[5vw]"></div>
-          <div className="absolute w-[30vw] h-[30vw] bg-[#7BA5FF] rounded-full blur-3xl opacity-20 top-[120vh] right-[15vw]"></div>
+          <div className="absolute w-[30vw] h-[30vw] bg-[#7BA5FF] rounded-full blur-3xl opacity-20 top-[125vh] right-[15vw]"></div>
           <div className="absolute w-[100vw] h-[200vh] bg-gradient-to-b opacity-90 from-white via-[#7BA5FF] to-white top-[260vh]"></div>
 
           <div className="absolute w-[60vw] h-[60vw] bg-[#E167FF] rounded-full blur-3xl opacity-10 top-[530vh] -left-[20vw]"></div>

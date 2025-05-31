@@ -37,7 +37,11 @@
     "seats": "Plätze",
     "upcoming": "Kommende",
     "all": "Alle",
-    "seemore": "Mehr sehen"
+    "seemore": "Mehr sehen",
+    "find": "Veranstaltungen finden",
+    "category": "Veranstaltungskategorie",
+    "city": "Stadt",
+    "time": "Zeitraum"
   },
   "footer": {
     "companyName": "Les sorties de Diane",
@@ -126,7 +130,20 @@
     "editEventButton": "Veranstaltung bearbeiten",
     "manageTicketsButton": "Tickets verwalten",
     "viewTicketButton": "Ticket ansehen",
-    "registerButton": "Zur Veranstaltung anmelden"
+    "registerButton": "Zur Veranstaltung anmelden",
+    "details": "Einzelheiten",
+    "tickets": "Tickets",
+    "organizer": "Veranstalter",
+    "aboutevent": "Über diese Veranstaltung",
+    "eventDetails": "Veranstaltungsdetails",
+    "location": "Ort",
+    "datetime": "Datum und Uhrzeit",
+    "refund": "Rückerstattungsrichtlinie",
+    "showmap": "Karte anzeigen",
+    "hidemap": "Karte ausblenden",
+    "ticketType": "Ticketarten",
+    "ticketBreak": "Aufschlüsselung der Ticketarten",
+    "delete": "Veranstaltung löschen"
   },
   "stripeDashboard": {
     "title": "Dashboard",

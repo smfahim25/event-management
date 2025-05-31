@@ -25,13 +25,13 @@ export const useEventStore = create((set, get) => ({
     page = 1,
     limit = 10,
     sort = "eventDate",
+    city,
     thisMonth,
     thisWeek,
     today,
   }) => {
     set({ loading: true });
 
-    // Build params dynamically
     const params = {
       searchTerm,
       eventCategory,
@@ -43,6 +43,7 @@ export const useEventStore = create((set, get) => ({
     if (thisMonth) params.thisMonth = true;
     if (thisWeek) params.thisWeek = true;
     if (today) params.today = true;
+    if (city) params.city = city;
 
     try {
       const res = await axios.get(`${API_BASE}`, {

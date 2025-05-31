@@ -3,6 +3,7 @@ import { useAuthStore } from "../../store/AuthStore";
 import { CiSettings } from "react-icons/ci";
 import { TbCategory } from "react-icons/tb";
 import { LiaUsersSolid } from "react-icons/lia";
+import { Mails } from "lucide-react";
 
 export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
   const location = useLocation();
@@ -157,6 +158,13 @@ export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
           />
         </svg>
       ),
+      badge: null,
+    },
+    {
+      id: "newsletter",
+      name: "News Letter",
+      path: "/admin/newsletter",
+      icon: <Mails size={25} />,
       badge: null,
     },
     {

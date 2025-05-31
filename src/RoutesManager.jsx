@@ -34,6 +34,7 @@ import EmailVerificationPage from "./pages/auth/VerifyEmail";
 import TicketPage from "./pages/private/TicketPage";
 import SignupSuccess from "./pages/auth/SignupSuccess";
 import AdminProfile from "./components/AdminDashboard/AdminProfile";
+import NewsletterSubscribers from "./components/AdminDashboard/NewLetter";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -124,6 +125,7 @@ function RoutesManager() {
         <Route path="content" element={<ContentManagement />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="profile" element={<AdminProfile />} />
+        <Route path="newsletter" element={<NewsletterSubscribers />} />
       </Route>
       <Route
         path="/dashboard"
