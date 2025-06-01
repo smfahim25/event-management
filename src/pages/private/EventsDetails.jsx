@@ -461,10 +461,14 @@ const EventsDetails = () => {
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">
                     {defaultTexts.eventDetails.organizer}
                   </h3>
-                  <div className="flex items-start">
-                    <VscOrganization
-                      size={24}
-                      className="text-purple-500 mt-1 mr-4"
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        selectedEvent?.organizerId?.organizerProfile?.logo ||
+                        "https://cdn.dribbble.com/userupload/5390076/file/original-9a4b7847105f92d9440d32bf7ee6df4e.jpg?resize=400x0"
+                      }
+                      alt={selectedEvent.organizerId?.name}
+                      className="rounded-full w-14 h-14 border"
                     />
                     <div>
                       <p className="font-medium">

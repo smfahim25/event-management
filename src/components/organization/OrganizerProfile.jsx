@@ -516,7 +516,7 @@ const OrganizerProfile = () => {
                           className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
                         >
                           <FiEdit2 size={16} />
-                          <span>Edit Profile</span>
+                          <span>Edit Organizer</span>
                         </button>
                       )}
                     </div>
@@ -704,33 +704,6 @@ const OrganizerProfile = () => {
                             </span>
                           </p>
                         </div>
-
-                        {organizerDetails?.commissionRate && (
-                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                              <FiAward size={16} className="text-purple-500" />
-                              <span>Commission rate</span>
-                            </div>
-                            <div className="mt-2">
-                              <p className="text-base text-gray-800">
-                                {organizerDetails.commissionRate}%
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                        {organizerDetails?.payoutSchedule && (
-                          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
-                              <FiAward size={16} className="text-purple-500" />
-                              <span>Payout Schedule</span>
-                            </div>
-                            <div className="mt-2">
-                              <p className="text-base text-gray-800">
-                                {organizerDetails.payoutSchedule}
-                              </p>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>

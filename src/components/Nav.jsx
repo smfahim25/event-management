@@ -166,17 +166,19 @@ const Nav = () => {
               {defaultTexts.nav.menuItems[1]}
             </li>
 
-            {/* {user?.role === "user" && ( */}
-            <li
-              className="cursor-pointer hover:text-black transition-colors"
-              onClick={() => {
-                closeMenu();
-                navigate("/app/profile");
-              }}
-            >
-              {defaultTexts.nav.menuItems[3]}
-            </li>
-            {/* )} */}
+            {user?.role !== "organizer" &&
+              user?.role !== "admin" &&
+              user?.role !== "superAdmin" && (
+                <li
+                  className="cursor-pointer hover:text-black transition-colors"
+                  onClick={() => {
+                    closeMenu();
+                    navigate("/app/profile");
+                  }}
+                >
+                  {defaultTexts.nav.menuItems[3]}
+                </li>
+              )}
 
             {user?.role === "user" && (
               <li
@@ -256,14 +258,16 @@ const Nav = () => {
           {defaultTexts.nav.menuItems[1]}
         </li>
 
-        {/* {user?.role === "user" && ( */}
-        <li
-          className="cursor-pointer hover:text-black transition-colors"
-          onClick={() => navigate("/app/profile")}
-        >
-          {defaultTexts.nav.menuItems[3]}
-        </li>
-        {/* )} */}
+        {user?.role !== "organizer" &&
+          user?.role !== "admin" &&
+          user?.role !== "superAdmin" && (
+            <li
+              className="cursor-pointer hover:text-black transition-colors"
+              onClick={() => navigate("/app/profile")}
+            >
+              {defaultTexts.nav.menuItems[3]}
+            </li>
+          )}
 
         <li
           className="cursor-pointer hover:text-black transition-colors"

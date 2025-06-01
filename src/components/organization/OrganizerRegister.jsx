@@ -390,60 +390,6 @@ export default function OrganizerRegistrationForm() {
                   <option value="AUS">Australia</option>
                   <option value="DEU">Germany</option>
                   <option value="FRA">France</option>
-                  {/* Add more countries as needed */}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Financial Information */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
-              Financial Information
-            </h2>
-            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
-              <div>
-                <label
-                  htmlFor="commissionRate"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Commission Rate (%)*
-                </label>
-                <input
-                  type="number"
-                  name="commissionRate"
-                  id="commissionRate"
-                  required
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  placeholder="7.5"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.commissionRate}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="payoutSchedule"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Payout Schedule*
-                </label>
-                <select
-                  id="payoutSchedule"
-                  name="payoutSchedule"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.payoutSchedule}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Select a schedule</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="biweekly">Bi-weekly</option>
-                  <option value="monthly">Monthly</option>
                 </select>
               </div>
             </div>
@@ -481,7 +427,7 @@ export default function OrganizerRegistrationForm() {
           <div className="pt-5">
             <div className="flex justify-end">
               <button
-                type="button"
+                onClick={() => navigate(-1)}
                 className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Cancel
