@@ -596,14 +596,14 @@ export default function RefundTable({ eventId, userId }) {
                             <button
                               className="inline-flex items-center px-2.5 py-1.5 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                               onClick={() => handleApprove(booking)}
-                              disabled={true}
+                              // disabled={true}
                             >
                               Approve
                             </button>
                             <button
                               className="inline-flex items-center px-2.5 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                               onClick={() => handleReject(booking)}
-                              disabled={true}
+                              // disabled={true}
                             >
                               Reject
                             </button>
