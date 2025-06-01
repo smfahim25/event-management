@@ -11,11 +11,11 @@ const Hero = ({ sliders }) => {
 
   return (
     <>
-      <section className="w-full h-[60vh] lg:h-screen bg-black/60 relative">
+      <section className="w-full h-[70vh] lg:h-screen bg-black/60 relative">
         <div className="absolute w-full h-full overflow-hidden">
           <Carousel sliders={sliders} />
         </div>
-        <div className="absolute bottom-20 left-12 flex flex-col text-white">
+        <div className="absolute bottom-8 lg:bottom-20 left-12 flex flex-col text-white">
           <div className="mb-12">
             <h1 className="md:text-8xl text-5xl font-semibold">
               {defaultTexts.hero.title[0]}
