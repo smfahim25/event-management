@@ -77,9 +77,7 @@ function ContactPage() {
             <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl text-white">
               <h1 className="text-4xl font-bold mb-6">{contactPage.title}</h1>
               <p className="text-white/80 mb-8 text-lg">
-                Have questions about our events or need assistance? We&apos;re
-                here to help! Fill out the form and our team will get back to
-                you as soon as possible.
+                {contactPage.description}
               </p>
 
               <div className="space-y-6">
@@ -88,7 +86,10 @@ function ContactPage() {
                     <FaEnvelope className="text-white" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg">Email Us</h3>
+                    <h3 className="font-medium text-lg">
+                      {" "}
+                      {contactPage.email}
+                    </h3>
                     <p className="text-white/80">support@eventify.com</p>
                   </div>
                 </div>
@@ -98,8 +99,11 @@ function ContactPage() {
                     <FaComment className="text-white" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg">Live Chat</h3>
-                    <p className="text-white/80">Available 9 AM - 5 PM EST</p>
+                    <h3 className="font-medium text-lg">
+                      {" "}
+                      {contactPage.livechat}
+                    </h3>
+                    <p className="text-white/80"> {contactPage.liveDet}</p>
                   </div>
                 </div>
 
@@ -108,10 +112,11 @@ function ContactPage() {
                     <FaUser className="text-white" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg">Customer Support</h3>
-                    <p className="text-white/80">
-                      We typically respond within 24 hours
-                    </p>
+                    <h3 className="font-medium text-lg">
+                      {" "}
+                      {contactPage.customer}
+                    </h3>
+                    <p className="text-white/80">{contactPage.customerDet}</p>
                   </div>
                 </div>
               </div>

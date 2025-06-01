@@ -63,7 +63,13 @@
     "copyright": " Les sorties de Diane. Todos los derechos reservados."
   },
   "contactPage": {
+    "description": "Heb je vragen over onze evenementen of heb je hulp nodig? We staan voor je klaar! Vul het formulier in en ons team neemt zo snel mogelijk contact met je op.",
     "title": "Contáctenos",
+    "email": "Envíanos un correo electrónico",
+    "livechat": "Chat en vivo",
+    "liveDet": "Disponible de 9:00 a 17:00 EST",
+    "customer": "Atención al cliente",
+    "customerDet": "Normalmente respondemos en un plazo de 24 horas",
     "form": {
       "name": {
         "label": "Nombre",

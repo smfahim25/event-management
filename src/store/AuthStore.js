@@ -274,4 +274,39 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  checkUserRole: async () => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      toast.error("No access token found");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/users/me/role-check`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || "Role check failed");
+      }
+
+      const role = result?.data?.role;
+
+      if (role === "organizer") {
+        toast.error("Access denied for organizer role");
+        useAuthStore.getState().logout();
+        return;
+      }
+
+      return role;
+    } catch (err) {
+      toast.error(err.message);
+      console.error("Role check error:", err);
+      return null;
+    }
+  },
 }));

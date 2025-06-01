@@ -12,7 +12,7 @@ const Hero = ({ sliders }) => {
   return (
     <>
       <section className="w-full h-screen bg-black/60 relative">
-        <div className="absolute w-full h-full overflow-hidden mix-blend-overlay">
+        <div className="absolute w-full h-full overflow-hidden">
           <Carousel sliders={sliders} />
         </div>
         <div className="absolute bottom-20 left-12 flex flex-col text-white">

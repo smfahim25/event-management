@@ -63,7 +63,13 @@
     "copyright": "Les sorties de Diane. Tutti i diritti riservati."
   },
   "contactPage": {
+    "description": "Hai domande sui nostri eventi o hai bisogno di assistenza? Siamo qui per aiutarti! Compila il modulo e il nostro team ti risponderà il prima possibile.",
     "title": "Contattaci",
+    "email": "Scrivici un’e-mail",
+    "livechat": "Chat dal vivo",
+    "liveDet": "Disponibile dalle 9:00 alle 17:00 EST",
+    "customer": "Assistenza clienti",
+    "customerDet": "Solitamente rispondiamo entro 24 ore",
     "form": {
       "name": {
         "label": "Nome",

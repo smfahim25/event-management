@@ -42,7 +42,6 @@ const useNewsletterStore = create((set, get) => ({
           ...get().getHeaders(),
         },
       });
-
       return res.data;
     } catch (err) {
       console.error("Get newsletter error:", err.response?.data || err.message);
@@ -64,6 +63,30 @@ const useNewsletterStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       console.error("Unsubscribe error:", err.response?.data || err.message);
+      throw err;
+    }
+  },
+
+  sendNewsletterEmail: async ({ subject, body }) => {
+    try {
+      const res = await axios.post(
+        `${API_BASE}/newsletter/sendemail`,
+        { subject, body },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...get().getHeaders(),
+          },
+        }
+      );
+      toast.success("Newsletter sent successfully!");
+      return res.data;
+    } catch (err) {
+      console.error(
+        "Send newsletter error:",
+        err.response?.data || err.message
+      );
+      toast.error(err.response?.data?.message || "Failed to send newsletter");
       throw err;
     }
   },
