@@ -20,12 +20,17 @@ export default function UserManagement() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
+
         await getAllUsers({
           page: currentPage,
           limit: itemsPerPage,
-          search: searchTerm,
           role: roleFilter !== "All" ? roleFilter : undefined,
-          status: statusFilter !== "All" ? statusFilter : undefined,
+          isVerified:
+            statusFilter === "Verified"
+              ? true
+              : statusFilter === "Unverified"
+              ? false
+              : undefined,
         });
       } catch (err) {
         setError(err.message || "Failed to fetch users");
@@ -35,37 +40,56 @@ export default function UserManagement() {
     };
 
     fetchUsers();
-  }, [
-    getAllUsers,
-    currentPage,
-    itemsPerPage,
-    searchTerm,
-    roleFilter,
-    statusFilter,
-  ]);
+  }, [getAllUsers, currentPage, itemsPerPage, roleFilter, statusFilter]);
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, roleFilter, statusFilter]);
+  }, [roleFilter, statusFilter]);
 
+  // Frontend filtering including search
   const filteredUsers = useMemo(() => {
     if (!Array.isArray(users?.users) || users?.users.length === 0) return [];
-    return users.users;
-  }, [users]);
 
+    let filtered = users.users;
+
+    // Apply search filter
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(
+        (user) =>
+          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [users, searchTerm]);
+
+  // Calculate pagination for filtered results
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredUsers.slice(startIndex, endIndex);
+  }, [filteredUsers, currentPage, itemsPerPage]);
+
+  // Calculate pagination meta for filtered results
   const paginationMeta = useMemo(() => {
-    return (
-      users?.meta || {
-        page: 1,
-        limit: 10,
-        total: 0,
-        totalPage: 1,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      }
-    );
-  }, [users]);
+    const total = filteredUsers.length;
+    const totalPage = Math.ceil(total / itemsPerPage);
+
+    return {
+      page: currentPage,
+      limit: itemsPerPage,
+      total: total,
+      totalPage: totalPage,
+      hasNextPage: currentPage < totalPage,
+      hasPreviousPage: currentPage > 1,
+    };
+  }, [filteredUsers.length, currentPage, itemsPerPage]);
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleEditUser = (user) => {
     setEditingUser(user);
@@ -87,12 +111,17 @@ export default function UserManagement() {
     setError(null);
     setLoading(true);
     try {
+      // Remove search from API call
       await getAllUsers({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchTerm,
         role: roleFilter !== "All" ? roleFilter : undefined,
-        status: statusFilter !== "All" ? statusFilter : undefined,
+        isVerified:
+          statusFilter === "Verified"
+            ? true
+            : statusFilter === "Unverified"
+            ? false
+            : undefined,
       });
     } catch (err) {
       setError(err.message);
@@ -268,7 +297,6 @@ export default function UserManagement() {
                     <option value="All">All Roles</option>
                     <option value="user">User</option>
                     <option value="organizer">Organizer</option>
-                    <option value="admin">Admin</option>
                   </select>
                   <select
                     className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 shadow-md focus:outline-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
@@ -278,7 +306,6 @@ export default function UserManagement() {
                     <option value="All">All Status</option>
                     <option value="Verified">Verified</option>
                     <option value="Unverified">Unverified</option>
-                    <option value="Blocked">Blocked</option>
                   </select>
                 </div>
               </div>
@@ -354,8 +381,8 @@ export default function UserManagement() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
+                {paginatedUsers.length > 0 ? (
+                  paginatedUsers.map((user) => (
                     <tr
                       key={user._id}
                       className="hover:bg-gray-50 transition-colors duration-150"

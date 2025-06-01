@@ -150,15 +150,33 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  getAllUsers: async () => {
+  getAllUsers: async ({
+    page = 1,
+    limit = 20,
+    search = "",
+    role,
+    isVerified,
+  }) => {
     set({ loading: true, error: null });
+
     try {
       const token = Cookies.get("accessToken");
-      const res = await fetch(`${API_BASE}/users`, {
+
+      const queryParams = new URLSearchParams();
+
+      if (search) queryParams.append("search", search);
+      if (role && role !== "All") queryParams.append("role", role);
+      if (isVerified !== undefined)
+        queryParams.append("isVerified", isVerified);
+      queryParams.append("page", page);
+      queryParams.append("limit", limit);
+
+      const res = await fetch(`${API_BASE}/users?${queryParams.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
+
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to get users");
       }
