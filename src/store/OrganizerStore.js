@@ -135,6 +135,7 @@ export const useOrganizerStore = create((set, get) => ({
       }
 
       set({ organizer: data.data });
+      return data.data;
     } catch (err) {
       set({ error: err.message });
       toast.error(err.message);

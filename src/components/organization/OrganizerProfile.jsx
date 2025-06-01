@@ -173,10 +173,9 @@ const OrganizerProfile = () => {
       }
 
       await updateOrganizerProfile(formData);
-      await getOrganizerProfile();
-      setOrganizerDetails(organizerProfile);
+      const data = await getOrganizerProfile();
+      setOrganizerDetails(data);
       setEditMode({ ...editMode, organizer: false });
-
       setLogoFile(null);
     } catch (error) {
       console.error("Failed to update organizer profile:", error);

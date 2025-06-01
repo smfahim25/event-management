@@ -11,7 +11,7 @@ const Hero = ({ sliders }) => {
 
   return (
     <>
-      <section className="w-full h-screen bg-black/60 relative">
+      <section className="w-full h-[60vh] lg:h-screen bg-black/60 relative">
         <div className="absolute w-full h-full overflow-hidden">
           <Carousel sliders={sliders} />
         </div>

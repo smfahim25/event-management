@@ -73,13 +73,13 @@ const Nav = () => {
 
   const getNavbarClasses = () => {
     if (isProfilePage || isDashboardPage || isMyticketPage) {
-      return "bg-[#7BA5FF] text-white";
+      return "bg-[#1e8489] text-white";
     }
 
     if (isScrolled) {
-      return "bg-[#7BA5FF] text-white";
+      return "bg-[#1e8489] text-white";
     } else {
-      return "bg-[#7BA5FF] text-white";
+      return "bg-[#1e8489] text-white";
     }
   };
 
@@ -124,7 +124,7 @@ const Nav = () => {
         } transition-transform duration-300 ease-in-out lg:hidden z-50`}
       >
         {/* Header Section */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-black">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-[#3D004D]">
           <div className="profile h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
             {user ? (
               <CustomUserButton />
@@ -144,7 +144,7 @@ const Nav = () => {
         </div>
 
         {/* Menu Items Section */}
-        <div className="bg-black/50 py-4">
+        <div className="bg-[#3D004D] py-4">
           <ul className="flex flex-col gap-6 font-semibold text-lg px-6 text-white">
             <li
               className="cursor-pointer hover:text-black transition-colors"

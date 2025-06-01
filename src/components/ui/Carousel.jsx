@@ -44,7 +44,7 @@ const Carousel = ({ sliders }) => {
                 ? sliders[index].title
                 : `Slide ${index + 1}`
             }
-            className="w-screen h-screen object-cover flex-shrink-0"
+            className="w-screen lg:h-screen lg:object-cover flex-shrink-0"
           />
         ))}
       </div>
