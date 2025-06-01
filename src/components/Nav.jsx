@@ -73,13 +73,13 @@ const Nav = () => {
 
   const getNavbarClasses = () => {
     if (isProfilePage || isDashboardPage || isMyticketPage) {
-      return "bg-[#9667c0] text-white";
+      return "bg-[#7BA5FF] text-white";
     }
 
     if (isScrolled) {
-      return "bg-[#9667c0] text-white";
+      return "bg-[#7BA5FF] text-white";
     } else {
-      return "bg-[#9667c0] text-white";
+      return "bg-[#7BA5FF] text-white";
     }
   };
 
@@ -147,7 +147,7 @@ const Nav = () => {
         <div className="bg-black/50 py-4">
           <ul className="flex flex-col gap-6 font-semibold text-lg px-6 text-white">
             <li
-              className="cursor-pointer hover:text-blue-600 transition-colors"
+              className="cursor-pointer hover:text-black transition-colors"
               onClick={() => {
                 closeMenu();
                 navigate("/");
@@ -157,7 +157,7 @@ const Nav = () => {
             </li>
 
             <li
-              className="cursor-pointer hover:text-blue-600 transition-colors"
+              className="cursor-pointer hover:text-black transition-colors"
               onClick={() => {
                 closeMenu();
                 navigate("/app/events");
@@ -166,21 +166,21 @@ const Nav = () => {
               {defaultTexts.nav.menuItems[1]}
             </li>
 
-            {user?.role === "user" && (
-              <li
-                className="cursor-pointer hover:text-blue-600 transition-colors"
-                onClick={() => {
-                  closeMenu();
-                  navigate("/app/profile");
-                }}
-              >
-                {defaultTexts.nav.menuItems[3]}
-              </li>
-            )}
+            {/* {user?.role === "user" && ( */}
+            <li
+              className="cursor-pointer hover:text-black transition-colors"
+              onClick={() => {
+                closeMenu();
+                navigate("/app/profile");
+              }}
+            >
+              {defaultTexts.nav.menuItems[3]}
+            </li>
+            {/* )} */}
 
             {user?.role === "user" && (
               <li
-                className="cursor-pointer hover:text-blue-600 transition-colors"
+                className="cursor-pointer hover:text-black transition-colors"
                 onClick={() => {
                   closeMenu();
                   navigate("/app/my-tickets");
@@ -191,7 +191,7 @@ const Nav = () => {
             )}
 
             <li
-              className="cursor-pointer hover:text-blue-600 transition-colors"
+              className="cursor-pointer hover:text-black transition-colors"
               onClick={() => {
                 closeMenu();
                 navigate("/contact-us");
@@ -202,7 +202,7 @@ const Nav = () => {
 
             {user?.role === "organizer" && (
               <li
-                className="cursor-pointer hover:text-blue-600 transition-colors"
+                className="cursor-pointer hover:text-black transition-colors"
                 onClick={() => {
                   closeMenu();
                   navigate("/dashboard");
@@ -214,7 +214,7 @@ const Nav = () => {
 
             {user && (
               <li
-                className="cursor-pointer hover:text-blue-600 transition-colors"
+                className="cursor-pointer hover:text-black transition-colors"
                 onClick={() => {
                   closeMenu();
                   navigate("/app/profile");
@@ -243,30 +243,30 @@ const Nav = () => {
       {/* Desktop Menu */}
       <ul className="hidden lg:flex justify-center gap-4 lg:gap-6 xl:gap-10 font-semibold text-lg">
         <li
-          className="cursor-pointer hover:text-blue-600 transition-colors"
+          className="cursor-pointer hover:text-black transition-colors"
           onClick={() => navigate("/")}
         >
           {defaultTexts.nav.menuItems[0]}
         </li>
 
         <li
-          className="cursor-pointer hover:text-blue-600 transition-colors"
+          className="cursor-pointer hover:text-black transition-colors"
           onClick={() => navigate("/app/events")}
         >
           {defaultTexts.nav.menuItems[1]}
         </li>
 
-        {user?.role === "user" && (
-          <li
-            className="cursor-pointer hover:text-blue-600 transition-colors"
-            onClick={() => navigate("/app/profile")}
-          >
-            {defaultTexts.nav.menuItems[3]}
-          </li>
-        )}
+        {/* {user?.role === "user" && ( */}
+        <li
+          className="cursor-pointer hover:text-black transition-colors"
+          onClick={() => navigate("/app/profile")}
+        >
+          {defaultTexts.nav.menuItems[3]}
+        </li>
+        {/* )} */}
 
         <li
-          className="cursor-pointer hover:text-blue-600 transition-colors"
+          className="cursor-pointer hover:text-black transition-colors"
           onClick={() => navigate("/contact-us")}
         >
           {defaultTexts.nav.menuItems[2]}
@@ -274,7 +274,7 @@ const Nav = () => {
 
         {user?.role === "organizer" && (
           <li
-            className="cursor-pointer hover:text-blue-600 transition-colors"
+            className="cursor-pointer hover:text-black transition-colors"
             onClick={() => navigate("/dashboard")}
           >
             {defaultTexts.nav.menuItems[4]}

@@ -17,11 +17,11 @@ const Hero = ({ sliders }) => {
         </div>
         <div className="absolute bottom-20 left-12 flex flex-col text-white">
           <div className="mb-12">
-            <h1 className="md:text-8xl text-6xl font-semibold">
+            <h1 className="md:text-8xl text-5xl font-semibold">
               {defaultTexts.hero.title[0]}
               {/**Live the moment, */}
             </h1>
-            <h1 className="md:text-8xl text-6xl font-semibold">
+            <h1 className="md:text-8xl text-5xl font-semibold">
               {defaultTexts.hero.title[1]}{" "}
               <span className="text-[#E167FF]">
                 {defaultTexts.hero.title[2]}
