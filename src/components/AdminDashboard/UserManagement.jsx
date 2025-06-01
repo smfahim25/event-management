@@ -46,13 +46,11 @@ export default function UserManagement() {
     setCurrentPage(1);
   }, [roleFilter, statusFilter]);
 
-  // Frontend filtering including search
   const filteredUsers = useMemo(() => {
     if (!Array.isArray(users?.users) || users?.users.length === 0) return [];
 
     let filtered = users.users;
 
-    // Apply search filter
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (user) =>
@@ -64,14 +62,12 @@ export default function UserManagement() {
     return filtered;
   }, [users, searchTerm]);
 
-  // Calculate pagination for filtered results
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredUsers.slice(startIndex, endIndex);
   }, [filteredUsers, currentPage, itemsPerPage]);
 
-  // Calculate pagination meta for filtered results
   const paginationMeta = useMemo(() => {
     const total = filteredUsers.length;
     const totalPage = Math.ceil(total / itemsPerPage);
@@ -86,7 +82,6 @@ export default function UserManagement() {
     };
   }, [filteredUsers.length, currentPage, itemsPerPage]);
 
-  // Reset to first page when search term changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
@@ -111,7 +106,6 @@ export default function UserManagement() {
     setError(null);
     setLoading(true);
     try {
-      // Remove search from API call
       await getAllUsers({
         page: currentPage,
         limit: itemsPerPage,
