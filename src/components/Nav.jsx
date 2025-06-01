@@ -73,13 +73,13 @@ const Nav = () => {
 
   const getNavbarClasses = () => {
     if (isProfilePage || isDashboardPage || isMyticketPage) {
-      return "bg-white/80 text-black";
+      return "bg-[#9667c0] text-white";
     }
 
     if (isScrolled) {
-      return "bg-white/80 text-black";
+      return "bg-[#9667c0] text-white";
     } else {
-      return "bg-white/30 text-white";
+      return "bg-[#9667c0] text-white";
     }
   };
 
@@ -94,7 +94,7 @@ const Nav = () => {
   return (
     <nav
       ref={navRef}
-      className={`nav w-full z-40 ${getNavbarClasses()} h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm`}
+      className={`nav w-full z-40 ${getNavbarClasses()} h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm shadow-lg`}
     >
       <div
         onClick={() => {
