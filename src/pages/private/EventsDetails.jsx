@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../components/Nav";
 import { useNavigate, useParams } from "react-router-dom";
-import { VscOrganization } from "react-icons/vsc";
 import {
   FaRegCalendar,
   FaRegClock,
@@ -107,11 +106,9 @@ const EventsDetails = () => {
     try {
       setIsDeleting(true);
       await deleteEvent(eventID);
-      // Navigate back to events list or dashboard after successful deletion
       navigate("/app/events");
     } catch (error) {
       console.error("Error deleting event:", error);
-      // Handle error (show toast, etc.)
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
