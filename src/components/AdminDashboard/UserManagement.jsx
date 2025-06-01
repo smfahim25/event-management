@@ -46,6 +46,17 @@ export default function UserManagement() {
     setCurrentPage(1);
   }, [roleFilter, statusFilter]);
 
+  // Use API pagination metadata directly
+  const paginationMeta = users?.meta || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPage: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  };
+
+  // For search, filter the current page results
   const filteredUsers = useMemo(() => {
     if (!Array.isArray(users?.users) || users?.users.length === 0) return [];
 
@@ -60,27 +71,9 @@ export default function UserManagement() {
     }
 
     return filtered;
-  }, [users, searchTerm]);
+  }, [users?.users, searchTerm]);
 
-  const paginatedUsers = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredUsers.slice(startIndex, endIndex);
-  }, [filteredUsers, currentPage, itemsPerPage]);
-
-  const paginationMeta = useMemo(() => {
-    const total = filteredUsers.length;
-    const totalPage = Math.ceil(total / itemsPerPage);
-
-    return {
-      page: currentPage,
-      limit: itemsPerPage,
-      total: total,
-      totalPage: totalPage,
-      hasNextPage: currentPage < totalPage,
-      hasPreviousPage: currentPage > 1,
-    };
-  }, [filteredUsers.length, currentPage, itemsPerPage]);
+  console.log(paginationMeta);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -310,9 +303,13 @@ export default function UserManagement() {
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, paginationMeta.total)} of{" "}
-                {paginationMeta.total} results
+                Showing {(paginationMeta.page - 1) * paginationMeta.limit + 1}{" "}
+                to{" "}
+                {Math.min(
+                  paginationMeta.page * paginationMeta.limit,
+                  paginationMeta.total
+                )}{" "}
+                of {paginationMeta.total} results
               </div>
               <div className="flex items-center space-x-2">
                 <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
@@ -375,8 +372,8 @@ export default function UserManagement() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedUsers.length > 0 ? (
-                  paginatedUsers.map((user) => (
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
                     <tr
                       key={user._id}
                       className="hover:bg-gray-50 transition-colors duration-150"
@@ -474,7 +471,8 @@ export default function UserManagement() {
                 <div>
                   <p className="text-sm text-gray-700">
                     Showing page{" "}
-                    <span className="font-medium">{currentPage}</span> of{" "}
+                    <span className="font-medium">{paginationMeta.page}</span>{" "}
+                    of{" "}
                     <span className="font-medium">
                       {paginationMeta.totalPage}
                     </span>
