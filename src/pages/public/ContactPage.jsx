@@ -126,7 +126,7 @@ function ContactPage() {
             <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
               <div className="p-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Send us a message
+                  {contactPage.message}
                 </h2>
 
                 {/* Success Message */}

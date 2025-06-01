@@ -74,6 +74,7 @@
     "liveDet": "Verfügbar von 9:00 bis 17:00 Uhr EST",
     "customer": "Kundensupport",
     "customerDet": "Wir antworten in der Regel innerhalb von 24 Stunden",
+    "message": "Senden Sie uns eine Nachricht",
     "form": {
       "name": {
         "label": "Name",

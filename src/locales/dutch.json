@@ -74,6 +74,7 @@
     "liveDet": "Beschikbaar van 9:00 tot 17:00 EST",
     "customer": "Klantenservice",
     "customerDet": "We reageren meestal binnen 24 uur",
+    "message": "Stuur ons een bericht",
     "form": {
       "name": {
         "label": "Naam",

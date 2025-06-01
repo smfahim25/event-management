@@ -70,6 +70,7 @@
     "liveDet": "Available 9 AM - 5 PM EST",
     "customer": "Customer Support",
     "customerDet": "We typically respond within 24 hours",
+    "message": "Send us a message",
     "form": {
       "name": {
         "label": "Name",
