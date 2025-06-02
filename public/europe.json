@@ -1,6 +1,7 @@
 [
   {
     "country": "Albania",
+    "iso2": "AL",
     "states": [
       {
         "state": "Berat",
@@ -191,39 +192,58 @@
   },
   {
     "country": "Andorra",
+    "iso2": "AD",
     "states": [
       {
         "state": "Andorra la Vella",
-        "cities": ["Andorra la Vella"]
+        "cities": [
+          "Andorra la Vella"
+        ]
       },
       {
         "state": "Canillo",
-        "cities": ["Canillo", "El Tarter"]
+        "cities": [
+          "Canillo",
+          "El Tarter"
+        ]
       },
       {
         "state": "Encamp",
-        "cities": ["Encamp", "Pas de la Casa"]
+        "cities": [
+          "Encamp",
+          "Pas de la Casa"
+        ]
       },
       {
         "state": "Escaldes-Engordany",
-        "cities": ["les Escaldes"]
+        "cities": [
+          "les Escaldes"
+        ]
       },
       {
         "state": "La Massana",
-        "cities": ["Arinsal", "la Massana"]
+        "cities": [
+          "Arinsal",
+          "la Massana"
+        ]
       },
       {
         "state": "Ordino",
-        "cities": ["Ordino"]
+        "cities": [
+          "Ordino"
+        ]
       },
       {
         "state": "Sant Julià de Lòria",
-        "cities": ["Sant Julià de Lòria"]
+        "cities": [
+          "Sant Julià de Lòria"
+        ]
       }
     ]
   },
   {
     "country": "Armenia",
+    "iso2": "AM",
     "states": [
       {
         "state": "Aragatsotn",
@@ -592,6 +612,7 @@
   },
   {
     "country": "Austria",
+    "iso2": "AT",
     "states": [
       {
         "state": "Burgenland",
@@ -3003,6 +3024,7 @@
   },
   {
     "country": "Azerbaijan",
+    "iso2": "AZ",
     "states": [
       {
         "state": "Absheron",
@@ -3017,27 +3039,43 @@
       },
       {
         "state": "Agdam",
-        "cities": ["Ağdam"]
+        "cities": [
+          "Ağdam"
+        ]
       },
       {
         "state": "Agdash",
-        "cities": ["Ağdaş"]
+        "cities": [
+          "Ağdaş"
+        ]
       },
       {
         "state": "Aghjabadi",
-        "cities": ["Agdzhabedy", "Avşar"]
+        "cities": [
+          "Agdzhabedy",
+          "Avşar"
+        ]
       },
       {
         "state": "Agstafa",
-        "cities": ["Aghstafa", "Saloğlu", "Vurğun"]
+        "cities": [
+          "Aghstafa",
+          "Saloğlu",
+          "Vurğun"
+        ]
       },
       {
         "state": "Agsu",
-        "cities": ["Aghsu"]
+        "cities": [
+          "Aghsu"
+        ]
       },
       {
         "state": "Astara",
-        "cities": ["Astara", "Kizhaba"]
+        "cities": [
+          "Astara",
+          "Kizhaba"
+        ]
       },
       {
         "state": "Baku",
@@ -3076,11 +3114,17 @@
       },
       {
         "state": "Balakan",
-        "cities": ["Belokany", "Qabaqçöl"]
+        "cities": [
+          "Belokany",
+          "Qabaqçöl"
+        ]
       },
       {
         "state": "Barda",
-        "cities": ["Barda", "Samuxlu"]
+        "cities": [
+          "Barda",
+          "Samuxlu"
+        ]
       },
       {
         "state": "Beylagan",
@@ -3094,19 +3138,29 @@
       },
       {
         "state": "Bilasuvar",
-        "cities": ["Pushkino"]
+        "cities": [
+          "Pushkino"
+        ]
       },
       {
         "state": "Dashkasan",
-        "cities": ["Verkhniy Dashkesan", "Yukhary-Dashkesan"]
+        "cities": [
+          "Verkhniy Dashkesan",
+          "Yukhary-Dashkesan"
+        ]
       },
       {
         "state": "Fizuli",
-        "cities": ["Fizuli", "Horadiz"]
+        "cities": [
+          "Fizuli",
+          "Horadiz"
+        ]
       },
       {
         "state": "Ganja",
-        "cities": ["Ganja"]
+        "cities": [
+          "Ganja"
+        ]
       },
       {
         "state": "Gədəbəy",
@@ -3120,83 +3174,137 @@
       },
       {
         "state": "Gobustan",
-        "cities": ["Qobustan"]
+        "cities": [
+          "Qobustan"
+        ]
       },
       {
         "state": "Goranboy",
-        "cities": ["Goranboy", "Qızılhacılı"]
+        "cities": [
+          "Goranboy",
+          "Qızılhacılı"
+        ]
       },
       {
         "state": "Goychay",
-        "cities": ["Geoktschai"]
+        "cities": [
+          "Geoktschai"
+        ]
       },
       {
         "state": "Goygol",
-        "cities": ["Yelenendorf"]
+        "cities": [
+          "Yelenendorf"
+        ]
       },
       {
         "state": "Hajigabul",
-        "cities": ["Hacıqabul", "Mughan"]
+        "cities": [
+          "Hacıqabul",
+          "Mughan"
+        ]
       },
       {
         "state": "Imishli",
-        "cities": ["Imishli"]
+        "cities": [
+          "Imishli"
+        ]
       },
       {
         "state": "Ismailli",
-        "cities": ["Basqal", "İsmayıllı"]
+        "cities": [
+          "Basqal",
+          "İsmayıllı"
+        ]
       },
       {
         "state": "Jabrayil",
-        "cities": ["Jebrail"]
+        "cities": [
+          "Jebrail"
+        ]
       },
       {
         "state": "Jalilabad",
-        "cities": ["Jalilabad", "Prishibinskoye"]
+        "cities": [
+          "Jalilabad",
+          "Prishibinskoye"
+        ]
       },
       {
         "state": "Kalbajar",
-        "cities": ["Kerbakhiar", "Vank"]
+        "cities": [
+          "Kerbakhiar",
+          "Vank"
+        ]
       },
       {
         "state": "Khachmaz",
-        "cities": ["Xaçmaz", "Xudat"]
+        "cities": [
+          "Xaçmaz",
+          "Xudat"
+        ]
       },
       {
         "state": "Khizi",
-        "cities": ["Altıağac", "Khyzy", "Kilyazi", "Şuraabad"]
+        "cities": [
+          "Altıağac",
+          "Khyzy",
+          "Kilyazi",
+          "Şuraabad"
+        ]
       },
       {
         "state": "Khojali",
-        "cities": ["Askyaran", "Xocalı"]
+        "cities": [
+          "Askyaran",
+          "Xocalı"
+        ]
       },
       {
         "state": "Kurdamir",
-        "cities": ["Kyurdarmir"]
+        "cities": [
+          "Kyurdarmir"
+        ]
       },
       {
         "state": "Lachin",
-        "cities": ["Laçın"]
+        "cities": [
+          "Laçın"
+        ]
       },
       {
         "state": "Lankaran",
-        "cities": ["Haftoni", "Lankaran"]
+        "cities": [
+          "Haftoni",
+          "Lankaran"
+        ]
       },
       {
         "state": "Lerik",
-        "cities": ["Lerik"]
+        "cities": [
+          "Lerik"
+        ]
       },
       {
         "state": "Martuni",
-        "cities": ["Hadrut", "Novyy Karanlug", "Qırmızı Bazar"]
+        "cities": [
+          "Hadrut",
+          "Novyy Karanlug",
+          "Qırmızı Bazar"
+        ]
       },
       {
         "state": "Masally",
-        "cities": ["Boradigah", "Masally"]
+        "cities": [
+          "Boradigah",
+          "Masally"
+        ]
       },
       {
         "state": "Mingachevir",
-        "cities": ["Mingelchaur"]
+        "cities": [
+          "Mingelchaur"
+        ]
       },
       {
         "state": "Nakhchivan",
@@ -3223,91 +3331,154 @@
       },
       {
         "state": "Neftchala",
-        "cities": ["Neftçala", "Severo-Vostotchnyi Bank", "Sovetabad", "Xıllı"]
+        "cities": [
+          "Neftçala",
+          "Severo-Vostotchnyi Bank",
+          "Sovetabad",
+          "Xıllı"
+        ]
       },
       {
         "state": "Oghuz",
-        "cities": ["Oğuz"]
+        "cities": [
+          "Oğuz"
+        ]
       },
       {
         "state": "Qabala",
-        "cities": ["Qutqashen"]
+        "cities": [
+          "Qutqashen"
+        ]
       },
       {
         "state": "Qakh",
-        "cities": ["Çinarlı", "Qax", "Qax İngiloy", "Qaxbaş"]
+        "cities": [
+          "Çinarlı",
+          "Qax",
+          "Qax İngiloy",
+          "Qaxbaş"
+        ]
       },
       {
         "state": "Qazakh",
-        "cities": ["Qazax"]
+        "cities": [
+          "Qazax"
+        ]
       },
       {
         "state": "Quba",
-        "cities": ["Hacıhüseynli", "Quba"]
+        "cities": [
+          "Hacıhüseynli",
+          "Quba"
+        ]
       },
       {
         "state": "Qubadli",
-        "cities": ["Qubadlı"]
+        "cities": [
+          "Qubadlı"
+        ]
       },
       {
         "state": "Qusar",
-        "cities": ["Qusar", "Samur"]
+        "cities": [
+          "Qusar",
+          "Samur"
+        ]
       },
       {
         "state": "Saatly",
-        "cities": ["Əhmədbəyli", "Saatlı"]
+        "cities": [
+          "Əhmədbəyli",
+          "Saatlı"
+        ]
       },
       {
         "state": "Sabirabad",
-        "cities": ["Sabirabad"]
+        "cities": [
+          "Sabirabad"
+        ]
       },
       {
         "state": "Salyan",
-        "cities": ["Qaraçala", "Salyan"]
+        "cities": [
+          "Qaraçala",
+          "Salyan"
+        ]
       },
       {
         "state": "Samukh",
-        "cities": ["Qarayeri", "Qırmızı Samux", "Samux"]
+        "cities": [
+          "Qarayeri",
+          "Qırmızı Samux",
+          "Samux"
+        ]
       },
       {
         "state": "Shabran",
-        "cities": ["Divichibazar"]
+        "cities": [
+          "Divichibazar"
+        ]
       },
       {
         "state": "Shaki",
-        "cities": ["Sheki"]
+        "cities": [
+          "Sheki"
+        ]
       },
       {
         "state": "Shaki",
-        "cities": ["Baş Göynük"]
+        "cities": [
+          "Baş Göynük"
+        ]
       },
       {
         "state": "Shamakhi",
-        "cities": ["Shamakhi"]
+        "cities": [
+          "Shamakhi"
+        ]
       },
       {
         "state": "Shamkir",
-        "cities": ["Dolyar", "Dzagam", "Qasım İsmayılov", "Shamkhor"]
+        "cities": [
+          "Dolyar",
+          "Dzagam",
+          "Qasım İsmayılov",
+          "Shamkhor"
+        ]
       },
       {
         "state": "Shirvan",
-        "cities": ["Şirvan"]
+        "cities": [
+          "Şirvan"
+        ]
       },
       {
         "state": "Shusha",
-        "cities": ["Shushi"]
+        "cities": [
+          "Shushi"
+        ]
       },
       {
         "state": "Siazan",
-        "cities": ["Gilgilçay", "Kyzyl-Burun"]
+        "cities": [
+          "Gilgilçay",
+          "Kyzyl-Burun"
+        ]
       },
       {
         "state": "Sumqayit",
-        "cities": ["Corat", "Hacı Zeynalabdin", "Sumqayıt"]
+        "cities": [
+          "Corat",
+          "Hacı Zeynalabdin",
+          "Sumqayıt"
+        ]
       },
       {
         "state": "Tartar",
-        "cities": ["Martakert", "Terter"]
+        "cities": [
+          "Martakert",
+          "Terter"
+        ]
       },
       {
         "state": "Tovuz",
@@ -3322,36 +3493,57 @@
       },
       {
         "state": "Ujar",
-        "cities": ["Ujar"]
+        "cities": [
+          "Ujar"
+        ]
       },
       {
         "state": "Yardymli",
-        "cities": ["Yardımlı"]
+        "cities": [
+          "Yardımlı"
+        ]
       },
       {
         "state": "Yevlakh",
-        "cities": ["Yevlakh"]
+        "cities": [
+          "Yevlakh"
+        ]
       },
       {
         "state": "Yevlakh",
-        "cities": ["Aran", "Qaramanlı"]
+        "cities": [
+          "Aran",
+          "Qaramanlı"
+        ]
       },
       {
         "state": "Zangilan",
-        "cities": ["Mincivan", "Zangilan"]
+        "cities": [
+          "Mincivan",
+          "Zangilan"
+        ]
       },
       {
         "state": "Zaqatala",
-        "cities": ["Aliabad", "Faldarlı", "Mamrux", "Qandax", "Zaqatala"]
+        "cities": [
+          "Aliabad",
+          "Faldarlı",
+          "Mamrux",
+          "Qandax",
+          "Zaqatala"
+        ]
       },
       {
         "state": "Zardab",
-        "cities": ["Zardob"]
+        "cities": [
+          "Zardob"
+        ]
       }
     ]
   },
   {
     "country": "Belarus",
+    "iso2": "BY",
     "states": [
       {
         "state": "Brest",
@@ -3721,10 +3913,13 @@
   },
   {
     "country": "Belgium",
+    "iso2": "BE",
     "states": [
       {
         "state": "Brussels-Capital ",
-        "cities": ["Brussels"]
+        "cities": [
+          "Brussels"
+        ]
       },
       {
         "state": "Flanders",
@@ -4288,10 +4483,14 @@
   },
   {
     "country": "Bosnia and Herzegovina",
+    "iso2": "BA",
     "states": [
       {
         "state": "Brčko",
-        "cities": ["Brčko", "Brka"]
+        "cities": [
+          "Brčko",
+          "Brka"
+        ]
       },
       {
         "state": "Federation of Bosnia and Herzegovina",
@@ -4537,6 +4736,7 @@
   },
   {
     "country": "Bulgaria",
+    "iso2": "BG",
     "states": [
       {
         "state": "Blagoevgrad",
@@ -4898,7 +5098,9 @@
       },
       {
         "state": "Shumen",
-        "cities": ["Shumen"]
+        "cities": [
+          "Shumen"
+        ]
       },
       {
         "state": "Silistra",
@@ -5008,7 +5210,11 @@
       },
       {
         "state": "Sofia City",
-        "cities": ["Buhovo", "Sofia", "Stolichna Obshtina"]
+        "cities": [
+          "Buhovo",
+          "Sofia",
+          "Stolichna Obshtina"
+        ]
       },
       {
         "state": "Stara Zagora",
@@ -5180,6 +5386,7 @@
   },
   {
     "country": "Croatia",
+    "iso2": "HR",
     "states": [
       {
         "state": "Bjelovar-Bilogora",
@@ -5949,6 +6156,7 @@
   },
   {
     "country": "Cyprus",
+    "iso2": "CY",
     "states": [
       {
         "state": "Famagusta (Mağusa)",
@@ -5972,7 +6180,11 @@
       },
       {
         "state": "Kyrenia (Keryneia)",
-        "cities": ["Kyrenia", "Kyrenia Municipality", "Lápithos"]
+        "cities": [
+          "Kyrenia",
+          "Kyrenia Municipality",
+          "Lápithos"
+        ]
       },
       {
         "state": "Larnaca (Larnaka)",
@@ -6075,6 +6287,7 @@
   },
   {
     "country": "Czech Republic",
+    "iso2": "CZ",
     "states": [
       {
         "state": "Jihočeský kraj",
@@ -7505,6 +7718,7 @@
   },
   {
     "country": "Denmark",
+    "iso2": "DK",
     "states": [
       {
         "state": "Central Denmark",
@@ -7965,6 +8179,7 @@
   },
   {
     "country": "Estonia",
+    "iso2": "EE",
     "states": [
       {
         "state": "Harju",
@@ -8008,7 +8223,9 @@
       },
       {
         "state": "Hiiu",
-        "cities": ["Kärdla"]
+        "cities": [
+          "Kärdla"
+        ]
       },
       {
         "state": "Ida-Viru",
@@ -8169,7 +8386,11 @@
       },
       {
         "state": "Valga",
-        "cities": ["Otepää vald", "Tõrva", "Valga"]
+        "cities": [
+          "Otepää vald",
+          "Tõrva",
+          "Valga"
+        ]
       },
       {
         "state": "Viljandi",
@@ -8201,6 +8422,7 @@
   },
   {
     "country": "Finland",
+    "iso2": "FI",
     "states": [
       {
         "state": "Åland Islands",
@@ -8745,6 +8967,7 @@
   },
   {
     "country": "France",
+    "iso2": "FR",
     "states": [
       {
         "state": "Auvergne-Rhône-Alpes",
@@ -19083,6 +19306,7 @@
   },
   {
     "country": "Georgia",
+    "iso2": "GE",
     "states": [
       {
         "state": "Abkhazia",
@@ -19119,7 +19343,12 @@
       },
       {
         "state": "Guria",
-        "cities": ["Lanchkhuti", "Naruja", "Ozurgeti", "Urek’i"]
+        "cities": [
+          "Lanchkhuti",
+          "Naruja",
+          "Ozurgeti",
+          "Urek’i"
+        ]
       },
       {
         "state": "Imereti",
@@ -19247,12 +19476,15 @@
       },
       {
         "state": "Tbilisi",
-        "cities": ["Tbilisi"]
+        "cities": [
+          "Tbilisi"
+        ]
       }
     ]
   },
   {
     "country": "Germany",
+    "iso2": "DE",
     "states": [
       {
         "state": "Baden-Württemberg",
@@ -22292,7 +22524,12 @@
       },
       {
         "state": "Bremen",
-        "cities": ["Bremen", "Bremerhaven", "Burglesum", "Vegesack"]
+        "cities": [
+          "Bremen",
+          "Bremerhaven",
+          "Burglesum",
+          "Vegesack"
+        ]
       },
       {
         "state": "Hamburg",
@@ -26437,6 +26674,7 @@
   },
   {
     "country": "Greece",
+    "iso2": "GR",
     "states": [
       {
         "state": "Attica",
@@ -27573,6 +27811,7 @@
   },
   {
     "country": "Hungary",
+    "iso2": "HU",
     "states": [
       {
         "state": "Bács-Kiskun",
@@ -28752,6 +28991,7 @@
   },
   {
     "country": "Iceland",
+    "iso2": "IS",
     "states": [
       {
         "state": "Capital",
@@ -28871,6 +29111,7 @@
   },
   {
     "country": "Ireland",
+    "iso2": "IE",
     "states": [
       {
         "state": "Connacht",
@@ -29268,6 +29509,7 @@
   },
   {
     "country": "Italy",
+    "iso2": "IT",
     "states": [
       {
         "state": "Abruzzo",
@@ -39331,6 +39573,7 @@
   },
   {
     "country": "Kazakhstan",
+    "iso2": "KZ",
     "states": [
       {
         "state": "Akmola",
@@ -39404,11 +39647,15 @@
       },
       {
         "state": "Almaty",
-        "cities": ["Almaty"]
+        "cities": [
+          "Almaty"
+        ]
       },
       {
         "state": "Astana",
-        "cities": ["Nur-Sultan"]
+        "cities": [
+          "Nur-Sultan"
+        ]
       },
       {
         "state": "Atyrau",
@@ -39430,7 +39677,9 @@
       },
       {
         "state": "Baikonur",
-        "cities": ["Baikonur"]
+        "cities": [
+          "Baikonur"
+        ]
       },
       {
         "state": "East Kazakhstan",
@@ -39675,14 +39924,18 @@
   },
   {
     "country": "Kosovo",
+    "iso2": "XK",
     "states": []
   },
   {
     "country": "Latvia",
+    "iso2": "LV",
     "states": [
       {
         "state": "Ādaži",
-        "cities": ["Carnikava"]
+        "cities": [
+          "Carnikava"
+        ]
       },
       {
         "state": "Aizkraukle",
@@ -39697,23 +39950,44 @@
       },
       {
         "state": "Alūksne",
-        "cities": ["Alūksne"]
+        "cities": [
+          "Alūksne"
+        ]
       },
       {
         "state": "Augšdaugava",
-        "cities": ["Daugavpils", "Ilūkste"]
+        "cities": [
+          "Daugavpils",
+          "Ilūkste"
+        ]
       },
       {
         "state": "Balvi",
-        "cities": ["Baltinava", "Balvi", "Rugāji", "Viļaka"]
+        "cities": [
+          "Baltinava",
+          "Balvi",
+          "Rugāji",
+          "Viļaka"
+        ]
       },
       {
         "state": "Bauska",
-        "cities": ["Bauska", "Iecava", "Pilsrundāle", "Vecumnieki"]
+        "cities": [
+          "Bauska",
+          "Iecava",
+          "Pilsrundāle",
+          "Vecumnieki"
+        ]
       },
       {
         "state": "Cēsis",
-        "cities": ["Cēsis", "Līgatne", "Priekuļi", "Stalbe", "Vecpiebalga"]
+        "cities": [
+          "Cēsis",
+          "Līgatne",
+          "Priekuļi",
+          "Stalbe",
+          "Vecpiebalga"
+        ]
       },
       {
         "state": "Dienvidkurzemes",
@@ -39730,111 +40004,209 @@
       },
       {
         "state": "Dobele",
-        "cities": ["Auce", "Dobele", "Tērvete", "Zelmeņi"]
+        "cities": [
+          "Auce",
+          "Dobele",
+          "Tērvete",
+          "Zelmeņi"
+        ]
       },
       {
         "state": "Gulbene",
-        "cities": ["Gulbene"]
+        "cities": [
+          "Gulbene"
+        ]
       },
       {
         "state": "Jēkabpils",
-        "cities": ["Aknīste", "Jēkabpils", "Krustpils", "Viesīte"]
+        "cities": [
+          "Aknīste",
+          "Jēkabpils",
+          "Krustpils",
+          "Viesīte"
+        ]
       },
       {
         "state": "Jelgava",
-        "cities": ["Ozolnieki", "Tīreļi"]
+        "cities": [
+          "Ozolnieki",
+          "Tīreļi"
+        ]
       },
       {
         "state": "Jelgava",
-        "cities": ["Jelgava"]
+        "cities": [
+          "Jelgava"
+        ]
       },
       {
         "state": "Jūrmala",
-        "cities": ["Jūrmala"]
+        "cities": [
+          "Jūrmala"
+        ]
       },
       {
         "state": "Ķekava",
-        "cities": ["Baldone", "Baloži", "Ķekava"]
+        "cities": [
+          "Baldone",
+          "Baloži",
+          "Ķekava"
+        ]
       },
       {
         "state": "Krāslava",
-        "cities": ["Dagda", "Krāslava"]
+        "cities": [
+          "Dagda",
+          "Krāslava"
+        ]
       },
       {
         "state": "Kuldīga",
-        "cities": ["Alsunga", "Kuldīga", "Skrunda"]
+        "cities": [
+          "Alsunga",
+          "Kuldīga",
+          "Skrunda"
+        ]
       },
       {
         "state": "Liepāja",
-        "cities": ["Karosta", "Liepāja"]
+        "cities": [
+          "Karosta",
+          "Liepāja"
+        ]
       },
       {
         "state": "Limbaži",
-        "cities": ["Ainaži", "Aloja", "Limbaži", "Salacgrīva", "Staicele"]
+        "cities": [
+          "Ainaži",
+          "Aloja",
+          "Limbaži",
+          "Salacgrīva",
+          "Staicele"
+        ]
       },
       {
         "state": "Līvāni",
-        "cities": ["Līvāni"]
+        "cities": [
+          "Līvāni"
+        ]
       },
       {
         "state": "Ludza",
-        "cities": ["Cibla", "Kārsava", "Ludza", "Zilupe"]
+        "cities": [
+          "Cibla",
+          "Kārsava",
+          "Ludza",
+          "Zilupe"
+        ]
       },
       {
         "state": "Madona",
-        "cities": ["Cesvaine", "Ērgļi", "Lubāna", "Madona"]
+        "cities": [
+          "Cesvaine",
+          "Ērgļi",
+          "Lubāna",
+          "Madona"
+        ]
       },
       {
         "state": "Mārupe",
-        "cities": ["Mārupe", "Piņķi"]
+        "cities": [
+          "Mārupe",
+          "Piņķi"
+        ]
       },
       {
         "state": "Ogre",
-        "cities": ["Ikšķile", "Jumprava", "Ķegums", "Lielvārde", "Ogre"]
+        "cities": [
+          "Ikšķile",
+          "Jumprava",
+          "Ķegums",
+          "Lielvārde",
+          "Ogre"
+        ]
       },
       {
         "state": "Olaine",
-        "cities": ["Olaine"]
+        "cities": [
+          "Olaine"
+        ]
       },
       {
         "state": "Preiļi",
-        "cities": ["Aglona", "Jaunaglona", "Preiļi", "Riebiņi", "Vecvārkava"]
+        "cities": [
+          "Aglona",
+          "Jaunaglona",
+          "Preiļi",
+          "Riebiņi",
+          "Vecvārkava"
+        ]
       },
       {
         "state": "Rēzekne",
-        "cities": ["Rēzekne"]
+        "cities": [
+          "Rēzekne"
+        ]
       },
       {
         "state": "Rēzekne",
-        "cities": ["Viļāni"]
+        "cities": [
+          "Viļāni"
+        ]
       },
       {
         "state": "Riga",
-        "cities": ["Bolderaja", "Daugavgrīva", "Jaunciems", "Mežaparks", "Riga"]
+        "cities": [
+          "Bolderaja",
+          "Daugavgrīva",
+          "Jaunciems",
+          "Mežaparks",
+          "Riga"
+        ]
       },
       {
         "state": "Ropaži",
-        "cities": ["Garkalne", "Ropaži", "Ulbroka", "Vangaži"]
+        "cities": [
+          "Garkalne",
+          "Ropaži",
+          "Ulbroka",
+          "Vangaži"
+        ]
       },
       {
         "state": "Salaspils",
-        "cities": ["Salaspils"]
+        "cities": [
+          "Salaspils"
+        ]
       },
       {
         "state": "Saldus",
-        "cities": ["Brocēni", "Saldus"]
+        "cities": [
+          "Brocēni",
+          "Saldus"
+        ]
       },
       {
         "state": "Saulkrasti",
-        "cities": ["Saulkrasti"]
+        "cities": [
+          "Saulkrasti"
+        ]
       },
       {
         "state": "Sigulda",
-        "cities": ["Inčukalns", "Mālpils", "Sigulda"]
+        "cities": [
+          "Inčukalns",
+          "Mālpils",
+          "Sigulda"
+        ]
       },
       {
         "state": "Smiltene",
-        "cities": ["Ape", "Rauna", "Smiltene"]
+        "cities": [
+          "Ape",
+          "Rauna",
+          "Smiltene"
+        ]
       },
       {
         "state": "Talsi",
@@ -39849,11 +40221,19 @@
       },
       {
         "state": "Tukums",
-        "cities": ["Engure", "Jaunpils", "Kandava", "Smārde", "Tukums"]
+        "cities": [
+          "Engure",
+          "Jaunpils",
+          "Kandava",
+          "Smārde",
+          "Tukums"
+        ]
       },
       {
         "state": "Valka",
-        "cities": ["Valka"]
+        "cities": [
+          "Valka"
+        ]
       },
       {
         "state": "Valmiera",
@@ -39870,69 +40250,99 @@
       },
       {
         "state": "Varakļāni",
-        "cities": ["Varakļāni"]
+        "cities": [
+          "Varakļāni"
+        ]
       },
       {
         "state": "Ventspils",
-        "cities": ["Ventspils"]
+        "cities": [
+          "Ventspils"
+        ]
       },
       {
         "state": "Ventspils",
-        "cities": ["Piltene"]
+        "cities": [
+          "Piltene"
+        ]
       }
     ]
   },
   {
     "country": "Liechtenstein",
+    "iso2": "LI",
     "states": [
       {
         "state": "Balzers",
-        "cities": ["Balzers"]
+        "cities": [
+          "Balzers"
+        ]
       },
       {
         "state": "Eschen",
-        "cities": ["Eschen"]
+        "cities": [
+          "Eschen"
+        ]
       },
       {
         "state": "Gamprin",
-        "cities": ["Gamprin"]
+        "cities": [
+          "Gamprin"
+        ]
       },
       {
         "state": "Mauren",
-        "cities": ["Mauren"]
+        "cities": [
+          "Mauren"
+        ]
       },
       {
         "state": "Planken",
-        "cities": ["Planken"]
+        "cities": [
+          "Planken"
+        ]
       },
       {
         "state": "Ruggell",
-        "cities": ["Ruggell"]
+        "cities": [
+          "Ruggell"
+        ]
       },
       {
         "state": "Schaan",
-        "cities": ["Schaan"]
+        "cities": [
+          "Schaan"
+        ]
       },
       {
         "state": "Schellenberg",
-        "cities": ["Schellenberg"]
+        "cities": [
+          "Schellenberg"
+        ]
       },
       {
         "state": "Triesen",
-        "cities": ["Triesen"]
+        "cities": [
+          "Triesen"
+        ]
       },
       {
         "state": "Triesenberg",
-        "cities": ["Triesenberg"]
+        "cities": [
+          "Triesenberg"
+        ]
       },
       {
         "state": "Vaduz",
-        "cities": ["Vaduz"]
+        "cities": [
+          "Vaduz"
+        ]
       }
     ]
   },
   {
     "country": "Lithuania",
+    "iso2": "LT",
     "states": [
       {
         "state": "Alytus",
@@ -40046,7 +40456,13 @@
       },
       {
         "state": "Tauragė",
-        "cities": ["Būgai", "Jurbarkas", "Pagėgiai", "Šilalė", "Taurage"]
+        "cities": [
+          "Būgai",
+          "Jurbarkas",
+          "Pagėgiai",
+          "Šilalė",
+          "Taurage"
+        ]
       },
       {
         "state": "Telšiai",
@@ -40111,6 +40527,7 @@
   },
   {
     "country": "Luxembourg",
+    "iso2": "LU",
     "states": [
       {
         "state": "Capellen",
@@ -40296,7 +40713,11 @@
       },
       {
         "state": "Vianden",
-        "cities": ["Putscheid", "Tandel", "Vianden"]
+        "cities": [
+          "Putscheid",
+          "Tandel",
+          "Vianden"
+        ]
       },
       {
         "state": "Wiltz",
@@ -40316,194 +40737,306 @@
   },
   {
     "country": "Malta",
+    "iso2": "MT",
     "states": [
       {
         "state": "Attard",
-        "cities": ["Attard"]
+        "cities": [
+          "Attard"
+        ]
       },
       {
         "state": "Balzan",
-        "cities": ["Balzan"]
+        "cities": [
+          "Balzan"
+        ]
       },
       {
         "state": "Birgu",
-        "cities": ["Birgu (Vittoriosa)"]
+        "cities": [
+          "Birgu (Vittoriosa)"
+        ]
       },
       {
         "state": "Birkirkara",
-        "cities": ["Birkirkara", "Fleur De Lys", "Swatar"]
+        "cities": [
+          "Birkirkara",
+          "Fleur De Lys",
+          "Swatar"
+        ]
       },
       {
         "state": "Birżebbuġa",
-        "cities": ["Birżebbuġa", "Ħal Far"]
+        "cities": [
+          "Birżebbuġa",
+          "Ħal Far"
+        ]
       },
       {
         "state": "Cospicua",
-        "cities": ["Cospicua"]
+        "cities": [
+          "Cospicua"
+        ]
       },
       {
         "state": "Dingli",
-        "cities": ["Dingli"]
+        "cities": [
+          "Dingli"
+        ]
       },
       {
         "state": "Fgura",
-        "cities": ["Fgura"]
+        "cities": [
+          "Fgura"
+        ]
       },
       {
         "state": "Floriana",
-        "cities": ["Floriana"]
+        "cities": [
+          "Floriana"
+        ]
       },
       {
         "state": "Fontana",
-        "cities": ["Fontana"]
+        "cities": [
+          "Fontana"
+        ]
       },
       {
         "state": "Għajnsielem",
-        "cities": ["Għajnsielem", "Ħal Għargħur"]
+        "cities": [
+          "Għajnsielem",
+          "Ħal Għargħur"
+        ]
       },
       {
         "state": "Għargħur",
-        "cities": ["Ħal Għaxaq"]
+        "cities": [
+          "Ħal Għaxaq"
+        ]
       },
       {
         "state": "Għasri",
-        "cities": ["Gudja"]
+        "cities": [
+          "Gudja"
+        ]
       },
       {
         "state": "Għaxaq",
-        "cities": ["Gżira"]
+        "cities": [
+          "Gżira"
+        ]
       },
       {
         "state": "Gżira",
-        "cities": ["Għarb"]
+        "cities": [
+          "Għarb"
+        ]
       },
       {
         "state": "Ħamrun",
-        "cities": ["Blata l' Bajda", "Ħamrun"]
+        "cities": [
+          "Blata l' Bajda",
+          "Ħamrun"
+        ]
       },
       {
         "state": "Iklin",
-        "cities": ["L-Iklin"]
+        "cities": [
+          "L-Iklin"
+        ]
       },
       {
         "state": "Kalkara",
-        "cities": ["Imġarr", "Mġarr"]
+        "cities": [
+          "Imġarr",
+          "Mġarr"
+        ]
       },
       {
         "state": "Kerċem",
-        "cities": ["Mqabba"]
+        "cities": [
+          "Mqabba"
+        ]
       },
       {
         "state": "Kirkop",
-        "cities": ["Imsida", "Kirkop"]
+        "cities": [
+          "Imsida",
+          "Kirkop"
+        ]
       },
       {
         "state": "Lija",
-        "cities": ["Ħal Lija", "Imtarfa"]
+        "cities": [
+          "Ħal Lija",
+          "Imtarfa"
+        ]
       },
       {
         "state": "Luqa",
-        "cities": ["Ħal Luqa", "Ħal Safi", "Senglea"]
+        "cities": [
+          "Ħal Luqa",
+          "Ħal Safi",
+          "Senglea"
+        ]
       },
       {
         "state": "Marsa",
-        "cities": ["Kalkara"]
+        "cities": [
+          "Kalkara"
+        ]
       },
       {
         "state": "Marsaskala",
-        "cities": ["Kerċem", "Marsaskala"]
+        "cities": [
+          "Kerċem",
+          "Marsaskala"
+        ]
       },
       {
         "state": "Marsaxlokk",
-        "cities": ["Marsaxlokk"]
+        "cities": [
+          "Marsaxlokk"
+        ]
       },
       {
         "state": "Mellieħa",
-        "cities": ["Manikata"]
+        "cities": [
+          "Manikata"
+        ]
       },
       {
         "state": "Mġarr",
-        "cities": ["Marsa"]
+        "cities": [
+          "Marsa"
+        ]
       },
       {
         "state": "Mosta",
-        "cities": ["Bidnija"]
+        "cities": [
+          "Bidnija"
+        ]
       },
       {
         "state": "Msida",
-        "cities": ["Mellieħa"]
+        "cities": [
+          "Mellieħa"
+        ]
       },
       {
         "state": "Munxar",
-        "cities": ["Munxar"]
+        "cities": [
+          "Munxar"
+        ]
       },
       {
         "state": "Nadur",
-        "cities": ["Nadur"]
+        "cities": [
+          "Nadur"
+        ]
       },
       {
         "state": "Naxxar",
-        "cities": ["Baħar iċ-Ċagħaq", "Magħtab", "Naxxar", "Salina"]
+        "cities": [
+          "Baħar iċ-Ċagħaq",
+          "Magħtab",
+          "Naxxar",
+          "Salina"
+        ]
       },
       {
         "state": "Paola",
-        "cities": ["Paola"]
+        "cities": [
+          "Paola"
+        ]
       },
       {
         "state": "Pembroke",
-        "cities": ["Pembroke"]
+        "cities": [
+          "Pembroke"
+        ]
       },
       {
         "state": "Pietà",
-        "cities": ["Pietà"]
+        "cities": [
+          "Pietà"
+        ]
       },
       {
         "state": "Qala",
-        "cities": ["Qala"]
+        "cities": [
+          "Qala"
+        ]
       },
       {
         "state": "Qormi",
-        "cities": ["Qormi"]
+        "cities": [
+          "Qormi"
+        ]
       },
       {
         "state": "Qrendi",
-        "cities": ["Qrendi"]
+        "cities": [
+          "Qrendi"
+        ]
       },
       {
         "state": "Rabat",
-        "cities": ["Baħrija", "Binġemma"]
+        "cities": [
+          "Baħrija",
+          "Binġemma"
+        ]
       },
       {
         "state": "San Ġwann",
-        "cities": ["San Ġiljan (St. Julian's)"]
+        "cities": [
+          "San Ġiljan (St. Julian's)"
+        ]
       },
       {
         "state": "San Lawrenz",
-        "cities": ["San Lawrenz"]
+        "cities": [
+          "San Lawrenz"
+        ]
       },
       {
         "state": "Sannat",
-        "cities": ["San Pawl il-Baħar", "Sannat"]
+        "cities": [
+          "San Pawl il-Baħar",
+          "Sannat"
+        ]
       },
       {
         "state": "Santa Luċija",
-        "cities": ["Santa Venera"]
+        "cities": [
+          "Santa Venera"
+        ]
       },
       {
         "state": "Senglea",
-        "cities": ["Imdina"]
+        "cities": [
+          "Imdina"
+        ]
       },
       {
         "state": "Siġġiewi",
-        "cities": ["Siġġiewi"]
+        "cities": [
+          "Siġġiewi"
+        ]
       },
       {
         "state": "Sliema",
-        "cities": ["Sliema"]
+        "cities": [
+          "Sliema"
+        ]
       },
       {
         "state": "St. Julian's",
-        "cities": ["Paceville", "San Ġwann"]
+        "cities": [
+          "Paceville",
+          "San Ġwann"
+        ]
       },
       {
         "state": "St. Paul's Bay",
@@ -40520,96 +41053,148 @@
       },
       {
         "state": "Swieqi",
-        "cities": ["Madliena", "Swieqi"]
+        "cities": [
+          "Madliena",
+          "Swieqi"
+        ]
       },
       {
         "state": "Ta' Xbiex",
-        "cities": ["Ta’ Xbiex"]
+        "cities": [
+          "Ta’ Xbiex"
+        ]
       },
       {
         "state": "Tarxien",
-        "cities": ["Ħal Tarxien"]
+        "cities": [
+          "Ħal Tarxien"
+        ]
       },
       {
         "state": "Valletta",
-        "cities": ["Valletta"]
+        "cities": [
+          "Valletta"
+        ]
       },
       {
         "state": "Victoria",
-        "cities": ["Rabat", "Victoria"]
+        "cities": [
+          "Rabat",
+          "Victoria"
+        ]
       },
       {
         "state": "Xagħra",
-        "cities": ["Xagħra"]
+        "cities": [
+          "Xagħra"
+        ]
       },
       {
         "state": "Xewkija",
-        "cities": ["Xewkija"]
+        "cities": [
+          "Xewkija"
+        ]
       },
       {
         "state": "Xgħajra",
-        "cities": ["Xgħajra"]
+        "cities": [
+          "Xgħajra"
+        ]
       },
       {
         "state": "Żabbar",
-        "cities": ["Żabbar"]
+        "cities": [
+          "Żabbar"
+        ]
       },
       {
         "state": "Żebbuġ Gozo",
-        "cities": ["Ħaż-Żebbuġ"]
+        "cities": [
+          "Ħaż-Żebbuġ"
+        ]
       },
       {
         "state": "Żebbuġ Malta",
-        "cities": ["Żebbuġ"]
+        "cities": [
+          "Żebbuġ"
+        ]
       },
       {
         "state": "Żejtun",
-        "cities": ["Żejtun"]
+        "cities": [
+          "Żejtun"
+        ]
       },
       {
         "state": "Żurrieq",
-        "cities": ["Żurrieq"]
+        "cities": [
+          "Żurrieq"
+        ]
       }
     ]
   },
   {
     "country": "Moldova",
+    "iso2": "MD",
     "states": [
       {
         "state": "Anenii Noi",
-        "cities": ["Anenii Noi", "Varniţa"]
+        "cities": [
+          "Anenii Noi",
+          "Varniţa"
+        ]
       },
       {
         "state": "Bălți",
-        "cities": ["Bălţi"]
+        "cities": [
+          "Bălţi"
+        ]
       },
       {
         "state": "Basarabeasca",
-        "cities": ["Basarabeasca"]
+        "cities": [
+          "Basarabeasca"
+        ]
       },
       {
         "state": "Bender",
-        "cities": ["Bender"]
+        "cities": [
+          "Bender"
+        ]
       },
       {
         "state": "Briceni",
-        "cities": ["Briceni"]
+        "cities": [
+          "Briceni"
+        ]
       },
       {
         "state": "Cahul",
-        "cities": ["Cahul", "Giurgiuleşti"]
+        "cities": [
+          "Cahul",
+          "Giurgiuleşti"
+        ]
       },
       {
         "state": "Călărași",
-        "cities": ["Călăraşi"]
+        "cities": [
+          "Călăraşi"
+        ]
       },
       {
         "state": "Cantemir",
-        "cities": ["Cantemir", "Iargara", "Vişniovca"]
+        "cities": [
+          "Cantemir",
+          "Iargara",
+          "Vişniovca"
+        ]
       },
       {
         "state": "Căușeni",
-        "cities": ["Căuşeni", "Chiţcani"]
+        "cities": [
+          "Căuşeni",
+          "Chiţcani"
+        ]
       },
       {
         "state": "Chișinău",
@@ -40625,99 +41210,162 @@
       },
       {
         "state": "Cimișlia",
-        "cities": ["Cimişlia"]
+        "cities": [
+          "Cimişlia"
+        ]
       },
       {
         "state": "Criuleni",
-        "cities": ["Criuleni"]
+        "cities": [
+          "Criuleni"
+        ]
       },
       {
         "state": "Dondușeni",
-        "cities": ["Briceni", "Donduşeni"]
+        "cities": [
+          "Briceni",
+          "Donduşeni"
+        ]
       },
       {
         "state": "Drochia",
-        "cities": ["Drochia"]
+        "cities": [
+          "Drochia"
+        ]
       },
       {
         "state": "Dubăsari",
-        "cities": ["Cocieri", "Ustia"]
+        "cities": [
+          "Cocieri",
+          "Ustia"
+        ]
       },
       {
         "state": "Edineț",
-        "cities": ["Edineţ"]
+        "cities": [
+          "Edineţ"
+        ]
       },
       {
         "state": "Fălești",
-        "cities": ["Fălești"]
+        "cities": [
+          "Fălești"
+        ]
       },
       {
         "state": "Florești",
-        "cities": ["Floreşti", "Ghindești", "Mărculeşti"]
+        "cities": [
+          "Floreşti",
+          "Ghindești",
+          "Mărculeşti"
+        ]
       },
       {
         "state": "Gagauzia",
-        "cities": ["Bugeac", "Ceadîr-Lunga", "Comrat", "Vulcăneşti"]
+        "cities": [
+          "Bugeac",
+          "Ceadîr-Lunga",
+          "Comrat",
+          "Vulcăneşti"
+        ]
       },
       {
         "state": "Glodeni",
-        "cities": ["Glodeni"]
+        "cities": [
+          "Glodeni"
+        ]
       },
       {
         "state": "Hîncești",
-        "cities": ["Dancu", "Hînceşti"]
+        "cities": [
+          "Dancu",
+          "Hînceşti"
+        ]
       },
       {
         "state": "Ialoveni",
-        "cities": ["Ialoveni"]
+        "cities": [
+          "Ialoveni"
+        ]
       },
       {
         "state": "Nisporeni",
-        "cities": ["Nisporeni"]
+        "cities": [
+          "Nisporeni"
+        ]
       },
       {
         "state": "Ocnița",
-        "cities": ["Ocniţa", "Otaci"]
+        "cities": [
+          "Ocniţa",
+          "Otaci"
+        ]
       },
       {
         "state": "Orhei",
-        "cities": ["Orhei"]
+        "cities": [
+          "Orhei"
+        ]
       },
       {
         "state": "Rezina",
-        "cities": ["Rezina", "Saharna"]
+        "cities": [
+          "Rezina",
+          "Saharna"
+        ]
       },
       {
         "state": "Rîșcani",
-        "cities": ["Rîşcani"]
+        "cities": [
+          "Rîşcani"
+        ]
       },
       {
         "state": "Sîngerei",
-        "cities": ["Bilicenii Vechi", "Biruinţa", "Sîngerei"]
+        "cities": [
+          "Bilicenii Vechi",
+          "Biruinţa",
+          "Sîngerei"
+        ]
       },
       {
         "state": "Șoldănești",
-        "cities": ["Şoldăneşti"]
+        "cities": [
+          "Şoldăneşti"
+        ]
       },
       {
         "state": "Soroca",
-        "cities": ["Soroca"]
+        "cities": [
+          "Soroca"
+        ]
       },
       {
         "state": "Ștefan Vodă",
-        "cities": ["Ştefan Vodă"]
+        "cities": [
+          "Ştefan Vodă"
+        ]
       },
       {
         "state": "Strășeni",
-        "cities": ["Bucovăţ", "Strășeni"]
+        "cities": [
+          "Bucovăţ",
+          "Strășeni"
+        ]
       },
       {
         "state": "Taraclia",
-        "cities": ["Taraclia", "Tvardița"]
+        "cities": [
+          "Taraclia",
+          "Tvardița"
+        ]
       },
       {
         "state": "Telenești",
-        "cities": ["Mîndreşti", "Teleneşti"]
+        "cities": [
+          "Mîndreşti",
+          "Teleneşti"
+        ]
       },
       {
         "state": "Transnistria",
@@ -40737,76 +41385,118 @@
       },
       {
         "state": "Ungheni",
-        "cities": ["Ungheni"]
+        "cities": [
+          "Ungheni"
+        ]
       }
     ]
   },
   {
     "country": "Monaco",
+    "iso2": "MC",
     "states": []
   },
   {
     "country": "Montenegro",
+    "iso2": "ME",
     "states": [
       {
         "state": "Andrijevica",
-        "cities": ["Andrijevica"]
+        "cities": [
+          "Andrijevica"
+        ]
       },
       {
         "state": "Bar",
-        "cities": ["Bar", "Stari Bar", "Šušanj", "Sutomore"]
+        "cities": [
+          "Bar",
+          "Stari Bar",
+          "Šušanj",
+          "Sutomore"
+        ]
       },
       {
         "state": "Berane",
-        "cities": ["Berane"]
+        "cities": [
+          "Berane"
+        ]
       },
       {
         "state": "Bijelo Polje",
-        "cities": ["Bijelo Polje"]
+        "cities": [
+          "Bijelo Polje"
+        ]
       },
       {
         "state": "Budva",
-        "cities": ["Budva", "Petrovac na Moru"]
+        "cities": [
+          "Budva",
+          "Petrovac na Moru"
+        ]
       },
       {
         "state": "Danilovgrad",
-        "cities": ["Danilovgrad", "Spuž"]
+        "cities": [
+          "Danilovgrad",
+          "Spuž"
+        ]
       },
       {
         "state": "Gusinje",
-        "cities": ["Gusinje"]
+        "cities": [
+          "Gusinje"
+        ]
       },
       {
         "state": "Kolašin",
-        "cities": ["Kolašin"]
+        "cities": [
+          "Kolašin"
+        ]
       },
       {
         "state": "Kotor",
-        "cities": ["Dobrota", "Kotor", "Prčanj", "Risan"]
+        "cities": [
+          "Dobrota",
+          "Kotor",
+          "Prčanj",
+          "Risan"
+        ]
       },
       {
         "state": "Mojkovac",
-        "cities": ["Mojkovac"]
+        "cities": [
+          "Mojkovac"
+        ]
       },
       {
         "state": "Nikšić",
-        "cities": ["Nikšić"]
+        "cities": [
+          "Nikšić"
+        ]
       },
       {
         "state": "Old Royal Capital Cetinje",
-        "cities": ["Cetinje"]
+        "cities": [
+          "Cetinje"
+        ]
       },
       {
         "state": "Plav",
-        "cities": ["Plav"]
+        "cities": [
+          "Plav"
+        ]
       },
       {
         "state": "Pljevlja",
-        "cities": ["Pljevlja"]
+        "cities": [
+          "Pljevlja"
+        ]
       },
       {
         "state": "Plužine",
-        "cities": ["Plužine"]
+        "cities": [
+          "Plužine"
+        ]
       },
       {
         "state": "Podgorica",
@@ -40821,28 +41511,39 @@
       },
       {
         "state": "Rožaje",
-        "cities": ["Rožaje"]
+        "cities": [
+          "Rožaje"
+        ]
       },
       {
         "state": "Šavnik",
-        "cities": ["Šavnik"]
+        "cities": [
+          "Šavnik"
+        ]
       },
       {
         "state": "Tivat",
-        "cities": ["Tivat"]
+        "cities": [
+          "Tivat"
+        ]
       },
       {
         "state": "Ulcinj",
-        "cities": ["Ulcinj"]
+        "cities": [
+          "Ulcinj"
+        ]
       },
       {
         "state": "Žabljak",
-        "cities": ["Žabljak"]
+        "cities": [
+          "Žabljak"
+        ]
       }
     ]
   },
   {
     "country": "Netherlands",
+    "iso2": "NL",
     "states": [
       {
         "state": "Drenthe",
@@ -42552,14 +43253,21 @@
   },
   {
     "country": "North Macedonia",
+    "iso2": "MK",
     "states": [
       {
         "state": "Aračinovo",
-        "cities": ["Арачиново"]
+        "cities": [
+          "Арачиново"
+        ]
       },
       {
         "state": "Berovo",
-        "cities": ["Berovo", "Rusinovo", "Vladimirovo"]
+        "cities": [
+          "Berovo",
+          "Rusinovo",
+          "Vladimirovo"
+        ]
       },
       {
         "state": "Bitola",
@@ -42575,79 +43283,137 @@
       },
       {
         "state": "Bogdanci",
-        "cities": ["Bogdanci", "Stojakovo"]
+        "cities": [
+          "Bogdanci",
+          "Stojakovo"
+        ]
       },
       {
         "state": "Bogovinje",
-        "cities": ["Bogovinje", "Dolno Palčište", "Gradec", "Kamenjane"]
+        "cities": [
+          "Bogovinje",
+          "Dolno Palčište",
+          "Gradec",
+          "Kamenjane"
+        ]
       },
       {
         "state": "Bosilovo",
-        "cities": ["Bosilovo", "Ilovica", "Sekirnik"]
+        "cities": [
+          "Bosilovo",
+          "Ilovica",
+          "Sekirnik"
+        ]
       },
       {
         "state": "Brvenica",
-        "cities": ["Brvenica", "Čelopek", "Gurgurnica", "Miletino"]
+        "cities": [
+          "Brvenica",
+          "Čelopek",
+          "Gurgurnica",
+          "Miletino"
+        ]
       },
       {
         "state": "Butel",
-        "cities": ["Butel", "Radishani"]
+        "cities": [
+          "Butel",
+          "Radishani"
+        ]
       },
       {
         "state": "Čair",
-        "cities": ["Čair"]
+        "cities": [
+          "Čair"
+        ]
       },
       {
         "state": "Čaška",
-        "cities": ["Bogomila", "Čaška"]
+        "cities": [
+          "Bogomila",
+          "Čaška"
+        ]
       },
       {
         "state": "Centar Župa",
-        "cities": ["Centar Župa"]
+        "cities": [
+          "Centar Župa"
+        ]
       },
       {
         "state": "Češinovo-Obleševo",
-        "cities": ["Češinovo", "Oblesevo"]
+        "cities": [
+          "Češinovo",
+          "Oblesevo"
+        ]
       },
       {
         "state": "Čučer-Sandevo",
-        "cities": ["Чучер - Сандево"]
+        "cities": [
+          "Чучер - Сандево"
+        ]
       },
       {
         "state": "Debarca",
-        "cities": ["Belčišta", "Mešeišta"]
+        "cities": [
+          "Belčišta",
+          "Mešeišta"
+        ]
       },
       {
         "state": "Delčevo",
-        "cities": ["Delcevo"]
+        "cities": [
+          "Delcevo"
+        ]
       },
       {
         "state": "Demir Hisar",
-        "cities": ["Demir Hisar", "Slepče", "Sopotnica"]
+        "cities": [
+          "Demir Hisar",
+          "Slepče",
+          "Sopotnica"
+        ]
       },
       {
         "state": "Demir Kapija",
-        "cities": ["Demir Kapija"]
+        "cities": [
+          "Demir Kapija"
+        ]
       },
       {
         "state": "Dojran",
-        "cities": ["Star Dojran"]
+        "cities": [
+          "Star Dojran"
+        ]
       },
       {
         "state": "Dolneni",
-        "cities": ["Crnilište", "Desovo", "Dolneni", "Lažani", "Žitoše"]
+        "cities": [
+          "Crnilište",
+          "Desovo",
+          "Dolneni",
+          "Lažani",
+          "Žitoše"
+        ]
       },
       {
         "state": "Gazi Baba",
-        "cities": ["Cresevo"]
+        "cities": [
+          "Cresevo"
+        ]
       },
       {
         "state": "Gevgelija",
-        "cities": ["Gevgelija", "Miravci"]
+        "cities": [
+          "Gevgelija",
+          "Miravci"
+        ]
       },
       {
         "state": "Gjorče Petrov",
-        "cities": ["Gjorče Petro"]
+        "cities": [
+          "Gjorče Petro"
+        ]
       },
       {
         "state": "Gostivar",
@@ -42662,11 +43428,19 @@
       },
       {
         "state": "Gradsko",
-        "cities": ["Gradsko"]
+        "cities": [
+          "Gradsko"
+        ]
       },
       {
         "state": "Greater Skopje",
-        "cities": ["Bojane", "Dračevo", "Ljubin", "Saraj", "Usje"]
+        "cities": [
+          "Bojane",
+          "Dračevo",
+          "Ljubin",
+          "Saraj",
+          "Usje"
+        ]
       },
       {
         "state": "Ilinden",
@@ -42681,19 +43455,29 @@
       },
       {
         "state": "Jegunovce",
-        "cities": ["Jegunovce", "Vratnica"]
+        "cities": [
+          "Jegunovce",
+          "Vratnica"
+        ]
       },
       {
         "state": "Karbinci",
-        "cities": ["Karbinci"]
+        "cities": [
+          "Karbinci"
+        ]
       },
       {
         "state": "Karpoš",
-        "cities": ["Skopje"]
+        "cities": [
+          "Skopje"
+        ]
       },
       {
         "state": "Kavadarci",
-        "cities": ["Kavadarci", "Vataša"]
+        "cities": [
+          "Kavadarci",
+          "Vataša"
+        ]
       },
       {
         "state": "Kičevo",
@@ -42709,35 +43493,57 @@
       },
       {
         "state": "Kisela Voda",
-        "cities": ["Kisela Voda"]
+        "cities": [
+          "Kisela Voda"
+        ]
       },
       {
         "state": "Kočani",
-        "cities": ["Kochani", "Orizari"]
+        "cities": [
+          "Kochani",
+          "Orizari"
+        ]
       },
       {
         "state": "Konče",
-        "cities": ["Konče"]
+        "cities": [
+          "Konče"
+        ]
       },
       {
         "state": "Kratovo",
-        "cities": ["Kratovo"]
+        "cities": [
+          "Kratovo"
+        ]
       },
       {
         "state": "Kriva Palanka",
-        "cities": ["Kriva Palanka"]
+        "cities": [
+          "Kriva Palanka"
+        ]
       },
       {
         "state": "Krivogaštani",
-        "cities": ["Krivogashtani", "Obršani", "Клечовце"]
+        "cities": [
+          "Krivogashtani",
+          "Obršani",
+          "Клечовце"
+        ]
       },
       {
         "state": "Kruševo",
-        "cities": ["Bučin", "Krusevo"]
+        "cities": [
+          "Bučin",
+          "Krusevo"
+        ]
       },
       {
         "state": "Kumanovo",
-        "cities": ["Bedinje", "Kumanovo", "Romanovci"]
+        "cities": [
+          "Bedinje",
+          "Kumanovo",
+          "Romanovci"
+        ]
       },
       {
         "state": "Lipkovo",
@@ -42753,91 +43559,156 @@
       },
       {
         "state": "Lozovo",
-        "cities": ["Lozovo"]
+        "cities": [
+          "Lozovo"
+        ]
       },
       {
         "state": "Makedonska Kamenica",
-        "cities": ["Makedonska Kamenica"]
+        "cities": [
+          "Makedonska Kamenica"
+        ]
       },
       {
         "state": "Makedonski Brod",
-        "cities": ["Makedonski Brod", "Samokov"]
+        "cities": [
+          "Makedonski Brod",
+          "Samokov"
+        ]
       },
       {
         "state": "Mavrovo and Rostuša",
-        "cities": ["Rostusa"]
+        "cities": [
+          "Rostusa"
+        ]
       },
       {
         "state": "Mogila",
-        "cities": ["Beranci", "Dobruševo", "Dolno Srpci", "Mogila"]
+        "cities": [
+          "Beranci",
+          "Dobruševo",
+          "Dolno Srpci",
+          "Mogila"
+        ]
       },
       {
         "state": "Negotino",
-        "cities": ["Negotino"]
+        "cities": [
+          "Negotino"
+        ]
       },
       {
         "state": "Novaci",
-        "cities": ["Novaci"]
+        "cities": [
+          "Novaci"
+        ]
       },
       {
         "state": "Novo Selo",
-        "cities": ["Novo Selo", "Sušica"]
+        "cities": [
+          "Novo Selo",
+          "Sušica"
+        ]
       },
       {
         "state": "Ohrid",
-        "cities": ["Kosel", "Ohrid", "Ohrid Opština"]
+        "cities": [
+          "Kosel",
+          "Ohrid",
+          "Ohrid Opština"
+        ]
       },
       {
         "state": "Pehčevo",
-        "cities": ["Pehčevo"]
+        "cities": [
+          "Pehčevo"
+        ]
       },
       {
         "state": "Petrovec",
-        "cities": ["Sredno Konjare", "Петровец"]
+        "cities": [
+          "Sredno Konjare",
+          "Петровец"
+        ]
       },
       {
         "state": "Plasnica",
-        "cities": ["Lisičani", "Plasnica"]
+        "cities": [
+          "Lisičani",
+          "Plasnica"
+        ]
       },
       {
         "state": "Prilep",
-        "cities": ["Kanatlarci", "Markov Grad", "Prilep", "Topolčani"]
+        "cities": [
+          "Kanatlarci",
+          "Markov Grad",
+          "Prilep",
+          "Topolčani"
+        ]
       },
       {
         "state": "Probištip",
-        "cities": ["Probishtip", "Zletovo"]
+        "cities": [
+          "Probishtip",
+          "Zletovo"
+        ]
       },
       {
         "state": "Radoviš",
-        "cities": ["Oraovica", "Podareš", "Radovis"]
+        "cities": [
+          "Oraovica",
+          "Podareš",
+          "Radovis"
+        ]
       },
       {
         "state": "Rankovce",
-        "cities": ["Ранковце"]
+        "cities": [
+          "Ранковце"
+        ]
       },
       {
         "state": "Resen",
-        "cities": ["Grnčari", "Jankovec", "Krani", "Resen"]
+        "cities": [
+          "Grnčari",
+          "Jankovec",
+          "Krani",
+          "Resen"
+        ]
       },
       {
         "state": "Rosoman",
-        "cities": ["Rosoman"]
+        "cities": [
+          "Rosoman"
+        ]
       },
       {
         "state": "Saraj",
-        "cities": ["Bukovik", "Grčec", "Kondovo", "Krušopek"]
+        "cities": [
+          "Bukovik",
+          "Grčec",
+          "Kondovo",
+          "Krušopek"
+        ]
       },
       {
         "state": "Sopište",
-        "cities": ["Сопиште"]
+        "cities": [
+          "Сопиште"
+        ]
       },
       {
         "state": "Staro Nagoričane",
-        "cities": ["Старо Нагоричане"]
+        "cities": [
+          "Старо Нагоричане"
+        ]
       },
       {
         "state": "Štip",
-        "cities": ["Shtip"]
+        "cities": [
+          "Shtip"
+        ]
       },
       {
         "state": "Struga",
@@ -42854,23 +43725,44 @@
       },
       {
         "state": "Strumica",
-        "cities": ["Kuklis", "Murtino", "Strumica", "Veljusa"]
+        "cities": [
+          "Kuklis",
+          "Murtino",
+          "Strumica",
+          "Veljusa"
+        ]
       },
       {
         "state": "Studeničani",
-        "cities": ["Batinci", "Dolno Količani", "Morani", "Studeničane"]
+        "cities": [
+          "Batinci",
+          "Dolno Količani",
+          "Morani",
+          "Studeničane"
+        ]
       },
       {
         "state": "Šuto Orizari",
-        "cities": ["Šuto Orizare"]
+        "cities": [
+          "Šuto Orizare"
+        ]
       },
       {
         "state": "Sveti Nikole",
-        "cities": ["Gorobinci", "Sveti Nikole"]
+        "cities": [
+          "Gorobinci",
+          "Sveti Nikole"
+        ]
       },
       {
         "state": "Tearce",
-        "cities": ["Nerašte", "Orashac", "Pršovce", "Slatino", "Tearce"]
+        "cities": [
+          "Nerašte",
+          "Orashac",
+          "Pršovce",
+          "Slatino",
+          "Tearce"
+        ]
       },
       {
         "state": "Tetovo",
@@ -42887,44 +43779,74 @@
       },
       {
         "state": "Valandovo",
-        "cities": ["Pirava", "Valandovo"]
+        "cities": [
+          "Pirava",
+          "Valandovo"
+        ]
       },
       {
         "state": "Vasilevo",
-        "cities": ["Vasilevo"]
+        "cities": [
+          "Vasilevo"
+        ]
       },
       {
         "state": "Veles",
-        "cities": ["Gorno Orizari", "Ivankovci", "Veles"]
+        "cities": [
+          "Gorno Orizari",
+          "Ivankovci",
+          "Veles"
+        ]
       },
       {
         "state": "Vevčani",
-        "cities": ["Vevčani"]
+        "cities": [
+          "Vevčani"
+        ]
       },
       {
         "state": "Vinica",
-        "cities": ["Blatec", "Gradec", "Vinica"]
+        "cities": [
+          "Blatec",
+          "Gradec",
+          "Vinica"
+        ]
       },
       {
         "state": "Vrapčište",
-        "cities": ["Dobri Dol", "Negotino", "Vrapčište"]
+        "cities": [
+          "Dobri Dol",
+          "Negotino",
+          "Vrapčište"
+        ]
       },
       {
         "state": "Zelenikovo",
-        "cities": ["Zelenikovo"]
+        "cities": [
+          "Zelenikovo"
+        ]
       },
       {
         "state": "Želino",
-        "cities": ["Dobarce", "Larce", "Sedlarevo", "Strimnica", "Zelino"]
+        "cities": [
+          "Dobarce",
+          "Larce",
+          "Sedlarevo",
+          "Strimnica",
+          "Zelino"
+        ]
       },
       {
         "state": "Zrnovci",
-        "cities": ["Zrnovci"]
+        "cities": [
+          "Zrnovci"
+        ]
       }
     ]
   },
   {
     "country": "Norway",
+    "iso2": "NO",
     "states": [
       {
         "state": "Agder",
@@ -43177,7 +44099,10 @@
       },
       {
         "state": "Oslo",
-        "cities": ["Oslo", "Sjølyststranda"]
+        "cities": [
+          "Oslo",
+          "Sjølyststranda"
+        ]
       },
       {
         "state": "Rogaland",
@@ -43648,6 +44573,7 @@
   },
   {
     "country": "Poland",
+    "iso2": "PL",
     "states": [
       {
         "state": "Greater Poland",
@@ -46859,6 +47785,7 @@
   },
   {
     "country": "Portugal",
+    "iso2": "PT",
     "states": [
       {
         "state": "Açores",
@@ -48274,6 +49201,7 @@
   },
   {
     "country": "Romania",
+    "iso2": "RO",
     "states": [
       {
         "state": "Alba",
@@ -56570,6 +57498,7 @@
   },
   {
     "country": "Russia",
+    "iso2": "RU",
     "states": [
       {
         "state": "Adygea",
@@ -59834,7 +60763,10 @@
       },
       {
         "state": "Nenets",
-        "cities": ["Iskateley", "Nar'yan-Mar"]
+        "cities": [
+          "Iskateley",
+          "Nar'yan-Mar"
+        ]
       },
       {
         "state": "Nizhny Novgorod",
@@ -62380,47 +63312,67 @@
   },
   {
     "country": "San Marino",
+    "iso2": "SM",
     "states": [
       {
         "state": "Acquaviva",
-        "cities": ["Acquaviva"]
+        "cities": [
+          "Acquaviva"
+        ]
       },
       {
         "state": "Borgo Maggiore",
-        "cities": ["Borgo Maggiore"]
+        "cities": [
+          "Borgo Maggiore"
+        ]
       },
       {
         "state": "Chiesanuova",
-        "cities": ["Poggio di Chiesanuova"]
+        "cities": [
+          "Poggio di Chiesanuova"
+        ]
       },
       {
         "state": "Domagnano",
-        "cities": ["Domagnano"]
+        "cities": [
+          "Domagnano"
+        ]
       },
       {
         "state": "Faetano",
-        "cities": ["Faetano"]
+        "cities": [
+          "Faetano"
+        ]
       },
       {
         "state": "Fiorentino",
-        "cities": ["Fiorentino"]
+        "cities": [
+          "Fiorentino"
+        ]
       },
       {
         "state": "Montegiardino",
-        "cities": ["Monte Giardino"]
+        "cities": [
+          "Monte Giardino"
+        ]
       },
       {
         "state": "San Marino",
-        "cities": ["San Marino"]
+        "cities": [
+          "San Marino"
+        ]
       },
       {
         "state": "Serravalle",
-        "cities": ["Serravalle"]
+        "cities": [
+          "Serravalle"
+        ]
       }
     ]
   },
   {
     "country": "Serbia",
+    "iso2": "RS",
     "states": [
       {
         "state": "Belgrade",
@@ -62449,7 +63401,13 @@
       },
       {
         "state": "Bor",
-        "cities": ["Bor", "Donji Milanovac", "Kladovo", "Majdanpek", "Negotin"]
+        "cities": [
+          "Bor",
+          "Donji Milanovac",
+          "Kladovo",
+          "Majdanpek",
+          "Negotin"
+        ]
       },
       {
         "state": "Braničevo",
@@ -62617,7 +63575,12 @@
       },
       {
         "state": "North Bačka",
-        "cities": ["Bačka Topola", "Krivaja", "Mali Iđoš", "Subotica"]
+        "cities": [
+          "Bačka Topola",
+          "Krivaja",
+          "Mali Iđoš",
+          "Subotica"
+        ]
       },
       {
         "state": "North Banat",
@@ -62892,7 +63855,13 @@
       },
       {
         "state": "Zaječar",
-        "cities": ["Boljevac", "Boljevci", "Knjazevac", "Sokobanja", "Zaječar"]
+        "cities": [
+          "Boljevac",
+          "Boljevci",
+          "Knjazevac",
+          "Sokobanja",
+          "Zaječar"
+        ]
       },
       {
         "state": "Zlatibor",
@@ -62918,6 +63887,7 @@
   },
   {
     "country": "Slovakia",
+    "iso2": "SK",
     "states": [
       {
         "state": "Banská Bystrica",
@@ -63196,62 +64166,104 @@
   },
   {
     "country": "Slovenia",
+    "iso2": "SI",
     "states": [
       {
         "state": "Ajdovščina",
-        "cities": ["Ajdovščina", "Cirkulane", "Lokavec"]
+        "cities": [
+          "Ajdovščina",
+          "Cirkulane",
+          "Lokavec"
+        ]
       },
       {
         "state": "Ankaran",
-        "cities": ["Ankaran"]
+        "cities": [
+          "Ankaran"
+        ]
       },
       {
         "state": "Apače",
-        "cities": ["Apače"]
+        "cities": [
+          "Apače"
+        ]
       },
       {
         "state": "Beltinci",
-        "cities": ["Beltinci", "Gančani", "Lipovci", "Zgornje Gorje"]
+        "cities": [
+          "Beltinci",
+          "Gančani",
+          "Lipovci",
+          "Zgornje Gorje"
+        ]
       },
       {
         "state": "Benedikt",
-        "cities": ["Benedikt"]
+        "cities": [
+          "Benedikt"
+        ]
       },
       {
         "state": "Bistrica ob Sotli",
-        "cities": ["Bistrica ob Sotli"]
+        "cities": [
+          "Bistrica ob Sotli"
+        ]
       },
       {
         "state": "Bled",
-        "cities": ["Bled", "Kostanjevica na Krki", "Zasip"]
+        "cities": [
+          "Bled",
+          "Kostanjevica na Krki",
+          "Zasip"
+        ]
       },
       {
         "state": "Bloke",
-        "cities": ["Nova Vas"]
+        "cities": [
+          "Nova Vas"
+        ]
       },
       {
         "state": "Bohinj",
-        "cities": ["Bohinjska Bistrica", "Dragomer", "Log pri Brezovici"]
+        "cities": [
+          "Bohinjska Bistrica",
+          "Dragomer",
+          "Log pri Brezovici"
+        ]
       },
       {
         "state": "Borovnica",
-        "cities": ["Borovnica", "Makole"]
+        "cities": [
+          "Borovnica",
+          "Makole"
+        ]
       },
       {
         "state": "Bovec",
-        "cities": ["Bovec", "Mirna"]
+        "cities": [
+          "Bovec",
+          "Mirna"
+        ]
       },
       {
         "state": "Braslovče",
-        "cities": ["Braslovče"]
+        "cities": [
+          "Braslovče"
+        ]
       },
       {
         "state": "Brda",
-        "cities": ["Dobrovo", "Mokronog"]
+        "cities": [
+          "Dobrovo",
+          "Mokronog"
+        ]
       },
       {
         "state": "Brežice",
-        "cities": ["Brežice", "Poljčane"]
+        "cities": [
+          "Brežice",
+          "Poljčane"
+        ]
       },
       {
         "state": "Brezovica",
@@ -63265,207 +64277,331 @@
       },
       {
         "state": "Cankova",
-        "cities": ["Cankova"]
+        "cities": [
+          "Cankova"
+        ]
       },
       {
         "state": "Celje",
-        "cities": ["Celje", "Ljubečna", "Trnovlje pri Celju"]
+        "cities": [
+          "Celje",
+          "Ljubečna",
+          "Trnovlje pri Celju"
+        ]
       },
       {
         "state": "Cerklje na Gorenjskem",
-        "cities": ["Cerklje na Gorenjskem"]
+        "cities": [
+          "Cerklje na Gorenjskem"
+        ]
       },
       {
         "state": "Cerknica",
-        "cities": ["Cerknica", "Rakek"]
+        "cities": [
+          "Cerknica",
+          "Rakek"
+        ]
       },
       {
         "state": "Cerkno",
-        "cities": ["Cerkno"]
+        "cities": [
+          "Cerkno"
+        ]
       },
       {
         "state": "Cerkvenjak",
-        "cities": ["Cerkvenjak"]
+        "cities": [
+          "Cerkvenjak"
+        ]
       },
       {
         "state": "Črenšovci",
-        "cities": ["Črenšovci"]
+        "cities": [
+          "Črenšovci"
+        ]
       },
       {
         "state": "Črna na Koroškem",
-        "cities": ["Črna na Koroškem"]
+        "cities": [
+          "Črna na Koroškem"
+        ]
       },
       {
         "state": "Črnomelj",
-        "cities": ["Črnomelj"]
+        "cities": [
+          "Črnomelj"
+        ]
       },
       {
         "state": "Destrnik",
-        "cities": ["Destrnik"]
+        "cities": [
+          "Destrnik"
+        ]
       },
       {
         "state": "Divača",
-        "cities": ["Divača"]
+        "cities": [
+          "Divača"
+        ]
       },
       {
         "state": "Dobje",
-        "cities": ["Dobje pri Planini"]
+        "cities": [
+          "Dobje pri Planini"
+        ]
       },
       {
         "state": "Dobrepolje",
-        "cities": ["Videm"]
+        "cities": [
+          "Videm"
+        ]
       },
       {
         "state": "Dobrna",
-        "cities": ["Dobrna"]
+        "cities": [
+          "Dobrna"
+        ]
       },
       {
         "state": "Dobrova–Polhov Gradec",
-        "cities": ["Dobrova"]
+        "cities": [
+          "Dobrova"
+        ]
       },
       {
         "state": "Dobrovnik",
-        "cities": ["Dobrovnik"]
+        "cities": [
+          "Dobrovnik"
+        ]
       },
       {
         "state": "Dol pri Ljubljani",
-        "cities": ["Dol pri Ljubljani"]
+        "cities": [
+          "Dol pri Ljubljani"
+        ]
       },
       {
         "state": "Dolenjske Toplice",
-        "cities": ["Dolenjske Toplice"]
+        "cities": [
+          "Dolenjske Toplice"
+        ]
       },
       {
         "state": "Domžale",
-        "cities": ["Dob", "Domžale", "Radomlje", "Vir"]
+        "cities": [
+          "Dob",
+          "Domžale",
+          "Radomlje",
+          "Vir"
+        ]
       },
       {
         "state": "Dornava",
-        "cities": ["Dornava"]
+        "cities": [
+          "Dornava"
+        ]
       },
       {
         "state": "Dravograd",
-        "cities": ["Dravograd"]
+        "cities": [
+          "Dravograd"
+        ]
       },
       {
         "state": "Duplek",
-        "cities": ["Spodnji Duplek", "Zgornji Duplek"]
+        "cities": [
+          "Spodnji Duplek",
+          "Zgornji Duplek"
+        ]
       },
       {
         "state": "Gorenja Vas–Poljane",
-        "cities": ["Gorenja Vas"]
+        "cities": [
+          "Gorenja Vas"
+        ]
       },
       {
         "state": "Gorišnica",
-        "cities": ["Gorišnica"]
+        "cities": [
+          "Gorišnica"
+        ]
       },
       {
         "state": "Gornja Radgona",
-        "cities": ["Gornja Radgona"]
+        "cities": [
+          "Gornja Radgona"
+        ]
       },
       {
         "state": "Gornji Grad",
-        "cities": ["Gornji Grad"]
+        "cities": [
+          "Gornji Grad"
+        ]
       },
       {
         "state": "Gornji Petrovci",
-        "cities": ["Gornji Petrovci"]
+        "cities": [
+          "Gornji Petrovci"
+        ]
       },
       {
         "state": "Grad",
-        "cities": ["Grad"]
+        "cities": [
+          "Grad"
+        ]
       },
       {
         "state": "Grosuplje",
-        "cities": ["Grosuplje", "Šmarje-Sap"]
+        "cities": [
+          "Grosuplje",
+          "Šmarje-Sap"
+        ]
       },
       {
         "state": "Hajdina",
-        "cities": ["Spodnja Hajdina"]
+        "cities": [
+          "Spodnja Hajdina"
+        ]
       },
       {
         "state": "Hoče–Slivnica",
-        "cities": ["Hotinja Vas", "Radizel", "Rogoza", "Spodnje Hoče"]
+        "cities": [
+          "Hotinja Vas",
+          "Radizel",
+          "Rogoza",
+          "Spodnje Hoče"
+        ]
       },
       {
         "state": "Hodoš",
-        "cities": ["Hodoš"]
+        "cities": [
+          "Hodoš"
+        ]
       },
       {
         "state": "Horjul",
-        "cities": ["Horjul"]
+        "cities": [
+          "Horjul"
+        ]
       },
       {
         "state": "Hrastnik",
-        "cities": ["Dol pri Hrastniku", "Hrastnik"]
+        "cities": [
+          "Dol pri Hrastniku",
+          "Hrastnik"
+        ]
       },
       {
         "state": "Hrpelje–Kozina",
-        "cities": ["Kozina"]
+        "cities": [
+          "Kozina"
+        ]
       },
       {
         "state": "Idrija",
-        "cities": ["Idrija", "Spodnja Idrija"]
+        "cities": [
+          "Idrija",
+          "Spodnja Idrija"
+        ]
       },
       {
         "state": "Ig",
-        "cities": ["Ig"]
+        "cities": [
+          "Ig"
+        ]
       },
       {
         "state": "Ilirska Bistrica",
-        "cities": ["Ilirska Bistrica"]
+        "cities": [
+          "Ilirska Bistrica"
+        ]
       },
       {
         "state": "Ivančna Gorica",
-        "cities": ["Ivančna Gorica", "Šentvid pri Stični"]
+        "cities": [
+          "Ivančna Gorica",
+          "Šentvid pri Stični"
+        ]
       },
       {
         "state": "Izola",
-        "cities": ["Izola", "Jagodje"]
+        "cities": [
+          "Izola",
+          "Jagodje"
+        ]
       },
       {
         "state": "Jesenice",
-        "cities": ["Hrušica", "Jesenice", "Koroška Bela", "Slovenski Javornik"]
+        "cities": [
+          "Hrušica",
+          "Jesenice",
+          "Koroška Bela",
+          "Slovenski Javornik"
+        ]
       },
       {
         "state": "Jezersko",
-        "cities": ["Zgornje Jezersko"]
+        "cities": [
+          "Zgornje Jezersko"
+        ]
       },
       {
         "state": "Juršinci",
-        "cities": ["Juršinci"]
+        "cities": [
+          "Juršinci"
+        ]
       },
       {
         "state": "Kamnik",
-        "cities": ["Kamnik", "Mekinje", "Šmarca"]
+        "cities": [
+          "Kamnik",
+          "Mekinje",
+          "Šmarca"
+        ]
       },
       {
         "state": "Kanal ob Soči",
-        "cities": ["Deskle", "Kanal"]
+        "cities": [
+          "Deskle",
+          "Kanal"
+        ]
       },
       {
         "state": "Kidričevo",
-        "cities": ["Kidričevo"]
+        "cities": [
+          "Kidričevo"
+        ]
       },
       {
         "state": "Kobarid",
-        "cities": ["Kobarid"]
+        "cities": [
+          "Kobarid"
+        ]
       },
       {
         "state": "Kobilje",
-        "cities": ["Kobilje"]
+        "cities": [
+          "Kobilje"
+        ]
       },
       {
         "state": "Kočevje",
-        "cities": ["Kočevje"]
+        "cities": [
+          "Kočevje"
+        ]
       },
       {
         "state": "Komen",
-        "cities": ["Komen"]
+        "cities": [
+          "Komen"
+        ]
       },
       {
         "state": "Komenda",
-        "cities": ["Komenda", "Moste"]
+        "cities": [
+          "Komenda",
+          "Moste"
+        ]
       },
       {
         "state": "Koper",
@@ -63481,11 +64617,15 @@
       },
       {
         "state": "Kostel",
-        "cities": ["Kostel"]
+        "cities": [
+          "Kostel"
+        ]
       },
       {
         "state": "Kozje",
-        "cities": ["Kozje"]
+        "cities": [
+          "Kozje"
+        ]
       },
       {
         "state": "Kranj",
@@ -63500,39 +64640,60 @@
       },
       {
         "state": "Kranjska Gora",
-        "cities": ["Kranjska Gora", "Mojstrana"]
+        "cities": [
+          "Kranjska Gora",
+          "Mojstrana"
+        ]
       },
       {
         "state": "Križevci",
-        "cities": ["Križevci pri Ljutomeru"]
+        "cities": [
+          "Križevci pri Ljutomeru"
+        ]
       },
       {
         "state": "Krško",
-        "cities": ["Krško", "Leskovec pri Krškem", "Senovo"]
+        "cities": [
+          "Krško",
+          "Leskovec pri Krškem",
+          "Senovo"
+        ]
       },
       {
         "state": "Kungota",
-        "cities": ["Zgornja Kungota"]
+        "cities": [
+          "Zgornja Kungota"
+        ]
       },
       {
         "state": "Kuzma",
-        "cities": ["Kuzma"]
+        "cities": [
+          "Kuzma"
+        ]
       },
       {
         "state": "Laško",
-        "cities": ["Laško"]
+        "cities": [
+          "Laško"
+        ]
       },
       {
         "state": "Lenart",
-        "cities": ["Lenart v Slov. Goricah"]
+        "cities": [
+          "Lenart v Slov. Goricah"
+        ]
       },
       {
         "state": "Lendava",
-        "cities": ["Lendava"]
+        "cities": [
+          "Lendava"
+        ]
       },
       {
         "state": "Litija",
-        "cities": ["Litija"]
+        "cities": [
+          "Litija"
+        ]
       },
       {
         "state": "Ljubljana",
@@ -63552,39 +64713,57 @@
       },
       {
         "state": "Ljubno",
-        "cities": ["Ljubno ob Savinji"]
+        "cities": [
+          "Ljubno ob Savinji"
+        ]
       },
       {
         "state": "Ljutomer",
-        "cities": ["Ljutomer"]
+        "cities": [
+          "Ljutomer"
+        ]
       },
       {
         "state": "Logatec",
-        "cities": ["Logatec"]
+        "cities": [
+          "Logatec"
+        ]
       },
       {
         "state": "Loška Dolina",
-        "cities": ["Leskova Dolina"]
+        "cities": [
+          "Leskova Dolina"
+        ]
       },
       {
         "state": "Loški Potok",
-        "cities": ["Hrib-Loški Potok"]
+        "cities": [
+          "Hrib-Loški Potok"
+        ]
       },
       {
         "state": "Lovrenc na Pohorju",
-        "cities": ["Lovrenc na Pohorju"]
+        "cities": [
+          "Lovrenc na Pohorju"
+        ]
       },
       {
         "state": "Luče",
-        "cities": ["Luče"]
+        "cities": [
+          "Luče"
+        ]
       },
       {
         "state": "Lukovica",
-        "cities": ["Lukovica pri Domžalah"]
+        "cities": [
+          "Lukovica pri Domžalah"
+        ]
       },
       {
         "state": "Majšperk",
-        "cities": ["Majšperk"]
+        "cities": [
+          "Majšperk"
+        ]
       },
       {
         "state": "Maribor",
@@ -63599,7 +64778,9 @@
       },
       {
         "state": "Markovci",
-        "cities": ["Markovci"]
+        "cities": [
+          "Markovci"
+        ]
       },
       {
         "state": "Medvode",
@@ -63611,247 +64792,394 @@
       },
       {
         "state": "Mengeš",
-        "cities": ["Mengeš", "Preserje pri Radomljah"]
+        "cities": [
+          "Mengeš",
+          "Preserje pri Radomljah"
+        ]
       },
       {
         "state": "Metlika",
-        "cities": ["Metlika"]
+        "cities": [
+          "Metlika"
+        ]
       },
       {
         "state": "Mežica",
-        "cities": ["Mežica"]
+        "cities": [
+          "Mežica"
+        ]
       },
       {
         "state": "Miklavž na Dravskem Polju",
-        "cities": ["Miklavž na Dravskem Polju"]
+        "cities": [
+          "Miklavž na Dravskem Polju"
+        ]
       },
       {
         "state": "Miren–Kostanjevica",
-        "cities": ["Bilje", "Miren"]
+        "cities": [
+          "Bilje",
+          "Miren"
+        ]
       },
       {
         "state": "Mirna Peč",
-        "cities": ["Mirna Peč"]
+        "cities": [
+          "Mirna Peč"
+        ]
       },
       {
         "state": "Mislinja",
-        "cities": ["Mislinja"]
+        "cities": [
+          "Mislinja"
+        ]
       },
       {
         "state": "Moravče",
-        "cities": ["Moravče"]
+        "cities": [
+          "Moravče"
+        ]
       },
       {
         "state": "Moravske Toplice",
-        "cities": ["Moravske Toplice"]
+        "cities": [
+          "Moravske Toplice"
+        ]
       },
       {
         "state": "Mozirje",
-        "cities": ["Mozirje"]
+        "cities": [
+          "Mozirje"
+        ]
       },
       {
         "state": "Murska Sobota",
-        "cities": ["Bakovci", "Černelavci", "Krog", "Murska Sobota", "Rakičan"]
+        "cities": [
+          "Bakovci",
+          "Černelavci",
+          "Krog",
+          "Murska Sobota",
+          "Rakičan"
+        ]
       },
       {
         "state": "Muta",
-        "cities": ["Muta"]
+        "cities": [
+          "Muta"
+        ]
       },
       {
         "state": "Naklo",
-        "cities": ["Naklo"]
+        "cities": [
+          "Naklo"
+        ]
       },
       {
         "state": "Nazarje",
-        "cities": ["Nazarje"]
+        "cities": [
+          "Nazarje"
+        ]
       },
       {
         "state": "Nova Gorica",
-        "cities": ["Kromberk", "Nova Gorica", "Prvačina", "Šempas", "Solkan"]
+        "cities": [
+          "Kromberk",
+          "Nova Gorica",
+          "Prvačina",
+          "Šempas",
+          "Solkan"
+        ]
       },
       {
         "state": "Novo Mesto",
-        "cities": ["Novo Mesto"]
+        "cities": [
+          "Novo Mesto"
+        ]
       },
       {
         "state": "Odranci",
-        "cities": ["Odranci"]
+        "cities": [
+          "Odranci"
+        ]
       },
       {
         "state": "Oplotnica",
-        "cities": ["Oplotnica"]
+        "cities": [
+          "Oplotnica"
+        ]
       },
       {
         "state": "Ormož",
-        "cities": ["Ormož"]
+        "cities": [
+          "Ormož"
+        ]
       },
       {
         "state": "Osilnica",
-        "cities": ["Osilnica"]
+        "cities": [
+          "Osilnica"
+        ]
       },
       {
         "state": "Pesnica",
-        "cities": ["Pesnica pri Mariboru"]
+        "cities": [
+          "Pesnica pri Mariboru"
+        ]
       },
       {
         "state": "Piran",
-        "cities": ["Lucija", "Piran", "Portorož", "Seča"]
+        "cities": [
+          "Lucija",
+          "Piran",
+          "Portorož",
+          "Seča"
+        ]
       },
       {
         "state": "Pivka",
-        "cities": ["Pivka"]
+        "cities": [
+          "Pivka"
+        ]
       },
       {
         "state": "Podčetrtek",
-        "cities": ["Podčetrtek"]
+        "cities": [
+          "Podčetrtek"
+        ]
       },
       {
         "state": "Podlehnik",
-        "cities": ["Podlehnik"]
+        "cities": [
+          "Podlehnik"
+        ]
       },
       {
         "state": "Podvelka",
-        "cities": ["Podvelka"]
+        "cities": [
+          "Podvelka"
+        ]
       },
       {
         "state": "Polzela",
-        "cities": ["Polzela"]
+        "cities": [
+          "Polzela"
+        ]
       },
       {
         "state": "Postojna",
-        "cities": ["Postojna"]
+        "cities": [
+          "Postojna"
+        ]
       },
       {
         "state": "Prebold",
-        "cities": ["Prebold"]
+        "cities": [
+          "Prebold"
+        ]
       },
       {
         "state": "Preddvor",
-        "cities": ["Preddvor"]
+        "cities": [
+          "Preddvor"
+        ]
       },
       {
         "state": "Prevalje",
-        "cities": ["Prevalje"]
+        "cities": [
+          "Prevalje"
+        ]
       },
       {
         "state": "Ptuj",
-        "cities": ["Ptuj"]
+        "cities": [
+          "Ptuj"
+        ]
       },
       {
         "state": "Puconci",
-        "cities": ["Puconci"]
+        "cities": [
+          "Puconci"
+        ]
       },
       {
         "state": "Rače–Fram",
-        "cities": ["Fram", "Morje", "Rače"]
+        "cities": [
+          "Fram",
+          "Morje",
+          "Rače"
+        ]
       },
       {
         "state": "Radeče",
-        "cities": ["Radeče"]
+        "cities": [
+          "Radeče"
+        ]
       },
       {
         "state": "Radenci",
-        "cities": ["Radenci"]
+        "cities": [
+          "Radenci"
+        ]
       },
       {
         "state": "Radlje ob Dravi",
-        "cities": ["Radlje ob Dravi"]
+        "cities": [
+          "Radlje ob Dravi"
+        ]
       },
       {
         "state": "Radovljica",
-        "cities": ["Lesce", "Radovljica"]
+        "cities": [
+          "Lesce",
+          "Radovljica"
+        ]
       },
       {
         "state": "Ravne na Koroškem",
-        "cities": ["Kotlje", "Ravne na Koroškem"]
+        "cities": [
+          "Kotlje",
+          "Ravne na Koroškem"
+        ]
       },
       {
         "state": "Razkrižje",
-        "cities": ["Razkrižje"]
+        "cities": [
+          "Razkrižje"
+        ]
       },
       {
         "state": "Renče–Vogrsko",
-        "cities": ["Renče", "Volčja Draga"]
+        "cities": [
+          "Renče",
+          "Volčja Draga"
+        ]
       },
       {
         "state": "Ribnica",
-        "cities": ["Ribnica"]
+        "cities": [
+          "Ribnica"
+        ]
       },
       {
         "state": "Ribnica na Pohorju",
-        "cities": ["Ribnica na Pohorju"]
+        "cities": [
+          "Ribnica na Pohorju"
+        ]
       },
       {
         "state": "Rogaška Slatina",
-        "cities": ["Rogaška Slatina"]
+        "cities": [
+          "Rogaška Slatina"
+        ]
       },
       {
         "state": "Rogašovci",
-        "cities": ["Rogašovci"]
+        "cities": [
+          "Rogašovci"
+        ]
       },
       {
         "state": "Rogatec",
-        "cities": ["Rogatec"]
+        "cities": [
+          "Rogatec"
+        ]
       },
       {
         "state": "Ruše",
-        "cities": ["Bistrica ob Dravi", "Ruše"]
+        "cities": [
+          "Bistrica ob Dravi",
+          "Ruše"
+        ]
       },
       {
         "state": "Šalovci",
-        "cities": ["Šalovci"]
+        "cities": [
+          "Šalovci"
+        ]
       },
       {
         "state": "Selnica ob Dravi",
-        "cities": ["Selnica ob Dravi"]
+        "cities": [
+          "Selnica ob Dravi"
+        ]
       },
       {
         "state": "Semič",
-        "cities": ["Semič"]
+        "cities": [
+          "Semič"
+        ]
       },
       {
         "state": "Šempeter–Vrtojba",
-        "cities": ["Rožna Dolina", "Šempeter pri Gorici", "Vrtojba"]
+        "cities": [
+          "Rožna Dolina",
+          "Šempeter pri Gorici",
+          "Vrtojba"
+        ]
       },
       {
         "state": "Šenčur",
-        "cities": ["Hrastje", "Šenčur"]
+        "cities": [
+          "Hrastje",
+          "Šenčur"
+        ]
       },
       {
         "state": "Šentilj",
-        "cities": ["Selnica ob Muri", "Šentilj v Slov. Goricah"]
+        "cities": [
+          "Selnica ob Muri",
+          "Šentilj v Slov. Goricah"
+        ]
       },
       {
         "state": "Šentjernej",
-        "cities": ["Šentjernej"]
+        "cities": [
+          "Šentjernej"
+        ]
       },
       {
         "state": "Šentjur",
-        "cities": ["Šentjur"]
+        "cities": [
+          "Šentjur"
+        ]
       },
       {
         "state": "Šentrupert",
-        "cities": ["Šentrupert"]
+        "cities": [
+          "Šentrupert"
+        ]
       },
       {
         "state": "Sevnica",
-        "cities": ["Sevnica"]
+        "cities": [
+          "Sevnica"
+        ]
       },
       {
         "state": "Sežana",
-        "cities": ["Sežana"]
+        "cities": [
+          "Sežana"
+        ]
       },
       {
         "state": "Škocjan",
-        "cities": ["Škocjan"]
+        "cities": [
+          "Škocjan"
+        ]
       },
       {
         "state": "Škofja Loka",
-        "cities": ["Škofja Loka", "Sv. Duh"]
+        "cities": [
+          "Škofja Loka",
+          "Sv. Duh"
+        ]
       },
       {
         "state": "Škofljica",
-        "cities": ["Lavrica", "Škofljica"]
+        "cities": [
+          "Lavrica",
+          "Škofljica"
+        ]
       },
       {
         "state": "Slovenj Gradec",
@@ -63864,159 +65192,246 @@
       },
       {
         "state": "Slovenska Bistrica",
-        "cities": ["Pragersko", "Slovenska Bistrica", "Zgornja Polskava"]
+        "cities": [
+          "Pragersko",
+          "Slovenska Bistrica",
+          "Zgornja Polskava"
+        ]
       },
       {
         "state": "Slovenske Konjice",
-        "cities": ["Slovenske Konjice"]
+        "cities": [
+          "Slovenske Konjice"
+        ]
       },
       {
         "state": "Šmarje pri Jelšah",
-        "cities": ["Šmarje pri Jelšah"]
+        "cities": [
+          "Šmarje pri Jelšah"
+        ]
       },
       {
         "state": "Šmarješke Toplice",
-        "cities": ["Šmarjeta"]
+        "cities": [
+          "Šmarjeta"
+        ]
       },
       {
         "state": "Šmartno ob Paki",
-        "cities": ["Šmartno ob Paki"]
+        "cities": [
+          "Šmartno ob Paki"
+        ]
       },
       {
         "state": "Šmartno pri Litiji",
-        "cities": ["Šmartno pri Litiji"]
+        "cities": [
+          "Šmartno pri Litiji"
+        ]
       },
       {
         "state": "Sodražica",
-        "cities": ["Sodražica"]
+        "cities": [
+          "Sodražica"
+        ]
       },
       {
         "state": "Solčava",
-        "cities": ["Solčava"]
+        "cities": [
+          "Solčava"
+        ]
       },
       {
         "state": "Šoštanj",
-        "cities": ["Ravne", "Šoštanj", "Topolšica"]
+        "cities": [
+          "Ravne",
+          "Šoštanj",
+          "Topolšica"
+        ]
       },
       {
         "state": "Središče ob Dravi",
-        "cities": ["Središče ob Dravi"]
+        "cities": [
+          "Središče ob Dravi"
+        ]
       },
       {
         "state": "Starše",
-        "cities": ["Starše"]
+        "cities": [
+          "Starše"
+        ]
       },
       {
         "state": "Štore",
-        "cities": ["Štore"]
+        "cities": [
+          "Štore"
+        ]
       },
       {
         "state": "Straža",
-        "cities": ["Straža"]
+        "cities": [
+          "Straža"
+        ]
       },
       {
         "state": "Sveta Ana",
-        "cities": ["Sv. Ana v Slov. Goricah"]
+        "cities": [
+          "Sv. Ana v Slov. Goricah"
+        ]
       },
       {
         "state": "Sveta Trojica v Slovenskih Goricah",
-        "cities": ["Sv. Trojica v Slov. Goricah"]
+        "cities": [
+          "Sv. Trojica v Slov. Goricah"
+        ]
       },
       {
         "state": "Sveti Andraž v Slovenskih Goricah",
-        "cities": ["Vitomarci"]
+        "cities": [
+          "Vitomarci"
+        ]
       },
       {
         "state": "Sveti Jurij v Slovenskih Goricah",
-        "cities": ["Sveti Jurij ob Ščavnici"]
+        "cities": [
+          "Sveti Jurij ob Ščavnici"
+        ]
       },
       {
         "state": "Sveti Tomaž",
-        "cities": ["Sveti Tomaž"]
+        "cities": [
+          "Sveti Tomaž"
+        ]
       },
       {
         "state": "Tabor",
-        "cities": ["Tabor"]
+        "cities": [
+          "Tabor"
+        ]
       },
       {
         "state": "Tišina",
-        "cities": ["Tišina"]
+        "cities": [
+          "Tišina"
+        ]
       },
       {
         "state": "Tolmin",
-        "cities": ["Tolmin"]
+        "cities": [
+          "Tolmin"
+        ]
       },
       {
         "state": "Trbovlje",
-        "cities": ["Trbovlje"]
+        "cities": [
+          "Trbovlje"
+        ]
       },
       {
         "state": "Trebnje",
-        "cities": ["Trebnje"]
+        "cities": [
+          "Trebnje"
+        ]
       },
       {
         "state": "Trnovska Vas",
-        "cities": ["Trnovska Vas"]
+        "cities": [
+          "Trnovska Vas"
+        ]
       },
       {
         "state": "Tržič",
-        "cities": ["Bistrica pri Tržiču", "Tržič"]
+        "cities": [
+          "Bistrica pri Tržiču",
+          "Tržič"
+        ]
       },
       {
         "state": "Trzin",
-        "cities": ["Črnuče District", "Trzin"]
+        "cities": [
+          "Črnuče District",
+          "Trzin"
+        ]
       },
       {
         "state": "Turnišče",
-        "cities": ["Turnišče"]
+        "cities": [
+          "Turnišče"
+        ]
       },
       {
         "state": "Velika Polana",
-        "cities": ["Velika Polana"]
+        "cities": [
+          "Velika Polana"
+        ]
       },
       {
         "state": "Velike Lašče",
-        "cities": ["Velike Lašče"]
+        "cities": [
+          "Velike Lašče"
+        ]
       },
       {
         "state": "Veržej",
-        "cities": ["Veržej"]
+        "cities": [
+          "Veržej"
+        ]
       },
       {
         "state": "Videm",
-        "cities": ["Videm pri Ptuju"]
+        "cities": [
+          "Videm pri Ptuju"
+        ]
       },
       {
         "state": "Vipava",
-        "cities": ["Vipava"]
+        "cities": [
+          "Vipava"
+        ]
       },
       {
         "state": "Vitanje",
-        "cities": ["Vitanje"]
+        "cities": [
+          "Vitanje"
+        ]
       },
       {
         "state": "Vodice",
-        "cities": ["Vodice"]
+        "cities": [
+          "Vodice"
+        ]
       },
       {
         "state": "Vojnik",
-        "cities": ["Vojnik"]
+        "cities": [
+          "Vojnik"
+        ]
       },
       {
         "state": "Vransko",
-        "cities": ["Vransko"]
+        "cities": [
+          "Vransko"
+        ]
       },
       {
         "state": "Vrhnika",
-        "cities": ["Verd", "Vrhnika"]
+        "cities": [
+          "Verd",
+          "Vrhnika"
+        ]
       },
       {
         "state": "Vuzenica",
-        "cities": ["Vuzenica"]
+        "cities": [
+          "Vuzenica"
+        ]
       },
       {
         "state": "Zagorje ob Savi",
-        "cities": ["Izlake", "Kisovec", "Zagorje ob Savi"]
+        "cities": [
+          "Izlake",
+          "Kisovec",
+          "Zagorje ob Savi"
+        ]
       },
       {
         "state": "Žalec",
@@ -64029,36 +65444,51 @@
       },
       {
         "state": "Zavrč",
-        "cities": ["Zavrč"]
+        "cities": [
+          "Zavrč"
+        ]
       },
       {
         "state": "Železniki",
-        "cities": ["Železniki"]
+        "cities": [
+          "Železniki"
+        ]
       },
       {
         "state": "Žetale",
-        "cities": ["Žetale"]
+        "cities": [
+          "Žetale"
+        ]
       },
       {
         "state": "Žiri",
-        "cities": ["Žiri"]
+        "cities": [
+          "Žiri"
+        ]
       },
       {
         "state": "Žirovnica",
-        "cities": ["Žirovnica"]
+        "cities": [
+          "Žirovnica"
+        ]
       },
       {
         "state": "Zreče",
-        "cities": ["Zreče"]
+        "cities": [
+          "Zreče"
+        ]
       },
       {
         "state": "Žužemberk",
-        "cities": ["Žužemberk"]
+        "cities": [
+          "Žužemberk"
+        ]
       }
     ]
   },
   {
     "country": "Spain",
+    "iso2": "ES",
     "states": [
       {
         "state": "A Coruña",
@@ -72743,6 +74173,7 @@
   },
   {
     "country": "Sweden",
+    "iso2": "SE",
     "states": [
       {
         "state": "Blekinge",
@@ -72841,7 +74272,13 @@
       },
       {
         "state": "Gotland",
-        "cities": ["Gotland", "Hemse", "Klintehamn", "Vibble", "Visby"]
+        "cities": [
+          "Gotland",
+          "Hemse",
+          "Klintehamn",
+          "Vibble",
+          "Visby"
+        ]
       },
       {
         "state": "Halland",
@@ -73642,6 +75079,7 @@
   },
   {
     "country": "Switzerland",
+    "iso2": "CH",
     "states": [
       {
         "state": "Aargau",
@@ -73788,7 +75226,12 @@
       },
       {
         "state": "Appenzell Innerrhoden",
-        "cities": ["Appenzell", "Gonten", "Haslen", "Oberegg"]
+        "cities": [
+          "Appenzell",
+          "Gonten",
+          "Haslen",
+          "Oberegg"
+        ]
       },
       {
         "state": "Basel-Land",
@@ -73843,7 +75286,11 @@
       },
       {
         "state": "Basel-Stadt",
-        "cities": ["Basel", "Bettingen", "Riehen"]
+        "cities": [
+          "Basel",
+          "Bettingen",
+          "Riehen"
+        ]
       },
       {
         "state": "Bern",
@@ -75275,6 +76722,7 @@
   },
   {
     "country": "Turkey",
+    "iso2": "TR",
     "states": [
       {
         "state": "Adana",
@@ -75430,7 +76878,14 @@
       },
       {
         "state": "Ardahan",
-        "cities": ["Çıldır", "Damal", "Göle", "Hanak", "Merkez", "Posof"]
+        "cities": [
+          "Çıldır",
+          "Damal",
+          "Göle",
+          "Hanak",
+          "Merkez",
+          "Posof"
+        ]
       },
       {
         "state": "Artvin",
@@ -75495,15 +76950,31 @@
       },
       {
         "state": "Bartın",
-        "cities": ["Amasra", "Kurucaşile", "Merkez", "Ulus"]
+        "cities": [
+          "Amasra",
+          "Kurucaşile",
+          "Merkez",
+          "Ulus"
+        ]
       },
       {
         "state": "Batman",
-        "cities": ["Beşiri", "Gercüş", "Hasankeyf", "Kozluk", "Merkez", "Sason"]
+        "cities": [
+          "Beşiri",
+          "Gercüş",
+          "Hasankeyf",
+          "Kozluk",
+          "Merkez",
+          "Sason"
+        ]
       },
       {
         "state": "Bayburt",
-        "cities": ["Aydıntepe", "Demirözü", "Merkez"]
+        "cities": [
+          "Aydıntepe",
+          "Demirözü",
+          "Merkez"
+        ]
       },
       {
         "state": "Bilecik",
@@ -75832,11 +77303,24 @@
       },
       {
         "state": "Gümüşhane",
-        "cities": ["Kelkit", "Köse", "Kürtün", "Merkez", "Şiran", "Torul"]
+        "cities": [
+          "Kelkit",
+          "Köse",
+          "Kürtün",
+          "Merkez",
+          "Şiran",
+          "Torul"
+        ]
       },
       {
         "state": "Hakkâri",
-        "cities": ["Çukurca", "Derecik", "Merkez", "Şemdinli", "Yüksekova"]
+        "cities": [
+          "Çukurca",
+          "Derecik",
+          "Merkez",
+          "Şemdinli",
+          "Yüksekova"
+        ]
       },
       {
         "state": "Hatay",
@@ -75860,7 +77344,12 @@
       },
       {
         "state": "Iğdır",
-        "cities": ["Aralık", "Karakoyunlu", "Merkez", "Tuzluca"]
+        "cities": [
+          "Aralık",
+          "Karakoyunlu",
+          "Merkez",
+          "Tuzluca"
+        ]
       },
       {
         "state": "Isparta",
@@ -76061,7 +77550,12 @@
       },
       {
         "state": "Kilis",
-        "cities": ["Elbeyli", "Merkez", "Musabeyli", "Polateli"]
+        "cities": [
+          "Elbeyli",
+          "Merkez",
+          "Musabeyli",
+          "Polateli"
+        ]
       },
       {
         "state": "Kırıkkale",
@@ -76545,7 +78039,14 @@
       },
       {
         "state": "Uşak",
-        "cities": ["Banaz", "Eşme", "Karahallı", "Merkez", "Sivaslı", "Ulubey"]
+        "cities": [
+          "Banaz",
+          "Eşme",
+          "Karahallı",
+          "Merkez",
+          "Sivaslı",
+          "Ulubey"
+        ]
       },
       {
         "state": "Van",
@@ -76612,6 +78113,7 @@
   },
   {
     "country": "Ukraine",
+    "iso2": "UA",
     "states": [
       {
         "state": "Autonomous Republic of Crimea",
@@ -78701,6 +80203,7 @@
   },
   {
     "country": "United Kingdom",
+    "iso2": "GB",
     "states": [
       {
         "state": "England",
@@ -82612,5 +84115,10 @@
         ]
       }
     ]
+  },
+  {
+    "country": "Vatican City State (Holy See)",
+    "iso2": "VA",
+    "states": []
   }
 ]

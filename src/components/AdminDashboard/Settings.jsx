@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSettingsStore } from "../../store/SettingsStore";
+import ColorPickerInput from "./ColorPicker";
 
 export default function SettingsPage() {
   const [companyName, setCompanyName] = useState("");
@@ -28,6 +29,8 @@ export default function SettingsPage() {
   const [sliders, setSliders] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sliderToDelete, setSliderToDelete] = useState(null);
+
+  const [themeColor, setThemeColor] = useState("black");
 
   const {
     settings,
@@ -117,6 +120,7 @@ export default function SettingsPage() {
         settings.daysBeforeProductExpiry?.toString() || "30"
       );
       setAddress(settings.address || "");
+      setThemeColor(settings?.navbarColor);
 
       if (settings.companyLogo) {
         setLogo(settings.companyLogo);
@@ -282,6 +286,7 @@ export default function SettingsPage() {
         daysBeforeProductExpiry
       );
       settingsFormData.append("address", address);
+      settingsFormData.append("navbarColor", themeColor);
 
       if (logoFile) {
         settingsFormData.append("companyLogo", logoFile);
@@ -457,7 +462,6 @@ export default function SettingsPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-
             {/* Address */}
             <div>
               <label
@@ -474,6 +478,20 @@ export default function SettingsPage() {
                 placeholder="Enter company address"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               ></textarea>
+            </div>
+
+            <div className="bg-white rounded-xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Navbar Color
+                  </label>
+                  <ColorPickerInput
+                    color={themeColor}
+                    onChange={(newColor) => setThemeColor(newColor)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

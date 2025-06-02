@@ -8,6 +8,7 @@ import { FiTag, FiCalendar, FiMapPin } from "react-icons/fi";
 import { useEventStore } from "../../store/EventStore";
 import { useCategoryStore } from "../../store/CategoryStore";
 import { FileSearch2 } from "lucide-react";
+import SearchableSelect from "../../components/ui/SearchSelect";
 
 const europeanCities = [
   "Amsterdam",
@@ -254,20 +255,13 @@ function EventsPage() {
                 <FiMapPin className="mr-2 h-4 w-4 text-purple-500" />
                 {defaultTexts.events.city}
               </label>
-              <select
-                id="cityFilter"
-                name="cityFilter"
+              <SearchableSelect
+                options={["All Cities", ...europeanCities]}
                 value={selectedCity}
                 onChange={handleCityChange}
-                className="w-full rounded-lg border border-purple-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20"
-              >
-                <option value="">All Cities</option>
-                {europeanCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+                placeholder="All Cities"
+                className="w-full"
+              />
             </div>
 
             <div className="w-full lg:w-56">

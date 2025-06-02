@@ -6,6 +6,7 @@ import CustomUserButton from "./ui/CustomUserButton";
 import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
 import { useAuthStore } from "../store/AuthStore";
+import { useSettingsStore } from "../store/SettingsStore";
 
 const Nav = () => {
   const { user, logout } = useAuthStore();
@@ -18,7 +19,11 @@ const Nav = () => {
   const location = useLocation();
   const isProfilePage = location.pathname === "/app/profile";
   const isDashboardPage = location.pathname === "/dashboard";
-  const isMyticketPage = location.pathname === "/app/my-tickets";
+
+  const { settings, fetchSettings } = useSettingsStore();
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,18 +76,6 @@ const Nav = () => {
     };
   }, [isMenuOpen]);
 
-  const getNavbarClasses = () => {
-    if (isProfilePage || isDashboardPage || isMyticketPage) {
-      return "bg-[#1e8489] text-white";
-    }
-
-    if (isScrolled) {
-      return "bg-[#1e8489] text-white";
-    } else {
-      return "bg-[#1e8489] text-white";
-    }
-  };
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -94,13 +87,14 @@ const Nav = () => {
   return (
     <nav
       ref={navRef}
-      className={`nav w-full z-40 ${getNavbarClasses()} h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm shadow-lg`}
+      className={`nav w-full z-40 h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm shadow-lg`}
+      style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
     >
       <div
         onClick={() => {
           navigate("/");
         }}
-        className="logo qwigley-regular text-2xl md:text-3xl lg:text-3xl xl:text-4xl"
+        className="logo qwigley-regular text-3xl lg:text-3xl xl:text-5xl"
         style={{
           cursor: "pointer",
         }}

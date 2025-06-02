@@ -27,7 +27,7 @@ export default function OrganizerApprovals() {
       page: currentPage,
       limit: itemsPerPage,
     });
-  }, [currentPage, itemsPerPage, dateFilter]);
+  }, [currentPage, itemsPerPage]);
 
   const handleApprove = async (organizerId) => {
     await approveOrganizer(organizerId);
@@ -78,15 +78,6 @@ export default function OrganizerApprovals() {
     ...new Set(organizers.map((org) => org.verificationStatus)),
   ];
 
-  const dates = [
-    ...new Set(
-      organizers.map((org) => {
-        const date = new Date(org.createdAt);
-        return date.toISOString().split("T")[0];
-      })
-    ),
-  ];
-
   const clearFilters = () => {
     setSearchTerm("");
     setStatusFilter("");
@@ -112,12 +103,6 @@ export default function OrganizerApprovals() {
     setStatusFilter(value);
     setCurrentPage(1);
   };
-
-  const handleDateFilterChange = (value) => {
-    setDateFilter(value);
-    setCurrentPage(1);
-  };
-
   const hasActiveFilters = searchTerm || statusFilter || dateFilter;
 
   const PaginationComponent = () => {
@@ -351,21 +336,6 @@ export default function OrganizerApprovals() {
                 </select>
               </div>
 
-              <div className="w-full md:w-auto">
-                <select
-                  value={dateFilter}
-                  onChange={(e) => handleDateFilterChange(e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="">All Dates</option>
-                  {dates.map((date) => (
-                    <option key={date} value={date}>
-                      {new Date(date).toLocaleDateString()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
@@ -427,29 +397,6 @@ export default function OrganizerApprovals() {
                     className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
                   >
                     <span className="sr-only">Remove status filter</span>
-                    <svg
-                      className="h-2 w-2"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 8 8"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeWidth="1.5"
-                        d="M1 1l6 6m0-6L1 7"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              )}
-              {dateFilter && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  Date: {new Date(dateFilter).toLocaleDateString()}
-                  <button
-                    onClick={() => handleDateFilterChange("")}
-                    className="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none"
-                  >
-                    <span className="sr-only">Remove date filter</span>
                     <svg
                       className="h-2 w-2"
                       stroke="currentColor"

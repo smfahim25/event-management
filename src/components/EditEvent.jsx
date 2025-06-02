@@ -16,6 +16,7 @@ import RefundPolicyManager from "./organization/RefundPolicy";
 import { useEventStore } from "../store/EventStore";
 import { useCategoryStore } from "../store/CategoryStore";
 import toast from "react-hot-toast";
+import SearchableSelect from "./ui/SearchSelect";
 
 const EditEvent = () => {
   const { eventID } = useParams();
@@ -1081,20 +1082,13 @@ const EditEvent = () => {
 
                     {/* Country Dropdown */}
                     <div>
-                      <select
+                      <SearchableSelect
+                        options={countries}
                         value={formData.venue.address.country}
-                        onChange={(e) => handleCountryChange(e.target.value)}
-                        className={`block w-full px-4 py-3 rounded-lg border ${
-                          errors.country ? "border-red-500" : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                      >
-                        <option value="">Select Country</option>
-                        {countries.map((country) => (
-                          <option key={country} value={country}>
-                            {country}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={handleCountryChange}
+                        placeholder="Select Country"
+                        error={errors.country}
+                      />
                       {errors.country && (
                         <div className="mt-1 text-xs text-red-600">
                           {errors.country}
@@ -1104,25 +1098,14 @@ const EditEvent = () => {
 
                     {/* State Dropdown */}
                     <div>
-                      <select
+                      <SearchableSelect
+                        options={availableStates}
                         value={formData.venue.address.state}
-                        onChange={(e) => handleStateChange(e.target.value)}
+                        onChange={handleStateChange}
+                        placeholder="Select State/Province"
                         disabled={!formData.venue.address.country}
-                        className={`block w-full px-4 py-3 rounded-lg border ${
-                          errors.state ? "border-red-500" : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors ${
-                          !formData.venue.address.country
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        <option value="">Select State/Province</option>
-                        {availableStates.map((state) => (
-                          <option key={state} value={state}>
-                            {state}
-                          </option>
-                        ))}
-                      </select>
+                        error={errors.state}
+                      />
                       {errors.state && (
                         <div className="mt-1 text-xs text-red-600">
                           {errors.state}
@@ -1132,25 +1115,14 @@ const EditEvent = () => {
 
                     {/* City Dropdown */}
                     <div>
-                      <select
+                      <SearchableSelect
+                        options={availableCities}
                         value={formData.venue.address.city}
-                        onChange={(e) => handleCityChange(e.target.value)}
+                        onChange={handleCityChange}
+                        placeholder="Select City"
                         disabled={!formData.venue.address.state}
-                        className={`block w-full px-4 py-3 rounded-lg border ${
-                          errors.city ? "border-red-500" : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors ${
-                          !formData.venue.address.state
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        <option value="">Select City</option>
-                        {availableCities.map((city) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        ))}
-                      </select>
+                        error={errors.city}
+                      />
                       {errors.city && (
                         <div className="mt-1 text-xs text-red-600">
                           {errors.city}

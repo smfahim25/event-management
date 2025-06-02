@@ -157,6 +157,7 @@ export const useEventStore = create((set, get) => ({
     sort = "eventDate",
     status = "",
     isSpecialCommision,
+    date = "",
   } = {}) => {
     set({ loading: true });
     try {
@@ -165,6 +166,7 @@ export const useEventStore = create((set, get) => ({
         page,
         limit,
         sort,
+        date,
       };
 
       if (status) {

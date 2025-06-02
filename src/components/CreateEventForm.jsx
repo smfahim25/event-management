@@ -22,6 +22,7 @@ import { useEventStore } from "../store/EventStore";
 import { useCategoryStore } from "../store/CategoryStore";
 import toast from "react-hot-toast";
 import { FaTrash } from "react-icons/fa";
+import SearchableSelect from "./ui/SearchSelect";
 
 function CreateEventPage() {
   const navigate = useNavigate();
@@ -985,24 +986,13 @@ function CreateEventPage() {
 
                         {/* Country Dropdown */}
                         <div>
-                          <select
+                          <SearchableSelect
+                            options={countries}
                             value={formData.venue.address.country}
-                            onChange={(e) =>
-                              handleCountryChange(e.target.value)
-                            }
-                            className={`w-full rounded-lg border ${
-                              errors.country
-                                ? "border-red-300 bg-red-50"
-                                : "border-purple-200 bg-white"
-                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
-                          >
-                            <option value="">Select Country</option>
-                            {countries.map((country) => (
-                              <option key={country} value={country}>
-                                {country}
-                              </option>
-                            ))}
-                          </select>
+                            onChange={handleCountryChange}
+                            placeholder="Select Country"
+                            error={errors.country}
+                          />
                           {errors.country && (
                             <div className="mt-1 text-xs text-red-600">
                               {errors.country}
@@ -1012,27 +1002,14 @@ function CreateEventPage() {
 
                         {/* State Dropdown */}
                         <div>
-                          <select
+                          <SearchableSelect
+                            options={availableStates}
                             value={formData.venue.address.state}
-                            onChange={(e) => handleStateChange(e.target.value)}
+                            onChange={handleStateChange}
+                            placeholder="Select State/Province"
                             disabled={!formData.venue.address.country}
-                            className={`w-full rounded-lg border ${
-                              errors.state
-                                ? "border-red-300 bg-red-50"
-                                : "border-purple-200 bg-white"
-                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20 ${
-                              !formData.venue.address.country
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                          >
-                            <option value="">Select State/Province</option>
-                            {availableStates.map((state) => (
-                              <option key={state} value={state}>
-                                {state}
-                              </option>
-                            ))}
-                          </select>
+                            error={errors.state}
+                          />
                           {errors.state && (
                             <div className="mt-1 text-xs text-red-600">
                               {errors.state}
@@ -1042,27 +1019,14 @@ function CreateEventPage() {
 
                         {/* City Dropdown */}
                         <div>
-                          <select
+                          <SearchableSelect
+                            options={availableCities}
                             value={formData.venue.address.city}
-                            onChange={(e) => handleCityChange(e.target.value)}
+                            onChange={handleCityChange}
+                            placeholder="Select City"
                             disabled={!formData.venue.address.state}
-                            className={`w-full rounded-lg border ${
-                              errors.city
-                                ? "border-red-300 bg-red-50"
-                                : "border-purple-200 bg-white"
-                            } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20 ${
-                              !formData.venue.address.state
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                          >
-                            <option value="">Select City</option>
-                            {availableCities.map((city) => (
-                              <option key={city} value={city}>
-                                {city}
-                              </option>
-                            ))}
-                          </select>
+                            error={errors.city}
+                          />
                           {errors.city && (
                             <div className="mt-1 text-xs text-red-600">
                               {errors.city}

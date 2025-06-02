@@ -36,6 +36,7 @@ export default function EventApprovals() {
         isSpecialCommissionFilter === ""
           ? undefined
           : isSpecialCommissionFilter === "true",
+      date: dateRangeFilter || undefined,
     });
   }, [
     searchTerm,
@@ -44,6 +45,7 @@ export default function EventApprovals() {
     limit,
     sort,
     isSpecialCommissionFilter,
+    dateRangeFilter,
     fetchAdminEvents,
   ]);
 
@@ -53,16 +55,6 @@ export default function EventApprovals() {
 
   const locations = [
     ...new Set(events.map((event) => event.venue?.address?.city || "")),
-  ].filter(Boolean);
-
-  const dateRanges = [
-    ...new Set(
-      events.map((event) => {
-        if (!event.eventDate) return "";
-        const date = new Date(event.eventDate);
-        return date.toLocaleDateString();
-      })
-    ),
   ].filter(Boolean);
 
   const statusOptions = [
@@ -93,35 +85,12 @@ export default function EventApprovals() {
     const matchesLocation =
       locationFilter === "" || event.venue?.address?.city === locationFilter;
 
-    const matchesDateRange = (() => {
-      if (dateRangeFilter === "") return true;
-      if (!event.eventDate) return false;
-      const eventDate = new Date(event.eventDate).toLocaleDateString();
-      return eventDate === dateRangeFilter;
-    })();
-
     const matchesStatus = statusFilter === "" || event.status === statusFilter;
 
-    // const matchesSpecialCommission = (() => {
-    //   if (isSpecialCommissionFilter === "") return true;
-    //   if (isSpecialCommissionFilter === "true")
-    //     return event.isSpecialCommission === true;
-    //   if (isSpecialCommissionFilter === "false")
-    //     return event.isSpecialCommission === false;
-    //   return true;
-    // })();
-
     return (
-      matchesSearch &&
-      matchesOrganizer &&
-      matchesLocation &&
-      matchesDateRange &&
-      matchesStatus
-      //  &&
-      // matchesSpecialCommission
+      matchesSearch && matchesOrganizer && matchesLocation && matchesStatus
     );
   });
-
   const openModal = (event, status) => {
     setSelectedEvent(event);
     setInitialStatus(status);
@@ -279,19 +248,29 @@ export default function EventApprovals() {
                 </select>
               </div>
 
-              <div className="w-full md:w-auto">
-                <select
+              <div className="w-full md:w-auto relative">
+                <input
+                  type="date"
                   value={dateRangeFilter}
                   onChange={(e) => setDateRangeFilter(e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="">All Dates</option>
-                  {dateRanges.map((date) => (
-                    <option key={date} value={date}>
-                      {date}
-                    </option>
-                  ))}
-                </select>
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                  className="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md cursor-pointer"
+                  placeholder="Select date"
+                  style={{
+                    colorScheme: "light",
+                  }}
+                />
+
+                <div
+                  className="absolute inset-0 cursor-pointer"
+                  onClick={() => {
+                    const input = document.querySelector('input[type="date"]');
+                    if (input && input.showPicker) {
+                      input.showPicker();
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>
