@@ -68,13 +68,12 @@ function CreateEventPage() {
   useEffect(() => {
     const loadLocationData = async () => {
       try {
-        // Load from public folder - update this path to match your file location
         const response = await fetch("/europe.json");
         const data = await response.json();
         setEuropeanLocations(data);
       } catch (error) {
         console.error("Error loading location data:", error);
-        // Fallback to sample data for demo
+
         setEuropeanLocations([
           {
             country: "Albania",
@@ -209,7 +208,6 @@ function CreateEventPage() {
     return europeanLocations.map((location) => location.country).sort();
   }, [europeanLocations]);
 
-  // Get available states based on selected country
   const availableStates = useMemo(() => {
     if (!formData.venue.address.country) return [];
     const selectedCountry = europeanLocations.find(
@@ -220,7 +218,6 @@ function CreateEventPage() {
       : [];
   }, [europeanLocations, formData.venue.address.country]);
 
-  // Get available cities based on selected country and state
   const availableCities = useMemo(() => {
     if (!formData.venue.address.country || !formData.venue.address.state)
       return [];
@@ -252,15 +249,14 @@ function CreateEventPage() {
         address: {
           ...prev.venue.address,
           country: country,
-          state: "", // Reset state when country changes
-          city: "", // Reset city when country changes
+          state: "",
+          city: "",
         },
       },
     }));
     setErrors((prev) => ({ ...prev, country: null, state: null, city: null }));
   };
 
-  // Handle state change
   const handleStateChange = (state) => {
     setFormData((prev) => ({
       ...prev,
@@ -269,14 +265,13 @@ function CreateEventPage() {
         address: {
           ...prev.venue.address,
           state: state,
-          city: "", // Reset city when state changes
+          city: "",
         },
       },
     }));
     setErrors((prev) => ({ ...prev, state: null, city: null }));
   };
 
-  // Handle city change
   const handleCityChange = (city) => {
     setFormData((prev) => ({
       ...prev,
