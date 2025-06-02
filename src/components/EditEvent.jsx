@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   FaCalendarAlt,
@@ -56,6 +56,7 @@ const EditEvent = () => {
   const [refundPolicies, setRefundPolicies] = useState({});
   const [refundPoliciesEnabled, setRefundPoliciesEnabled] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
+  const [europeanLocations, setEuropeanLocations] = useState([]);
 
   const { categories, fetchCategories } = useCategoryStore();
   const {
@@ -74,6 +75,37 @@ const EditEvent = () => {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    const loadLocationData = async () => {
+      try {
+        // Load from public folder - update this path to match your file location
+        const response = await fetch("/europe.json");
+        const data = await response.json();
+        setEuropeanLocations(data);
+      } catch (error) {
+        console.error("Error loading location data:", error);
+        // Fallback to sample data for demo
+        setEuropeanLocations([
+          {
+            country: "Albania",
+            states: [
+              {
+                state: "Berat",
+                cities: ["Berat", "Kuçovë", "Poliçan"],
+              },
+              {
+                state: "Tirana",
+                cities: ["Tirana", "Kamëz", "Vorë"],
+              },
+            ],
+          },
+        ]);
+      }
+    };
+
+    loadLocationData();
+  }, []);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -226,6 +258,87 @@ const EditEvent = () => {
     }
 
     return errors;
+  };
+
+  const countries = useMemo(() => {
+    return europeanLocations.map((location) => location.country).sort();
+  }, [europeanLocations]);
+
+  // Get available states based on selected country
+  const availableStates = useMemo(() => {
+    if (!formData.venue.address.country) return [];
+    const selectedCountry = europeanLocations.find(
+      (location) => location.country === formData.venue.address.country
+    );
+    return selectedCountry
+      ? selectedCountry.states.map((state) => state.state).sort()
+      : [];
+  }, [europeanLocations, formData.venue.address.country]);
+
+  // Get available cities based on selected country and state
+  const availableCities = useMemo(() => {
+    if (!formData.venue.address.country || !formData.venue.address.state)
+      return [];
+    const selectedCountry = europeanLocations.find(
+      (location) => location.country === formData.venue.address.country
+    );
+    if (!selectedCountry) return [];
+
+    const selectedState = selectedCountry.states.find(
+      (state) => state.state === formData.venue.address.state
+    );
+    return selectedState ? selectedState.cities.sort() : [];
+  }, [
+    europeanLocations,
+    formData.venue.address.country,
+    formData.venue.address.state,
+  ]);
+
+  const handleCountryChange = (country) => {
+    setFormData((prev) => ({
+      ...prev,
+      venue: {
+        ...prev.venue,
+        address: {
+          ...prev.venue.address,
+          country: country,
+          state: "", // Reset state when country changes
+          city: "", // Reset city when country changes
+        },
+      },
+    }));
+    setErrors((prev) => ({ ...prev, country: null, state: null, city: null }));
+  };
+
+  // Handle state change
+  const handleStateChange = (state) => {
+    setFormData((prev) => ({
+      ...prev,
+      venue: {
+        ...prev.venue,
+        address: {
+          ...prev.venue.address,
+          state: state,
+          city: "", // Reset city when state changes
+        },
+      },
+    }));
+    setErrors((prev) => ({ ...prev, state: null, city: null }));
+  };
+
+  // Handle city change
+  const handleCityChange = (city) => {
+    setFormData((prev) => ({
+      ...prev,
+      venue: {
+        ...prev.venue,
+        address: {
+          ...prev.venue.address,
+          city: city,
+        },
+      },
+    }));
+    setErrors((prev) => ({ ...prev, city: null }));
   };
 
   const extractSrcFromIframe = (htmlString) => {
@@ -931,6 +1044,7 @@ const EditEvent = () => {
                     Address
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Street */}
                     <div>
                       <input
                         type="text"
@@ -967,79 +1081,88 @@ const EditEvent = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Country Dropdown */}
                     <div>
-                      <input
-                        type="text"
-                        placeholder="City"
-                        value={formData.venue.address.city}
-                        onChange={(e) => {
-                          const error = validateStringInput(
-                            e.target.value,
-                            "City"
-                          );
-                          if (error && e.target.value) {
-                            setErrors((prev) => ({ ...prev, city: error }));
-                          } else {
-                            setErrors((prev) => ({ ...prev, city: null }));
-                          }
-                          setFormData((prev) => ({
-                            ...prev,
-                            venue: {
-                              ...prev.venue,
-                              address: {
-                                ...prev.venue.address,
-                                city: e.target.value,
-                              },
-                            },
-                          }));
-                        }}
+                      <select
+                        value={formData.venue.address.country}
+                        onChange={(e) => handleCountryChange(e.target.value)}
                         className={`block w-full px-4 py-3 rounded-lg border ${
-                          errors.city ? "border-red-500" : "border-gray-300"
+                          errors.country ? "border-red-500" : "border-gray-300"
                         } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                      />
-                      {errors.city && (
+                      >
+                        <option value="">Select Country</option>
+                        {countries.map((country) => (
+                          <option key={country} value={country}>
+                            {country}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.country && (
                         <div className="mt-1 text-xs text-red-600">
-                          {errors.city}
+                          {errors.country}
                         </div>
                       )}
                     </div>
+
+                    {/* State Dropdown */}
                     <div>
-                      <input
-                        type="text"
-                        placeholder="State/Province"
+                      <select
                         value={formData.venue.address.state}
-                        onChange={(e) => {
-                          const error = validateStringInput(
-                            e.target.value,
-                            "State"
-                          );
-                          if (error && e.target.value) {
-                            setErrors((prev) => ({ ...prev, state: error }));
-                          } else {
-                            setErrors((prev) => ({ ...prev, state: null }));
-                          }
-                          setFormData((prev) => ({
-                            ...prev,
-                            venue: {
-                              ...prev.venue,
-                              address: {
-                                ...prev.venue.address,
-                                state: e.target.value,
-                              },
-                            },
-                          }));
-                        }}
+                        onChange={(e) => handleStateChange(e.target.value)}
+                        disabled={!formData.venue.address.country}
                         className={`block w-full px-4 py-3 rounded-lg border ${
                           errors.state ? "border-red-500" : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                      />
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors ${
+                          !formData.venue.address.country
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        <option value="">Select State/Province</option>
+                        {availableStates.map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
+                      </select>
                       {errors.state && (
                         <div className="mt-1 text-xs text-red-600">
                           {errors.state}
                         </div>
                       )}
                     </div>
+
+                    {/* City Dropdown */}
                     <div>
+                      <select
+                        value={formData.venue.address.city}
+                        onChange={(e) => handleCityChange(e.target.value)}
+                        disabled={!formData.venue.address.state}
+                        className={`block w-full px-4 py-3 rounded-lg border ${
+                          errors.city ? "border-red-500" : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors ${
+                          !formData.venue.address.state
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        <option value="">Select City</option>
+                        {availableCities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.city && (
+                        <div className="mt-1 text-xs text-red-600">
+                          {errors.city}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Zip Code */}
+                    <div className="md:col-span-2">
                       <input
                         type="text"
                         placeholder="Zip/Postal Code"
@@ -1069,42 +1192,6 @@ const EditEvent = () => {
                       {errors.zipCode && (
                         <div className="mt-1 text-xs text-red-600">
                           {errors.zipCode}
-                        </div>
-                      )}
-                    </div>
-                    <div className="md:col-span-2">
-                      <input
-                        type="text"
-                        placeholder="Country"
-                        value={formData.venue.address.country}
-                        onChange={(e) => {
-                          const error = validateStringInput(
-                            e.target.value,
-                            "Country"
-                          );
-                          if (error && e.target.value) {
-                            setErrors((prev) => ({ ...prev, country: error }));
-                          } else {
-                            setErrors((prev) => ({ ...prev, country: null }));
-                          }
-                          setFormData((prev) => ({
-                            ...prev,
-                            venue: {
-                              ...prev.venue,
-                              address: {
-                                ...prev.venue.address,
-                                country: e.target.value,
-                              },
-                            },
-                          }));
-                        }}
-                        className={`block w-full px-4 py-3 rounded-lg border ${
-                          errors.country ? "border-red-500" : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                      />
-                      {errors.country && (
-                        <div className="mt-1 text-xs text-red-600">
-                          {errors.country}
                         </div>
                       )}
                     </div>
