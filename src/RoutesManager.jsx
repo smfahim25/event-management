@@ -150,8 +150,6 @@ function RoutesManager() {
       <Route path="/terms" element={<TermsConditionPage />} />
       <Route path="/stripe-success" element={<StripeConnectSuccess />} />
       <Route path="/stripe-failed" element={<StripeConnectFailure />} />
-
-      {/* <Route path="*" element={<Navigate to="/" />} /> */}
     </Routes>
   );
 }
