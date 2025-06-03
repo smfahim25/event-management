@@ -26,7 +26,7 @@ const StripeDashboard = () => {
   const [isPayoutProcessing, setIsPayoutProcessing] = useState(false);
   const [earnings, setEarnings] = useState({});
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawError, setWithdrawError] = useState("");
+  const [withdrawError /*setWithdrawError*/] = useState("");
   const [isStripeConnected, setIsStripeConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -232,56 +232,21 @@ const StripeDashboard = () => {
     }
   }
 
-  const handleWithdrawAmountChange = (e) => {
-    const value = e.target.value;
-    setWithdrawAmount(value);
-
-    setWithdrawError("");
-
-    const amount = parseFloat(value);
-    const availableBalance = earnings?.availableBalance || 0;
-
-    if (value && (isNaN(amount) || amount <= 0)) {
-      setWithdrawError("Please enter a valid amount");
-    } else if (amount > availableBalance) {
-      setWithdrawError("Amount cannot exceed available balance");
-    }
-  };
-
   const handlePayout = async () => {
     if (!isStripeConnected) {
       toast.error("Please connect your Stripe account first");
       return;
     }
 
-    const amount = parseFloat(withdrawAmount);
-    const availableBalance = earnings?.availableBalance || 0;
-
-    if (!amount || amount <= 0) {
-      setWithdrawError("Please enter a valid amount");
-      return;
-    }
-
-    if (amount > availableBalance) {
-      setWithdrawError("Amount cannot exceed available balance");
-      return;
-    }
-
     setIsPayoutProcessing(true);
 
     try {
-      const payoutData = {
-        amount: amount,
-        currency: "USD",
-        type: "manual",
-      };
-
-      const result = await createPayout(payoutData);
+      const result = await createPayout();
 
       if (result) {
         setEarnings((prev) => ({
           ...prev,
-          availableBalance: prev.availableBalance - amount,
+          availableBalance: 0,
         }));
         setCall(true);
         setWithdrawAmount("");
@@ -707,20 +672,6 @@ const StripeDashboard = () => {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiDollarSign className="h-4 w-4 text-gray-400" />
                 </div>
-                <input
-                  type="number"
-                  id="withdrawAmount"
-                  value={withdrawAmount}
-                  onChange={handleWithdrawAmountChange}
-                  placeholder="0.00"
-                  min="0"
-                  max={earnings?.availableBalance || 0}
-                  step="0.01"
-                  disabled={!isStripeConnected}
-                  className={`block w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-                    withdrawError ? "border-red-300" : "border-gray-300"
-                  }`}
-                />
               </div>
               {withdrawError && (
                 <p className="text-sm text-red-600">{withdrawError}</p>

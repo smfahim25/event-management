@@ -75,12 +75,11 @@ export const usePayoutStore = create((set, get) => ({
     }
   },
 
-  createPayout: async (payload) => {
+  createPayout: async () => {
     try {
       const res = await fetch(`${API_BASE}/payouts`, {
         method: "POST",
         headers: get().getHeaders(),
-        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
