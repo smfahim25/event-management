@@ -152,7 +152,6 @@ export const useSettingsStore = create((set, get) => ({
         body: formData,
       });
       const data = await res.json();
-      toast.success("Slider created successfully");
       await get().fetchSliders();
       return data;
     } catch (err) {

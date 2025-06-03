@@ -348,7 +348,6 @@ export default function SettingsPage() {
         }
       }
 
-      // Fetch updated sliders
       const updatedSliders = await fetchSliders();
       setSliders(updatedSliders);
     } catch (error) {
