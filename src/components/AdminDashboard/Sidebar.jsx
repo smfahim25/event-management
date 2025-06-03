@@ -3,7 +3,7 @@ import { useAuthStore } from "../../store/AuthStore";
 import { CiSettings } from "react-icons/ci";
 import { TbCategory } from "react-icons/tb";
 import { LiaUsersSolid } from "react-icons/lia";
-import { Mails } from "lucide-react";
+import { DollarSign, Mails } from "lucide-react";
 
 export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
   const location = useLocation();
@@ -130,6 +130,12 @@ export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
       name: "Attendees List",
       path: "/admin/refunds",
       icon: <LiaUsersSolid size={25} />,
+    },
+    {
+      id: "transaction",
+      name: "Transaction",
+      path: "/admin/transaction",
+      icon: <DollarSign size={25} />,
     },
     {
       id: "categories",

@@ -302,7 +302,7 @@ const OrganizerDashboard = () => {
                   : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
               }`}
             >
-              My Tickets
+              My Events
             </button>
             <button
               onClick={() => handleTabChange("attendee")}

@@ -36,6 +36,44 @@ export const usePayoutStore = create((set, get) => ({
       return { data: null, error: err.message };
     }
   },
+  getAllPayouts: async (
+    page = 1,
+    limit = 10,
+    searchTerm = "",
+    status = "all"
+  ) => {
+    try {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      if (searchTerm && searchTerm.trim()) {
+        queryParams.append("search", searchTerm.trim());
+      }
+
+      if (status && status !== "all") {
+        queryParams.append("status", status);
+      }
+
+      const res = await fetch(`${API_BASE}/payouts?${queryParams.toString()}`, {
+        method: "GET",
+        headers: get().getHeaders(),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
+      }
+
+      const data = await res.json();
+      return { data, error: null };
+    } catch (err) {
+      console.error("Error fetching payouts:", err.message);
+      toast.error("Failed to fetch payouts.");
+      return { data: null, error: err.message };
+    }
+  },
 
   createPayout: async (payload) => {
     try {

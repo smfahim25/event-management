@@ -150,7 +150,7 @@ function EventsPage() {
   };
 
   const handleCityChange = (e) => {
-    setSelectedCity(e.target.value);
+    setSelectedCity(e);
     setPage(1);
   };
 
@@ -256,7 +256,7 @@ function EventsPage() {
                 {defaultTexts.events.city}
               </label>
               <SearchableSelect
-                options={["All Cities", ...europeanCities]}
+                options={[...europeanCities]}
                 value={selectedCity}
                 onChange={handleCityChange}
                 placeholder="All Cities"

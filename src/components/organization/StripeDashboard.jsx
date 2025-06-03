@@ -6,11 +6,19 @@ import {
   FiArrowDown,
   FiRefreshCw,
   FiCreditCard,
+  FiLink,
+  FiCheckCircle,
+  FiInfo,
+  FiGlobe,
+  FiMail,
+  FiShield,
+  FiX,
 } from "react-icons/fi";
 import { usePayoutStore } from "../../store/PayoutStore";
 import { useAuthStore } from "../../store/AuthStore";
 import { useOrganizerStore } from "../../store/OrganizerStore";
 import toast from "react-hot-toast";
+import { FaUnlink } from "react-icons/fa";
 
 const StripeDashboard = () => {
   const { defaultTexts } = useData();
@@ -19,9 +27,20 @@ const StripeDashboard = () => {
   const [earnings, setEarnings] = useState({});
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawError, setWithdrawError] = useState("");
+  const [isStripeConnected, setIsStripeConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [stripeAccountDetails, setStripeAccountDetails] = useState(null);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const { user } = useAuthStore();
   const { getPayouts, createPayout } = usePayoutStore();
-  const { getOrganizerEarnings } = useOrganizerStore();
+  const {
+    getOrganizerEarnings,
+    getStripeConnectLink,
+    getStripeStatus,
+    disconnectStripe,
+    loading,
+  } = useOrganizerStore();
   const [call, setCall] = useState(false);
 
   useEffect(() => {
@@ -49,6 +68,135 @@ const StripeDashboard = () => {
 
     fetchStripeData();
   }, [getPayouts, user?._id]);
+
+  useEffect(() => {
+    checkStripeConnectionStatus();
+  }, []);
+
+  const checkStripeConnectionStatus = async () => {
+    try {
+      const data = await getStripeStatus();
+
+      setIsStripeConnected(data.success);
+
+      if (data?.success && data?.status) {
+        setStripeAccountDetails(data.status);
+      }
+    } catch (error) {
+      console.error("Error checking Stripe connection:", error);
+    }
+  };
+
+  const handleStripeConnect = async () => {
+    setIsConnecting(true);
+    try {
+      const data = await getStripeConnectLink();
+      console.log(data);
+      if (data.success) {
+        setTimeout(() => {
+          window.location.href = data.url;
+        }, 300);
+      }
+    } catch (error) {
+      console.error("Error connecting to Stripe:", error);
+      toast.error("Failed to connect to Stripe. Please try again.");
+      setIsConnecting(false);
+    }
+  };
+
+  const handleDisconnectConfirmation = () => {
+    setShowDisconnectConfirm(true);
+  };
+
+  const cancelDisconnect = () => {
+    setShowDisconnectConfirm(false);
+  };
+
+  const confirmDisconnect = async () => {
+    setIsDisconnecting(true);
+    setShowDisconnectConfirm(false);
+    try {
+      await disconnectStripe();
+      setIsStripeConnected(false);
+      setStripeAccountDetails(null);
+      toast.success("Stripe account disconnected successfully");
+    } catch (error) {
+      console.error("Error disconnecting from Stripe:", error);
+      toast.error("Failed to disconnect from Stripe. Please try again.");
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
+  const getCapabilityStatus = (status) => {
+    switch (status) {
+      case "active":
+        return { color: "text-green-600", bg: "bg-green-100", text: "Active" };
+      case "pending":
+        return {
+          color: "text-yellow-600",
+          bg: "bg-yellow-100",
+          text: "Pending",
+        };
+      case "inactive":
+        return { color: "text-red-600", bg: "bg-red-100", text: "Inactive" };
+      default:
+        return { color: "text-gray-600", bg: "bg-gray-100", text: "Unknown" };
+    }
+  };
+
+  const getCountryFlag = (countryCode) => {
+    const flags = {
+      AL: "🇦🇱",
+      AD: "🇦🇩",
+      AT: "🇦🇹",
+      BY: "🇧🇾",
+      BE: "🇧🇪",
+      BA: "🇧🇦",
+      BG: "🇧🇬",
+      HR: "🇭🇷",
+      CY: "🇨🇾",
+      CZ: "🇨🇿",
+      DK: "🇩🇰",
+      EE: "🇪🇪",
+      FI: "🇫🇮",
+      FR: "🇫🇷",
+      DE: "🇩🇪",
+      GR: "🇬🇷",
+      HU: "🇭🇺",
+      IS: "🇮🇸",
+      IE: "🇮🇪",
+      IT: "🇮🇹",
+      LV: "🇱🇻",
+      LI: "🇱🇮",
+      LT: "🇱🇹",
+      LU: "🇱🇺",
+      MT: "🇲🇹",
+      MD: "🇲🇩",
+      MC: "🇲🇨",
+      ME: "🇲🇪",
+      NL: "🇳🇱",
+      MK: "🇲🇰",
+      NO: "🇳🇴",
+      PL: "🇵🇱",
+      PT: "🇵🇹",
+      RO: "🇷🇴",
+      RU: "🇷🇺",
+      SM: "🇸🇲",
+      RS: "🇷🇸",
+      SK: "🇸🇰",
+      SI: "🇸🇮",
+      ES: "🇪🇸",
+      SE: "🇸🇪",
+      CH: "🇨🇭",
+      TR: "🇹🇷",
+      UA: "🇺🇦",
+      GB: "🇬🇧",
+      VA: "🇻🇦",
+    };
+
+    return flags[countryCode] || "🌍";
+  };
 
   function formatDate(isoString) {
     const date = new Date(isoString);
@@ -101,6 +249,11 @@ const StripeDashboard = () => {
   };
 
   const handlePayout = async () => {
+    if (!isStripeConnected) {
+      toast.error("Please connect your Stripe account first");
+      return;
+    }
+
     const amount = parseFloat(withdrawAmount);
     const availableBalance = earnings?.availableBalance || 0;
 
@@ -148,6 +301,7 @@ const StripeDashboard = () => {
     const availableBalance = earnings?.availableBalance || 0;
 
     return (
+      !isStripeConnected ||
       isPayoutProcessing ||
       !withdrawAmount ||
       isNaN(amount) ||
@@ -191,6 +345,284 @@ const StripeDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
+        </div>
+      )}
+      {/* Disconnect Confirmation Modal */}
+      {showDisconnectConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Disconnect Stripe Account
+              </h3>
+              <button
+                onClick={cancelDisconnect}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <FiX className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-600">
+                Are you sure you want to disconnect your Stripe account? You
+                won&apos;t be able to receive payments until you reconnect.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelDisconnect}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDisconnect}
+                disabled={isDisconnecting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDisconnecting ? (
+                  <>
+                    <FiRefreshCw className="inline mr-2 h-4 w-4 animate-spin" />
+                    Disconnecting...
+                  </>
+                ) : (
+                  "Disconnect"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stripe Connection Status Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5">
+          <h3 className="text-xl font-semibold text-white">
+            Stripe Connection
+          </h3>
+          <p className="text-blue-100 text-sm">
+            Manage your Stripe account connection
+          </p>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              {isStripeConnected ? (
+                <>
+                  <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                    <FiCheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Connected
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Your Stripe account is connected
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full">
+                    <FiLink className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Not Connected
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Connect your Stripe account to receive payouts
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {isStripeConnected ? (
+              <button
+                onClick={handleDisconnectConfirmation}
+                disabled={isDisconnecting}
+                className="flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isDisconnecting ? (
+                  <>
+                    <FiRefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Disconnecting...
+                  </>
+                ) : (
+                  <>
+                    <FaUnlink className="w-4 h-4 mr-2" />
+                    Disconnect
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleStripeConnect}
+                disabled={isConnecting}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-md hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isConnecting ? (
+                  <>
+                    <FiRefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <FiLink className="w-4 h-4 mr-2" />
+                    Connect Stripe
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Stripe Account Details - Show when connected */}
+          {isStripeConnected && stripeAccountDetails && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+              <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+                <FiInfo className="w-4 h-4 mr-2 text-green-600" />
+                Account Information
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Account ID */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+                    <FiShield className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Account ID</p>
+                    <p className="text-sm font-medium text-gray-900 font-mono">
+                      {stripeAccountDetails.id}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Country */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
+                    <FiGlobe className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Country</p>
+                    <p className="text-sm font-medium text-gray-900 flex items-center">
+                      <span className="mr-2">
+                        {getCountryFlag(stripeAccountDetails.country)}
+                      </span>
+                      {stripeAccountDetails.country}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full">
+                    <FiMail className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {stripeAccountDetails.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Account Status */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+                    <FiCheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Status</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {stripeAccountDetails.charges_enabled
+                          ? "Charges Enabled"
+                          : "Charges Disabled"}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {stripeAccountDetails.payouts_enabled
+                          ? "Payouts Enabled"
+                          : "Payouts Disabled"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Capabilities */}
+              {stripeAccountDetails.capabilities && (
+                <div className="mt-4 pt-4 border-t border-green-200">
+                  <h5 className="text-xs font-semibold text-gray-700 mb-2">
+                    Capabilities
+                  </h5>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(stripeAccountDetails.capabilities).map(
+                      ([capability, status]) => {
+                        const statusInfo = getCapabilityStatus(status);
+                        return (
+                          <span
+                            key={capability}
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}
+                          >
+                            {capability.replace("_", " ").toUpperCase()}:{" "}
+                            {statusInfo.text}
+                          </span>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Requirements */}
+              {stripeAccountDetails.requirements && (
+                <div className="mt-4 pt-4 border-t border-green-200">
+                  <h5 className="text-xs font-semibold text-gray-700 mb-2">
+                    Account Requirements
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-gray-500">Details Submitted:</span>
+                      <span
+                        className={`ml-2 font-medium ${
+                          stripeAccountDetails.details_submitted
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {stripeAccountDetails.details_submitted ? "Yes" : "No"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Items Due:</span>
+                      <span className="ml-2 font-medium text-gray-900">
+                        {stripeAccountDetails.requirements.currently_due
+                          ?.length || 0}{" "}
+                        items
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isStripeConnected && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> You need to connect your Stripe account
+                to receive payouts and manage your earnings.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* Balance Card */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
@@ -284,7 +716,8 @@ const StripeDashboard = () => {
                   min="0"
                   max={earnings?.availableBalance || 0}
                   step="0.01"
-                  className={`block w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 ${
+                  disabled={!isStripeConnected}
+                  className={`block w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
                     withdrawError ? "border-red-300" : "border-gray-300"
                   }`}
                 />
@@ -315,7 +748,9 @@ const StripeDashboard = () => {
               ) : (
                 <>
                   <FiArrowDown className="mr-2 h-4 w-4" />
-                  Withdraw
+                  {!isStripeConnected
+                    ? "Connect Stripe to Withdraw"
+                    : "Withdraw"}
                 </>
               )}
             </button>

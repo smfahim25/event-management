@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useOrganizerStore } from "../../store/OrganizerStore";
 import { useNavigate } from "react-router-dom";
+import SearchableSelect from "../ui/SearchSelect";
 
 export default function OrganizerRegistrationForm() {
   const { createOrganizer, loading, error, success } = useOrganizerStore();
@@ -23,10 +24,111 @@ export default function OrganizerRegistrationForm() {
       state: "",
       zipCode: "",
       country: "",
+      countryIso2: "",
     },
     commissionRate: "",
     payoutSchedule: "",
   });
+  const [europeanLocations, setEuropeanLocations] = useState([]);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const loadLocationData = async () => {
+      try {
+        const response = await fetch("/europe.json");
+        const data = await response.json();
+        setEuropeanLocations(data);
+      } catch (error) {
+        console.error("Error loading location data:", error);
+
+        setEuropeanLocations([
+          {
+            country: "Albania",
+            states: [
+              {
+                state: "Berat",
+                cities: ["Berat", "Kuçovë", "Poliçan"],
+              },
+              {
+                state: "Tirana",
+                cities: ["Tirana", "Kamëz", "Vorë"],
+              },
+            ],
+          },
+        ]);
+      }
+    };
+
+    loadLocationData();
+  }, []);
+
+  const countries = useMemo(() => {
+    return europeanLocations.map((location) => location.country).sort();
+  }, [europeanLocations]);
+
+  const availableStates = useMemo(() => {
+    if (!formData.address.country) return [];
+    const selectedCountry = europeanLocations.find(
+      (location) => location.country === formData.address.country
+    );
+    return selectedCountry
+      ? selectedCountry.states.map((state) => state.state).sort()
+      : [];
+  }, [europeanLocations, formData.address.country]);
+
+  const availableCities = useMemo(() => {
+    if (!formData.address.country || !formData.address.state) return [];
+    const selectedCountry = europeanLocations.find(
+      (location) => location.country === formData.address.country
+    );
+    if (!selectedCountry) return [];
+
+    const selectedState = selectedCountry.states.find(
+      (state) => state.state === formData.address.state
+    );
+    return selectedState ? selectedState.cities.sort() : [];
+  }, [europeanLocations, formData.address.country, formData.address.state]);
+
+  const handleCountryChange = (country) => {
+    const selectedCountryObj = europeanLocations.find(
+      (location) => location.country === country
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        country: country,
+        countryIso2: selectedCountryObj?.iso2 || "",
+        state: "",
+        city: "",
+      },
+    }));
+    setErrors((prev) => ({ ...prev, country: null, state: null, city: null }));
+  };
+
+  const handleStateChange = (state) => {
+    setFormData((prev) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        state: state,
+        city: "",
+      },
+    }));
+    setErrors((prev) => ({ ...prev, state: null, city: null }));
+  };
+
+  const handleCityChange = (city) => {
+    setFormData((prev) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        city: city,
+      },
+    }));
+    setErrors((prev) => ({ ...prev, city: null }));
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -206,86 +308,6 @@ export default function OrganizerRegistrationForm() {
             </div>
           </div>
 
-          {/* Social Media */}
-          {/* <div>
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
-              Social Media
-            </h2>
-            <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
-              <div>
-                <label
-                  htmlFor="socialMedia.facebook"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Facebook
-                </label>
-                <input
-                  type="text"
-                  name="socialMedia.facebook"
-                  id="socialMedia.facebook"
-                  placeholder="https://facebook.com/creativeevents"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.socialMedia.facebook}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="socialMedia.twitter"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Twitter
-                </label>
-                <input
-                  type="text"
-                  name="socialMedia.twitter"
-                  id="socialMedia.twitter"
-                  placeholder="https://twitter.com/creativeevents"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.socialMedia.twitter}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="socialMedia.instagram"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Instagram
-                </label>
-                <input
-                  type="text"
-                  name="socialMedia.instagram"
-                  id="socialMedia.instagram"
-                  placeholder="https://instagram.com/creativeevents"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.socialMedia.instagram}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="socialMedia.linkedin"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  LinkedIn
-                </label>
-                <input
-                  type="text"
-                  name="socialMedia.linkedin"
-                  id="socialMedia.linkedin"
-                  placeholder="https://linkedin.com/company/creativeevents"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.socialMedia.linkedin}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          </div> */}
-
           {/* Address */}
           <div>
             <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">
@@ -311,42 +333,61 @@ export default function OrganizerRegistrationForm() {
                 />
               </div>
 
+              {/* Country Dropdown */}
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="address.city"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  City*
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Country*
                 </label>
-                <input
-                  type="text"
-                  name="address.city"
-                  id="address.city"
-                  required
-                  placeholder="New York"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.address.city}
-                  onChange={handleInputChange}
+                <SearchableSelect
+                  options={countries}
+                  value={formData.address.country}
+                  onChange={handleCountryChange}
+                  placeholder="Select Country"
+                  error={errors.country}
                 />
+                {errors.country && (
+                  <div className="mt-1 text-xs text-red-600">
+                    {errors.country}
+                  </div>
+                )}
               </div>
 
+              {/* State Dropdown */}
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="address.state"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   State/Province*
                 </label>
-                <input
-                  type="text"
-                  name="address.state"
-                  id="address.state"
-                  required
-                  placeholder="NY"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                <SearchableSelect
+                  options={availableStates}
                   value={formData.address.state}
-                  onChange={handleInputChange}
+                  onChange={handleStateChange}
+                  placeholder="Select State/Province"
+                  disabled={!formData.address.country}
+                  error={errors.state}
                 />
+                {errors.state && (
+                  <div className="mt-1 text-xs text-red-600">
+                    {errors.state}
+                  </div>
+                )}
+              </div>
+
+              {/* City Dropdown */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  City*
+                </label>
+                <SearchableSelect
+                  options={availableCities}
+                  value={formData.address.city}
+                  onChange={handleCityChange}
+                  placeholder="Select City"
+                  disabled={!formData.address.state}
+                  error={errors.city}
+                />
+                {errors.city && (
+                  <div className="mt-1 text-xs text-red-600">{errors.city}</div>
+                )}
               </div>
 
               <div className="sm:col-span-2">
@@ -366,31 +407,6 @@ export default function OrganizerRegistrationForm() {
                   value={formData.address.zipCode}
                   onChange={handleInputChange}
                 />
-              </div>
-
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="address.country"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Country*
-                </label>
-                <select
-                  id="address.country"
-                  name="address.country"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                  value={formData.address.country}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Select a country</option>
-                  <option value="USA">United States</option>
-                  <option value="CAN">Canada</option>
-                  <option value="GBR">United Kingdom</option>
-                  <option value="AUS">Australia</option>
-                  <option value="DEU">Germany</option>
-                  <option value="FRA">France</option>
-                </select>
               </div>
             </div>
           </div>
@@ -427,6 +443,7 @@ export default function OrganizerRegistrationForm() {
           <div className="pt-5">
             <div className="flex justify-end">
               <button
+                type="button"
                 onClick={() => navigate(-1)}
                 className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
@@ -442,26 +459,29 @@ export default function OrganizerRegistrationForm() {
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
               >
                 {loading ? (
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Registering...
+                  </>
                 ) : (
                   "Register"
                 )}

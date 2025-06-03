@@ -39,6 +39,7 @@ import PrivacyPolicyPage from "./pages/public/Privacy";
 import TermsConditionPage from "./pages/public/Terms";
 import StripeConnectSuccess from "./pages/payment/StripeConnectSuccess";
 import StripeConnectFailure from "./pages/payment/StripeConnectFailed";
+import AdminTransactionsTable from "./components/AdminDashboard/TransactionTable";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -130,6 +131,7 @@ function RoutesManager() {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="newsletter" element={<NewsletterSubscribers />} />
+        <Route path="transaction" element={<AdminTransactionsTable />} />
       </Route>
       <Route
         path="/dashboard"

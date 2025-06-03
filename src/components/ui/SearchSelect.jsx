@@ -53,22 +53,38 @@ const SearchableSelect = ({
     setSearchTerm("");
   };
 
+  const handleToggle = (e) => {
+    // Check if the click target is the clear button or its child
+    if (e.target.closest(".clear-button")) {
+      return; // Don't toggle dropdown if clear button was clicked
+    }
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
+  };
+
   const displayValue = value || placeholder;
   const hasValue = Boolean(value);
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-        className={`w-full bg-white px-4 py-3 text-left rounded-lg border transition-colors ${
+      {/* FIXED: Changed button to div to avoid nested button issue */}
+      <div
+        onClick={handleToggle}
+        className={`w-full bg-white px-4 py-3 text-left rounded-lg border transition-colors cursor-pointer ${
           error ? "border-red-500" : "border-gray-300"
         } ${
           disabled
             ? "opacity-50 cursor-not-allowed bg-gray-50"
             : "hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent"
         } ${isOpen ? "ring-2 ring-[#E167FF] border-transparent" : ""}`}
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleToggle(e);
+          }
+        }}
       >
         <div className="flex items-center justify-between">
           <span className={hasValue ? "text-gray-900" : "text-gray-500"}>
@@ -76,13 +92,21 @@ const SearchableSelect = ({
           </span>
           <div className="flex items-center gap-1">
             {hasValue && !disabled && (
-              <button
+              // FIXED: Changed to div with button behavior instead of actual button
+              <div
                 onClick={handleClear}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                type="button"
+                className="clear-button p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleClear(e);
+                  }
+                }}
               >
                 <X className="w-4 h-4 text-gray-400" />
-              </button>
+              </div>
             )}
             <ChevronDown
               className={`w-4 h-4 text-gray-400 transition-transform ${
@@ -91,7 +115,7 @@ const SearchableSelect = ({
             />
           </div>
         </div>
-      </button>
+      </div>
 
       {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-screen overflow-hidden">
@@ -137,4 +161,5 @@ const SearchableSelect = ({
     </div>
   );
 };
+
 export default SearchableSelect;

@@ -33,6 +33,7 @@ export const useOrganizerStore = create((set, get) => ({
       formData.append("address[state]", formDataObj.address.state);
       formData.append("address[zipCode]", formDataObj.address.zipCode);
       formData.append("address[country]", formDataObj.address.country);
+      formData.append("address[iso2]", formDataObj.address.countryIso2);
 
       formData.append(
         "socialMedia[facebook]",
@@ -281,6 +282,96 @@ export const useOrganizerStore = create((set, get) => ({
       set({ success: true });
 
       await get().getOrganizers();
+    } catch (err) {
+      set({ error: err.message });
+      toast.error(err.message);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getStripeConnectLink: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/stripe/connect`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to retrieve Stripe connect link."
+        );
+      }
+
+      return data;
+    } catch (err) {
+      set({ error: err.message });
+      toast.error(err.message);
+      return null;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getStripeStatus: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/stripe/status`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to retrieve Stripe status.");
+      }
+
+      return data;
+    } catch (err) {
+      set({ error: err.message });
+      return null;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  disconnectStripe: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const token = Cookies.get("accessToken");
+      if (!token) throw new Error("Unauthorized. Please login first.");
+
+      const res = await fetch(`${API_BASE}/stripe/disconnect`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to disconnect Stripe.");
+      }
+
+      toast.success("Stripe disconnected successfully");
+
+      await get().getStripeStatus();
     } catch (err) {
       set({ error: err.message });
       toast.error(err.message);
