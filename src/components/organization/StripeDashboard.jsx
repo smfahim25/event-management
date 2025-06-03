@@ -25,8 +25,6 @@ const StripeDashboard = () => {
   const [stripeData, setStripeData] = useState(null);
   const [isPayoutProcessing, setIsPayoutProcessing] = useState(false);
   const [earnings, setEarnings] = useState({});
-  const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawError /*setWithdrawError*/] = useState("");
   const [isStripeConnected, setIsStripeConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -249,7 +247,6 @@ const StripeDashboard = () => {
           availableBalance: 0,
         }));
         setCall(true);
-        setWithdrawAmount("");
       } else {
         toast.error("Failed to process payout. Please try again.");
       }
@@ -262,18 +259,9 @@ const StripeDashboard = () => {
   };
 
   const isWithdrawDisabled = () => {
-    const amount = parseFloat(withdrawAmount);
     const availableBalance = earnings?.availableBalance || 0;
 
-    return (
-      !isStripeConnected ||
-      isPayoutProcessing ||
-      !withdrawAmount ||
-      isNaN(amount) ||
-      amount <= 0 ||
-      amount > availableBalance ||
-      availableBalance === 0
-    );
+    return !isStripeConnected || isPayoutProcessing || availableBalance === 0;
   };
 
   if (!earnings) {
@@ -662,20 +650,6 @@ const StripeDashboard = () => {
 
             {/* Withdraw Amount Input */}
             <div className="space-y-2">
-              <label
-                htmlFor="withdrawAmount"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Withdraw Amount
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiDollarSign className="h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              {withdrawError && (
-                <p className="text-sm text-red-600">{withdrawError}</p>
-              )}
               <p className="text-xs text-gray-500">
                 Available balance: $
                 {earnings?.availableBalance?.toFixed(2) || "0.00"}
