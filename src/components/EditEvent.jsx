@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  FaCalendarAlt,
   FaMapMarkerAlt,
   FaTicketAlt,
   FaTrash,
@@ -17,11 +16,13 @@ import { useEventStore } from "../store/EventStore";
 import { useCategoryStore } from "../store/CategoryStore";
 import toast from "react-hot-toast";
 import SearchableSelect from "./ui/SearchSelect";
+import { AlertCircle, Calendar } from "lucide-react";
 
 const EditEvent = () => {
   const { eventID } = useParams();
   const navigate = useNavigate();
   const tagInputRef = useRef();
+  const dateInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -591,6 +592,24 @@ const EditEvent = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleDateClick = () => {
+    if (dateInputRef.current) {
+      dateInputRef.current.showPicker?.() || dateInputRef.current.focus();
+    }
+  };
+
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return "Select date";
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -883,34 +902,58 @@ const EditEvent = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
-                      <FaCalendarAlt className="mr-2 text-gray-500" />
+                      <Calendar className="mr-2 text-gray-500" />
                       Date
                     </div>
                   </label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={(e) => {
-                      const dateError = validateFutureDate(e.target.value);
-                      if (dateError) {
-                        setErrors((prev) => ({ ...prev, date: dateError }));
-                      } else {
-                        setErrors((prev) => ({ ...prev, date: null }));
-                      }
-                      setFormData((prev) => ({
-                        ...prev,
-                        date: e.target.value,
-                      }));
-                    }}
-                    min={new Date().toISOString().split("T")[0]}
-                    className={`block w-full px-4 py-3 rounded-lg border ${
-                      errors.date ? "border-red-500" : "border-gray-300"
-                    } focus:outline-none focus:ring-2 focus:ring-[#E167FF] focus:border-transparent transition-colors`}
-                  />
+
+                  {/* Clickable Date Container */}
+                  <div
+                    onClick={handleDateClick}
+                    className={`relative block w-full px-4 py-3 rounded-lg border cursor-pointer transition-all ${
+                      errors.date
+                        ? "border-red-500 bg-red-50 hover:bg-red-100"
+                        : "border-gray-300 bg-white hover:bg-gray-50 hover:border-[#E167FF]"
+                    } focus-within:outline-none focus-within:ring-2 focus-within:ring-[#E167FF] focus-within:border-transparent`}
+                  >
+                    {/* Hidden actual input */}
+                    <input
+                      ref={dateInputRef}
+                      type="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={(e) => {
+                        const dateError = validateFutureDate(e.target.value);
+                        if (dateError) {
+                          setErrors((prev) => ({ ...prev, date: dateError }));
+                        } else {
+                          setErrors((prev) => ({ ...prev, date: null }));
+                        }
+                        setFormData((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }));
+                      }}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+
+                    {/* Custom Display */}
+                    <div className="flex items-center justify-between pointer-events-none">
+                      <span
+                        className={`${
+                          !formData.date ? "text-gray-500" : "text-gray-900"
+                        }`}
+                      >
+                        {formatDisplayDate(formData.date)}
+                      </span>
+                      <Calendar className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                    </div>
+                  </div>
+
                   {errors.date && (
                     <div className="mt-1 flex items-center text-sm text-red-600">
-                      <FaExclamationCircle className="mr-1 h-4 w-4" />
+                      <AlertCircle className="mr-1 h-4 w-4" />
                       {errors.date}
                     </div>
                   )}

@@ -2,12 +2,38 @@ import { useNavigate } from "react-router-dom";
 import { useSettingsStore } from "../../store/SettingsStore";
 import PendingApprovalCard from "./PendingApprovalCard";
 import StatsCard from "./StatsCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as Chart from "chart.js";
+
+Chart.Chart.register(
+  Chart.CategoryScale,
+  Chart.LinearScale,
+  Chart.BarElement,
+  Chart.BarController,
+  Chart.DoughnutController,
+  Chart.PieController,
+  Chart.Title,
+  Chart.Tooltip,
+  Chart.Legend,
+  Chart.ArcElement,
+  Chart.LineElement,
+  Chart.PointElement
+);
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const { adminStats, fetchAdminStats } = useSettingsStore();
   const navigate = useNavigate();
+
+  const overviewChartRef = useRef(null);
+  const revenueChartRef = useRef(null);
+  const eventStatusChartRef = useRef(null);
+  const pendingApprovalsChartRef = useRef(null);
+
+  const overviewChartInstance = useRef(null);
+  const revenueChartInstance = useRef(null);
+  const eventStatusChartInstance = useRef(null);
+  const pendingApprovalsChartInstance = useRef(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -21,6 +47,212 @@ export default function Dashboard() {
       setDashboardData(adminStats);
     }
   }, [adminStats]);
+
+  useEffect(() => {
+    if (dashboardData) {
+      if (overviewChartInstance.current)
+        overviewChartInstance.current.destroy();
+      if (revenueChartInstance.current) revenueChartInstance.current.destroy();
+      if (eventStatusChartInstance.current)
+        eventStatusChartInstance.current.destroy();
+      if (pendingApprovalsChartInstance.current)
+        pendingApprovalsChartInstance.current.destroy();
+
+      if (overviewChartRef.current) {
+        overviewChartInstance.current = new Chart.Chart(
+          overviewChartRef.current,
+          {
+            type: "bar",
+            data: {
+              labels: [
+                "Total Events",
+                "Active Events",
+                "Total Organizers",
+                "Active Organizers",
+                "Total Users",
+              ],
+              datasets: [
+                {
+                  label: "Count",
+                  data: [
+                    dashboardData.totalEvents || 0,
+                    dashboardData.totalActiveEvents || 0,
+                    dashboardData.totalOrganizers || 0,
+                    dashboardData.activeOrganizers || 0,
+                    dashboardData.totalUsers || 0,
+                  ],
+                  backgroundColor: [
+                    "#4f46e5",
+                    "#10B981",
+                    "#F59E0B",
+                    "#EF4444",
+                    "#8B5CF6",
+                  ],
+                  borderColor: [
+                    "#2563EB",
+                    "#059669",
+                    "#D97706",
+                    "#DC2626",
+                    "#7C3AED",
+                  ],
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Platform Overview",
+                },
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          }
+        );
+      }
+
+      if (revenueChartRef.current) {
+        const totalRevenue = dashboardData.totalRevenue || 0;
+        const commission = dashboardData.totalPlatformCommission || 0;
+        const organizerRevenue = totalRevenue - commission;
+
+        revenueChartInstance.current = new Chart.Chart(
+          revenueChartRef.current,
+          {
+            type: "pie",
+            data: {
+              labels: ["Organizer Revenue", "Platform Commission"],
+              datasets: [
+                {
+                  data: [organizerRevenue, commission],
+                  backgroundColor: ["#10B981", "#4f46e5"],
+                  borderColor: ["#059669", "#2563EB"],
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Revenue Breakdown",
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return (
+                        context.label + ": $" + context.parsed.toLocaleString()
+                      );
+                    },
+                  },
+                },
+              },
+            },
+          }
+        );
+      }
+
+      if (eventStatusChartRef.current) {
+        const activeEvents = dashboardData.totalActiveEvents || 0;
+        const inactiveEvents = (dashboardData.totalEvents || 0) - activeEvents;
+
+        eventStatusChartInstance.current = new Chart.Chart(
+          eventStatusChartRef.current,
+          {
+            type: "doughnut",
+            data: {
+              labels: ["Active Events", "Inactive Events"],
+              datasets: [
+                {
+                  data: [activeEvents, inactiveEvents],
+                  backgroundColor: ["#10B981", "#EF4444"],
+                  borderColor: ["#059669", "#DC2626"],
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Event Status Distribution",
+                },
+              },
+            },
+          }
+        );
+      }
+
+      if (pendingApprovalsChartRef.current) {
+        pendingApprovalsChartInstance.current = new Chart.Chart(
+          pendingApprovalsChartRef.current,
+          {
+            type: "bar",
+            data: {
+              labels: ["Organizer Approvals", "Event Approvals"],
+              datasets: [
+                {
+                  label: "Pending Count",
+                  data: [
+                    dashboardData.pendingOrganizers || 0,
+                    dashboardData.pendingEvents || 0,
+                  ],
+                  backgroundColor: ["#0acaf5", "#4f46e5"],
+                  borderColor: ["#0acaf5", "#4f46e5"],
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Pending Approvals",
+                },
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+            },
+          }
+        );
+      }
+    }
+
+    return () => {
+      if (overviewChartInstance.current)
+        overviewChartInstance.current.destroy();
+      if (revenueChartInstance.current) revenueChartInstance.current.destroy();
+      if (eventStatusChartInstance.current)
+        eventStatusChartInstance.current.destroy();
+      if (pendingApprovalsChartInstance.current)
+        pendingApprovalsChartInstance.current.destroy();
+    };
+  }, [dashboardData]);
 
   return (
     <div>
@@ -125,6 +357,45 @@ export default function Dashboard() {
             </button>
           }
         />
+      </div>
+
+      {/* Charts Section */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Platform Overview Chart */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div style={{ position: "relative", height: "300px" }}>
+              <canvas ref={overviewChartRef}></canvas>
+            </div>
+          </div>
+        </div>
+
+        {/* Revenue Breakdown Chart */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div style={{ position: "relative", height: "300px" }}>
+              <canvas ref={revenueChartRef}></canvas>
+            </div>
+          </div>
+        </div>
+
+        {/* Event Status Chart */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div style={{ position: "relative", height: "300px" }}>
+              <canvas ref={eventStatusChartRef}></canvas>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Approvals Chart */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div style={{ position: "relative", height: "300px" }}>
+              <canvas ref={pendingApprovalsChartRef}></canvas>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Pending Approvals */}

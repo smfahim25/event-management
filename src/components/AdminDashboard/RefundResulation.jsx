@@ -63,10 +63,6 @@ export default function AttendeeTable({ eventId }) {
     fetchBookings();
   }, [eventId, pagination.page, pagination.limit, getAllBookings]);
 
-  // Get unique values for filter options
-  const paymentStatuses = [
-    ...new Set(bookings.map((b) => b.paymentDetails?.status).filter(Boolean)),
-  ];
   const refundStatuses = [
     ...new Set(
       bookings.map((b) => b.refundDetails?.status || "none").filter(Boolean)
@@ -277,22 +273,6 @@ export default function AttendeeTable({ eventId }) {
                 {events.map((event) => (
                   <option key={event} value={event}>
                     {event}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Payment Status Filter */}
-            <div className="w-full md:w-auto">
-              <select
-                value={paymentStatusFilter}
-                onChange={(e) => setPaymentStatusFilter(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              >
-                <option value="">All Payment Status</option>
-                {paymentStatuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
                   </option>
                 ))}
               </select>

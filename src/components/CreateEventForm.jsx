@@ -23,12 +23,14 @@ import { useCategoryStore } from "../store/CategoryStore";
 import toast from "react-hot-toast";
 import { FaTrash } from "react-icons/fa";
 import SearchableSelect from "./ui/SearchSelect";
+import { AlertCircle, Calendar } from "lucide-react";
 
 function CreateEventPage() {
   const navigate = useNavigate();
   const { createEvent } = useEventStore();
   const { categories, fetchCategories } = useCategoryStore();
   const tagInputRef = useRef();
+  const dateInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     eventName: "",
@@ -371,6 +373,24 @@ function CreateEventPage() {
         { name: "", price: "", availableQuantity: "", maxPerOrder: "" },
       ],
     }));
+  };
+
+  const handleDateClick = () => {
+    if (dateInputRef.current) {
+      dateInputRef.current.showPicker?.() || dateInputRef.current.focus();
+    }
+  };
+
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return "Select event date";
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const handleRemoveTicketTier = (index) => {
@@ -1388,39 +1408,61 @@ function CreateEventPage() {
                       htmlFor="eventDate"
                       className="mb-2 flex items-center text-sm font-medium text-gray-700"
                     >
-                      <FiCalendar className="mr-2 h-4 w-4 text-purple-500" />
+                      <Calendar className="mr-2 h-4 w-4 text-purple-500" />
                       Event Date
                     </label>
-                    <input
-                      type="date"
-                      id="eventDate"
-                      name="eventDate"
-                      value={formData.eventDate}
-                      onChange={(e) => {
-                        const dateError = validateFutureDate(e.target.value);
-                        if (dateError) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            eventDate: dateError,
-                          }));
-                        } else {
-                          setErrors((prev) => ({ ...prev, eventDate: null }));
-                        }
-                        setFormData((prev) => ({
-                          ...prev,
-                          eventDate: e.target.value,
-                        }));
-                      }}
-                      min={new Date().toISOString().split("T")[0]}
-                      className={`w-full rounded-lg border ${
+
+                    {/* Clickable Date Container */}
+                    <div
+                      onClick={handleDateClick}
+                      className={`relative w-full rounded-lg border cursor-pointer transition-all ${
                         errors.eventDate
-                          ? "border-red-300 bg-red-50"
-                          : "border-purple-200 bg-white"
-                      } px-4 py-3 text-gray-900 shadow-sm transition-all focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/20`}
-                    />
+                          ? "border-red-300 bg-red-50 hover:bg-red-100"
+                          : "border-purple-200 bg-white hover:bg-purple-50 hover:border-purple-300"
+                      } px-4 py-3 shadow-sm focus-within:border-purple-500 focus-within:outline-none focus-within:ring-4 focus-within:ring-purple-500/20`}
+                    >
+                      {/* Hidden actual input */}
+                      <input
+                        ref={dateInputRef}
+                        type="date"
+                        id="eventDate"
+                        name="eventDate"
+                        value={formData.eventDate}
+                        onChange={(e) => {
+                          const dateError = validateFutureDate(e.target.value);
+                          if (dateError) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              eventDate: dateError,
+                            }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, eventDate: null }));
+                          }
+                          setFormData((prev) => ({
+                            ...prev,
+                            eventDate: e.target.value,
+                          }));
+                        }}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+
+                      {/* Custom Display */}
+                      <div className="flex items-center justify-between pointer-events-none">
+                        <span
+                          className={`text-gray-900 ${
+                            !formData.eventDate ? "text-gray-500" : ""
+                          }`}
+                        >
+                          {formatDisplayDate(formData.eventDate)}
+                        </span>
+                        <Calendar className="h-5 w-5 text-purple-500 flex-shrink-0" />
+                      </div>
+                    </div>
+
                     {errors.eventDate && (
                       <div className="mt-1 flex items-center text-sm text-red-600">
-                        <FiAlertCircle className="mr-1 h-4 w-4" />
+                        <AlertCircle className="mr-1 h-4 w-4" />
                         {errors.eventDate}
                       </div>
                     )}
