@@ -63,7 +63,7 @@ const InfoSecond = ({ settings }) => {
   }, []);
   return (
     <section className=" info2 w-full min-h-screen md:px-12 px-8 md:pt-10 pt-10 flex flex-col items-center">
-      <h1 className=" text-[7.3vw] font-black bg-gradient-to-b from-[#FF8317]  to-white inline-block text-transparent bg-clip-text h-fit opacity-80">
+      <h1 className=" text-[7.3vw] font-black bg-gradient-to-b from-[#FF8317]  to-[#FF8317] inline-block text-transparent bg-clip-text h-fit opacity-80">
         {defaultTexts.infoSecond.title}
       </h1>
 

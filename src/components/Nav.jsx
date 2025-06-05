@@ -94,7 +94,7 @@ const Nav = () => {
         onClick={() => {
           navigate("/");
         }}
-        className="logo qwigley-regular text-3xl lg:text-3xl xl:text-5xl"
+        className="logo text-xl md:text-2xl xl:text-3xl"
         style={{
           cursor: "pointer",
         }}
