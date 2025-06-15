@@ -7,6 +7,7 @@ import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
 import { useAuthStore } from "../store/AuthStore";
 import { useSettingsStore } from "../store/SettingsStore";
+import OrganizerModal from "./ui/BecomeOrganizerModal";
 
 const Nav = () => {
   const { user, logout } = useAuthStore();
@@ -19,6 +20,26 @@ const Nav = () => {
   const location = useLocation();
   const isProfilePage = location.pathname === "/app/profile";
   const isDashboardPage = location.pathname === "/dashboard";
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleBecomeOrganizer = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSkip = () => {
+    setIsModalOpen(false);
+    navigate("/app/create-organizer");
+  };
+
+  const handleProceed = () => {
+    setIsModalOpen(false);
+    navigate("/app/create-organizer");
+  };
 
   const { settings, fetchSettings } = useSettingsStore();
   useEffect(() => {
@@ -167,7 +188,7 @@ const Nav = () => {
                   className="cursor-pointer hover:text-black transition-colors"
                   onClick={() => {
                     closeMenu();
-                    navigate("/app/profile");
+                    handleBecomeOrganizer();
                   }}
                 >
                   {defaultTexts.nav.menuItems[3]}
@@ -257,7 +278,7 @@ const Nav = () => {
           user?.role !== "superAdmin" && (
             <li
               className="cursor-pointer hover:text-black transition-colors"
-              onClick={() => navigate("/app/profile")}
+              onClick={handleBecomeOrganizer}
             >
               {defaultTexts.nav.menuItems[3]}
             </li>
@@ -319,6 +340,12 @@ const Nav = () => {
             </Link>
           )}
         </div>
+        <OrganizerModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSkip={handleSkip}
+          onProceed={handleProceed}
+        />
       </div>
     </nav>
   );

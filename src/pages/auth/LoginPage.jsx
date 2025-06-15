@@ -63,7 +63,10 @@ function LoginPage() {
         } else if (user?.data?.isPreviouslyLoggedIn === false) {
           navigate(`/event-prefer?id=${user?.data?._id}`);
         }
-      } else {
+      } else if (
+        user?.data?.role === "admin" ||
+        user?.data?.role === "superAdmin"
+      ) {
         window.location.href = "/admin";
       }
     } catch (error) {
