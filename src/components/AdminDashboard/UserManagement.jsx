@@ -73,8 +73,6 @@ export default function UserManagement() {
     return filtered;
   }, [users?.users, searchTerm]);
 
-  console.log(paginationMeta);
-
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);

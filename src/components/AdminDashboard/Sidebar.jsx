@@ -3,16 +3,26 @@ import { useAuthStore } from "../../store/AuthStore";
 import { CiSettings } from "react-icons/ci";
 import { TbCategory } from "react-icons/tb";
 import { LiaUsersSolid } from "react-icons/lia";
-import { DollarSign, Mails } from "lucide-react";
+import { DollarSign, Mails, ChevronRight, BookText } from "lucide-react";
+import { FaBloggerB } from "react-icons/fa";
+import { useState } from "react";
 
 export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const [expandedMenus, setExpandedMenus] = useState({});
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const toggleSubmenu = (menuId) => {
+    setExpandedMenus((prev) => ({
+      ...prev,
+      [menuId]: !prev[menuId],
+    }));
   };
 
   // Navigation items with routes
@@ -174,6 +184,27 @@ export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
       badge: null,
     },
     {
+      id: "blogs",
+      name: "Blogs",
+      icon: <FaBloggerB size={25} />,
+      badge: null,
+      hasSubmenu: true,
+      submenu: [
+        {
+          id: "all-blogs",
+          name: "All Blogs",
+          path: "/admin/blogs",
+          icon: <BookText size={20} />,
+        },
+        {
+          id: "blog-categories",
+          name: "Categories",
+          path: "/admin/blogs/categories",
+          icon: <TbCategory size={20} />,
+        },
+      ],
+    },
+    {
       id: "settings",
       name: "Settings",
       path: "/admin/settings",
@@ -182,9 +213,93 @@ export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
     },
   ];
 
+  // Check if any submenu item is active
+  const isSubmenuActive = (submenu) => {
+    return submenu.some((item) => location.pathname === item.path);
+  };
+
+  // Check if parent menu should be expanded based on active submenu
+  const shouldExpandMenu = (item) => {
+    if (item.hasSubmenu) {
+      return expandedMenus[item.id] || isSubmenuActive(item.submenu);
+    }
+    return false;
+  };
+
   // Render sidebar item
   const renderSidebarItem = (item, isMobile = false) => {
     const isActive = location.pathname === item.path;
+    const hasActiveSubmenu = item.hasSubmenu && isSubmenuActive(item.submenu);
+    const isExpanded = shouldExpandMenu(item);
+
+    if (item.hasSubmenu) {
+      return (
+        <div key={item.id} className="space-y-1">
+          <button
+            onClick={() => toggleSubmenu(item.id)}
+            className={`${
+              hasActiveSubmenu
+                ? "bg-indigo-50 text-indigo-600"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            } group flex items-center justify-between px-2 py-2 text-sm md:text-base font-medium rounded-md w-full transition-colors duration-200`}
+          >
+            <div className="flex items-center">
+              <span
+                className={`${
+                  hasActiveSubmenu
+                    ? "text-indigo-600"
+                    : "text-gray-400 group-hover:text-gray-500"
+                } mr-3 md:mr-4 flex-shrink-0 h-5 w-5 md:h-6 md:w-6 transition-colors duration-200`}
+              >
+                {item.icon}
+              </span>
+              <span>{item.name}</span>
+            </div>
+            <span
+              className={`${
+                hasActiveSubmenu ? "text-indigo-600" : "text-gray-400"
+              } transition-transform duration-200 ${
+                isExpanded ? "rotate-90" : ""
+              }`}
+            >
+              <ChevronRight size={16} />
+            </span>
+          </button>
+
+          {/* Submenu items */}
+          {isExpanded && (
+            <div className="ml-6 space-y-1">
+              {item.submenu.map((subItem) => {
+                const isSubActive = location.pathname === subItem.path;
+                return (
+                  <Link
+                    key={subItem.id}
+                    to={subItem.path}
+                    onClick={() => isMobile && setMobileMenuOpen(false)}
+                    className={`${
+                      isSubActive
+                        ? "bg-indigo-50 text-indigo-600"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    } group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full transition-colors duration-200`}
+                  >
+                    <span
+                      className={`${
+                        isSubActive
+                          ? "text-indigo-600"
+                          : "text-gray-400 group-hover:text-gray-500"
+                      } mr-3 flex-shrink-0 h-4 w-4 transition-colors duration-200`}
+                    >
+                      {subItem.icon}
+                    </span>
+                    <span>{subItem.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
 
     return (
       <Link

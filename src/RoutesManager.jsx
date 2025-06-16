@@ -40,6 +40,10 @@ import TermsConditionPage from "./pages/public/Terms";
 import StripeConnectSuccess from "./pages/payment/StripeConnectSuccess";
 import StripeConnectFailure from "./pages/payment/StripeConnectFailed";
 import AdminTransactionsTable from "./components/AdminDashboard/TransactionTable";
+import BlogsList from "./components/AdminDashboard/BlogsList";
+import CreateBlog from "./components/AdminDashboard/CreateBlog";
+import EditBlog from "./components/AdminDashboard/EditBlog";
+import BlogCategory from "./components/AdminDashboard/BlogCategory";
 
 function RoutesManager() {
   // useEffect(()=>{
@@ -132,6 +136,10 @@ function RoutesManager() {
         <Route path="profile" element={<AdminProfile />} />
         <Route path="newsletter" element={<NewsletterSubscribers />} />
         <Route path="transaction" element={<AdminTransactionsTable />} />
+        <Route path="blogs" element={<BlogsList />} />
+        <Route path="blogs/create" element={<CreateBlog />} />
+        <Route path="blogs/edit/:id" element={<EditBlog />} />
+        <Route path="blogs/categories" element={<BlogCategory />} />
       </Route>
       <Route
         path="/dashboard"
