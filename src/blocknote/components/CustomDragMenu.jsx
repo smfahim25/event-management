@@ -129,7 +129,7 @@ export function ChangeToItem(props) {
               onClick={() => handleChangeType(type)}
             >
               <span className="option-icon">{type.icon}</span>
-              <span className="option-label">{type.label}</span>
+              <span className="option-label text-black">{type.label}</span>
             </div>
           ))}
         </div>
