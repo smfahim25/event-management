@@ -72,6 +72,14 @@ const Footer = () => {
                   </li>
                   <li>
                     <a
+                      href="https://blog.lessortiesdediane.com"
+                      className="hover:text-[#E167FF] transition-colors duration-200"
+                    >
+                      Blogs
+                    </a>
+                  </li>
+                  <li>
+                    <a
                       href="/contact-us"
                       className="hover:text-[#E167FF] transition-colors duration-200"
                     >
