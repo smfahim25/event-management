@@ -10,7 +10,6 @@ import EventsDetails from "./pages/private/EventsDetails";
 import SuccessSplit from "./pages/payment/SuccessSplit";
 import ContactPage from "./pages/public/ContactPage";
 import EditEvent from "./components/EditEvent";
-// import AdminRouteGuard from "./pages/private/AdminRouteGuard";
 import OrganizerDashboard from "./pages/private/OrganizationDashboard";
 import CreateEventForm from "./components/CreateEventForm";
 import AdminDashboard from "./pages/private/AdminPanel";
@@ -44,16 +43,9 @@ import BlogsList from "./components/AdminDashboard/BlogsList";
 import CreateBlog from "./components/AdminDashboard/CreateBlog";
 import EditBlog from "./components/AdminDashboard/EditBlog";
 import BlogCategory from "./components/AdminDashboard/BlogCategory";
+import OrganizerPage from "./components/ui/BecomeOrganizerModal";
 
 function RoutesManager() {
-  // useEffect(()=>{
-  //   checkIfUserExists(user)
-  // },[])
-
-  // if (loading) {
-  //   return <div><FullScreenLoader /></div>;
-  // }
-
   return (
     <Routes>
       {/* Public Routes */}
@@ -160,6 +152,7 @@ function RoutesManager() {
       <Route path="/terms" element={<TermsConditionPage />} />
       <Route path="/stripe-success" element={<StripeConnectSuccess />} />
       <Route path="/stripe-failed" element={<StripeConnectFailure />} />
+      <Route path="/organizer-step" element={<OrganizerPage />} />
     </Routes>
   );
 }

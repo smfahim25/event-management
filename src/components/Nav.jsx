@@ -7,7 +7,6 @@ import { useData } from "../context/DataContext";
 import LanguageDropdown from "./ui/LanguageToggleButton";
 import { useAuthStore } from "../store/AuthStore";
 import { useSettingsStore } from "../store/SettingsStore";
-import OrganizerModal from "./ui/BecomeOrganizerModal";
 
 const Nav = () => {
   const { user, logout } = useAuthStore();
@@ -21,24 +20,8 @@ const Nav = () => {
   const isProfilePage = location.pathname === "/app/profile";
   const isDashboardPage = location.pathname === "/dashboard";
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const handleBecomeOrganizer = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSkip = () => {
-    setIsModalOpen(false);
-    navigate("/app/create-organizer");
-  };
-
-  const handleProceed = () => {
-    setIsModalOpen(false);
-    navigate("/app/create-organizer");
+    navigate("/organizer-step");
   };
 
   const { settings, fetchSettings } = useSettingsStore();
@@ -139,7 +122,10 @@ const Nav = () => {
         } transition-transform duration-300 ease-in-out lg:hidden z-50`}
       >
         {/* Header Section */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-[#3D004D]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-gray-700"
+          style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
+        >
           <div className="profile h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
             {user ? (
               <CustomUserButton />
@@ -159,7 +145,10 @@ const Nav = () => {
         </div>
 
         {/* Menu Items Section */}
-        <div className="bg-[#3D004D] py-4">
+        <div
+          className="py-4"
+          style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
+        >
           <ul className="flex flex-col gap-6 font-semibold text-lg px-6 text-white">
             <li
               className="cursor-pointer hover:text-black transition-colors"
@@ -340,12 +329,6 @@ const Nav = () => {
             </Link>
           )}
         </div>
-        <OrganizerModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSkip={handleSkip}
-          onProceed={handleProceed}
-        />
       </div>
     </nav>
   );

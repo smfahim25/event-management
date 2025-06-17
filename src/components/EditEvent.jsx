@@ -48,7 +48,7 @@ const EditEvent = () => {
     },
     price: [],
     limit: "",
-    poster: null,
+    poster: [],
     tags: [],
   });
 
@@ -177,6 +177,7 @@ const EditEvent = () => {
       return `${fieldName} must be a valid number`;
     }
     const numValue = Number.parseFloat(value);
+
     if (numValue < min) {
       return `${fieldName} must be at least ${min}`;
     }
@@ -548,7 +549,7 @@ const EditEvent = () => {
           newErrors[`price_${index}_label`] = labelError;
         }
 
-        const priceError = validateNumberInput(price.value, "Price", 0);
+        const priceError = validateNumberInput(price.value, "Price", -1);
         if (priceError) {
           newErrors[`price_${index}_value`] = priceError;
         }
@@ -693,8 +694,8 @@ const EditEvent = () => {
         refundPolicies.description
       );
     }
-
     if (formData.poster && formData.poster.length > 0) {
+      console.log(formData.poster);
       formData.poster.forEach((file) => {
         formDataObj.append(`eventImages`, file);
       });
@@ -1528,22 +1529,6 @@ const EditEvent = () => {
                             placeholder="0.00"
                             value={priceItem.value}
                             onChange={(e) => {
-                              const error = validateNumberInput(
-                                e.target.value,
-                                "Price",
-                                0
-                              );
-                              if (error && e.target.value) {
-                                setErrors((prev) => ({
-                                  ...prev,
-                                  [`price_${index}_value`]: error,
-                                }));
-                              } else {
-                                setErrors((prev) => ({
-                                  ...prev,
-                                  [`price_${index}_value`]: null,
-                                }));
-                              }
                               handlePriceChange(index, "value", e.target.value);
                             }}
                             min="0"

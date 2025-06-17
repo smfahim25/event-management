@@ -26,7 +26,7 @@ const RefundPolicyManager = ({ onSave, initial }) => {
   useEffect(() => {
     let isMounted = true;
 
-    if (!initialized.current && initial?.length) {
+    if (!initialized.current) {
       initialized.current = true;
 
       const loadPolicies = () => {
@@ -57,42 +57,56 @@ const RefundPolicyManager = ({ onSave, initial }) => {
         let updatedPolicies = [...defaultPolicies];
         let selectedId = null;
 
-        const initialId =
-          initial[0]._id ||
-          `custom_${initial[0].daysBeforeEvent}_${initial[0].refundPercentage}`;
+        // Check if initial has valid data
+        if (initial && initial.length > 0 && initial[0]) {
+          const initialId =
+            initial[0]._id ||
+            `custom_${initial[0].daysBeforeEvent}_${initial[0].refundPercentage}`;
 
-        // Always create or find the initial policy
-        const existingPolicy = updatedPolicies.find(
-          (p) =>
-            p.daysBeforeEvent === initial[0].daysBeforeEvent &&
-            p.refundPercentage === initial[0].refundPercentage
-        );
+          // Always create or find the initial policy
+          const existingPolicy = updatedPolicies.find(
+            (p) =>
+              p.daysBeforeEvent === initial[0].daysBeforeEvent &&
+              p.refundPercentage === initial[0].refundPercentage
+          );
 
-        if (existingPolicy) {
-          selectedId = existingPolicy.id;
+          if (existingPolicy) {
+            selectedId = existingPolicy.id;
+          } else {
+            const newPolicy = {
+              id: initialId,
+              ...initial[0],
+              isDefault: false,
+            };
+            updatedPolicies.push(newPolicy);
+            selectedId = initialId;
+          }
         } else {
-          const newPolicy = {
-            id: initialId,
-            ...initial[0],
-            isDefault: false,
-          };
-          updatedPolicies.push(newPolicy);
-          selectedId = initialId;
+          // If no initial value, select the first default policy
+          selectedId = defaultPolicies[0].id;
         }
 
         if (isMounted) {
           setPolicies(updatedPolicies);
           setSelectedPolicy(selectedId);
           setIsLoading(false);
-          onSave(updatedPolicies.find((p) => p.id === selectedId));
+
+          // Call onSave with the selected policy
+          const selectedPolicyData = updatedPolicies.find(
+            (p) => p.id === selectedId
+          );
+          if (onSave && selectedPolicyData) {
+            onSave(selectedPolicyData);
+          }
         }
       };
 
       loadPolicies();
-      return () => {
-        isMounted = false;
-      };
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [initial, onSave]);
 
   const handleAddPolicy = () => {
@@ -146,7 +160,9 @@ const RefundPolicyManager = ({ onSave, initial }) => {
   const handleSelectPolicy = (policyId) => {
     setSelectedPolicy(policyId);
     const selected = policies.find((p) => p.id === policyId);
-    onSave(selected);
+    if (onSave) {
+      onSave(selected);
+    }
   };
 
   const handleEditPolicy = (policy) => {
@@ -178,7 +194,9 @@ const RefundPolicyManager = ({ onSave, initial }) => {
     // If the edited policy is currently selected, update the callback
     if (selectedPolicy === policyId) {
       const updatedPolicy = updatedPolicies.find((p) => p.id === policyId);
-      onSave(updatedPolicy);
+      if (onSave) {
+        onSave(updatedPolicy);
+      }
     }
   };
 
