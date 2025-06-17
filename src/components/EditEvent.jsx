@@ -695,7 +695,6 @@ const EditEvent = () => {
       );
     }
     if (formData.poster && formData.poster.length > 0) {
-      console.log(formData.poster);
       formData.poster.forEach((file) => {
         formDataObj.append(`eventImages`, file);
       });
