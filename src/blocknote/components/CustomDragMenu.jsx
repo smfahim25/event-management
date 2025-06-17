@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { DragHandleMenu, useComponentsContext } from "@blocknote/react";
 import { BLOCKNOTE_ICONS } from "../utils/icons";
 import { BLOCK_TYPES } from "../utils/constants";
