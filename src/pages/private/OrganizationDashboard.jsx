@@ -106,7 +106,7 @@ const OrganizerDashboard = () => {
     <div className="min-h-screen bg-gray-50 pb-8 sm:pb-12">
       {/* Dashboard Header */}
       <Nav />
-      <div className="bg-white border-b mt-14">
+      <div className="bg-white border-b pt-16 lg:pt-24 xl:pt-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
