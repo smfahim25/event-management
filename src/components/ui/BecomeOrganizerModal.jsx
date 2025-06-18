@@ -201,13 +201,6 @@ const OrganizerPage = () => {
         <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-md mx-auto">
           <button
             onClick={() => navigate("/app/create-organizer")}
-            className="px-8 py-4 text-gray-600 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-colors font-medium text-lg"
-          >
-            Skip
-          </button>
-
-          <button
-            // onClick={onProceed}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105"
           >
             Proceed to Organizer Form

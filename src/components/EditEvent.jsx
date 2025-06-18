@@ -1772,7 +1772,7 @@ const EditEvent = () => {
             <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate(`/app/eventDetails/${eventID}`)}
+                onClick={() => navigate(-1)}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
