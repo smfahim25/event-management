@@ -1,22 +1,31 @@
 import { Users, Calendar, Heart, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Nav from "../Nav";
+import Footer from "../Footer";
 
 const OrganizerPage = () => {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="relative h-64 bg-gradient-to-r from-purple-600 to-indigo-600">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">
-              Become an organizer with
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-extrabold">
-              Les Sorties de Diane
-            </h2>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen">
+      <Nav />
+     <div className="relative h-64 bg-gradient-to-r from-purple-600 to-indigo-600 mt-10">
+  <div className="absolute inset-0 flex items-center justify-center">
+    <div className="text-center text-white px-4">
+      <h1 className="text-4xl md:text-5xl font-bold mb-2">
+        Become an organizer with
+      </h1>
+      <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+        Les Sorties de Diane
+      </h2>
+      <button
+        onClick={() => navigate("/app/create-organizer")}
+        className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105 border border-white"
+      >
+        Proceed to Organizer Form
+      </button>
+    </div>
+  </div>
+</div>
 
       {/* Main content */}
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -49,7 +58,7 @@ const OrganizerPage = () => {
         </div>
 
         {/* Why become an organizer section */}
-        <div className="mb-16">
+        <div className="mb-10">
           <h3 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Why become an organizer?
           </h3>
@@ -115,6 +124,15 @@ const OrganizerPage = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-md mx-auto mb-5">
+          <button
+            onClick={() => navigate("/app/create-organizer")}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105"
+          >
+            Proceed to Organizer Form
+          </button>
         </div>
 
         {/* How it works section */}
@@ -207,6 +225,7 @@ const OrganizerPage = () => {
           </button>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

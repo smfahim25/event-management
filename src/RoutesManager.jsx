@@ -152,7 +152,14 @@ function RoutesManager() {
       <Route path="/terms" element={<TermsConditionPage />} />
       <Route path="/stripe-success" element={<StripeConnectSuccess />} />
       <Route path="/stripe-failed" element={<StripeConnectFailure />} />
-      <Route path="/organizer-step" element={<OrganizerPage />} />
+      <Route
+        path="/organizer-step"
+        element={
+          <RequireUser>
+            <OrganizerPage />
+          </RequireUser>
+        }
+      />
     </Routes>
   );
 }

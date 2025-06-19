@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/AuthStore";
 import { ArrowLeft } from "lucide-react";
 
@@ -15,6 +15,10 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const originalFrom = location.state?.from?.pathname || "/";
+  const from =
+    originalFrom === "/organizer-step" ? "/app/create-organizer" : originalFrom;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,10 +60,10 @@ function LoginPage() {
 
     try {
       const user = await login(formData.email, formData.password);
-      // console.log(user);
+
       if (user?.data?.role === "user" || user?.data?.role === "organizer") {
         if (user?.data?.isPreviouslyLoggedIn) {
-          window.location.href = "/";
+          window.location.href = from;
         } else if (user?.data?.isPreviouslyLoggedIn === false) {
           navigate(`/event-prefer?id=${user?.data?._id}`);
         }

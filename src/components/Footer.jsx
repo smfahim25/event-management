@@ -37,7 +37,7 @@ const Footer = () => {
   return (
     <footer className="bg-[#3D004D] text-white py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto">
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-5 lg:gap-5 xl:gap-12">
           <div className="w-full lg:w-auto lg:flex-shrink-0">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#E167FF] qwigley-regular leading-tight">
               {defaultTexts.footer.companyName}
@@ -48,7 +48,7 @@ const Footer = () => {
           </div>
 
           <div className="w-full lg:flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-base">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-base">
               <div>
                 <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.quickLinks.title}
