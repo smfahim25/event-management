@@ -16,9 +16,7 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const originalFrom = location.state?.from?.pathname || "/";
-  const from =
-    originalFrom === "/organizer-step" ? "/app/create-organizer" : originalFrom;
+  const from = location.state?.from?.pathname || "/";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
