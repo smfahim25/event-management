@@ -328,9 +328,9 @@ export default function OrganizerApprovals() {
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
                   <option value="">All Statuses</option>
-                  {verificationStatuses.map((status) => (
+                  {verificationStatuses?.map((status) => (
                     <option key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      {status?.charAt(0)?.toUpperCase() + status?.slice(1)}
                     </option>
                   ))}
                 </select>
@@ -509,10 +509,10 @@ export default function OrganizerApprovals() {
                                 : "bg-red-100 text-red-800"
                             }`}
                           >
-                            {organizer.verificationStatus
-                              .charAt(0)
-                              .toUpperCase() +
-                              organizer.verificationStatus.slice(1)}
+                            {organizer?.verificationStatus
+                              ?.charAt(0)
+                              ?.toUpperCase() +
+                              organizer?.verificationStatus?.slice(1)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center gap-3">
