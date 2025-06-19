@@ -26,7 +26,6 @@ export const useOrganizerStore = create((set, get) => ({
       formData.append("logo", formDataObj.logo);
       formData.append("website", formDataObj.website);
       formData.append("commissionRate", formDataObj.commissionRate);
-      formData.append("payoutSchedule", formDataObj.payoutSchedule);
 
       formData.append("address[street]", formDataObj.address.street);
       formData.append("address[city]", formDataObj.address.city);
@@ -34,20 +33,6 @@ export const useOrganizerStore = create((set, get) => ({
       formData.append("address[zipCode]", formDataObj.address.zipCode);
       formData.append("address[country]", formDataObj.address.country);
       formData.append("address[iso2]", formDataObj.address.countryIso2);
-
-      formData.append(
-        "socialMedia[facebook]",
-        formDataObj.socialMedia.facebook
-      );
-      formData.append("socialMedia[twitter]", formDataObj.socialMedia.twitter);
-      formData.append(
-        "socialMedia[instagram]",
-        formDataObj.socialMedia.instagram
-      );
-      formData.append(
-        "socialMedia[linkedin]",
-        formDataObj.socialMedia.linkedin
-      );
 
       const res = await fetch(API_BASE, {
         method: "POST",
