@@ -27,7 +27,7 @@ const Nav = () => {
   const { settings, fetchSettings } = useSettingsStore();
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   useEffect(() => {
     const handleScroll = () => {

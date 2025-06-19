@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../context/DataContext";
 import useNewsletterStore from "../store/newsLetterStore";
 import toast from "react-hot-toast";
+import { useSettingsStore } from "../store/SettingsStore";
 
 const Footer = () => {
   const { defaultTexts } = useData();
@@ -9,6 +10,11 @@ const Footer = () => {
 
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { settings, fetchSettings } = useSettingsStore();
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,14 +41,17 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#3D004D] text-white py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8">
+    <footer
+      className=" text-black py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8"
+      style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
+    >
       <div className="container mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start gap-5 lg:gap-5 xl:gap-12">
           <div className="w-full lg:w-auto lg:flex-shrink-0">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#E167FF] qwigley-regular leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black qwigley-regular leading-tight">
               {defaultTexts.footer.companyName}
             </h1>
-            <p className="text-sm sm:text-base text-white mt-2 max-w-xs">
+            <p className="text-sm sm:text-base text-black mt-2 max-w-xs">
               {defaultTexts.footer.tagline}
             </p>
           </div>
@@ -50,14 +59,14 @@ const Footer = () => {
           <div className="w-full lg:flex-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-base">
               <div>
-                <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
+                <h2 className="text-black font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.quickLinks.title}
                 </h2>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="/"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[0]}
                     </a>
@@ -65,7 +74,7 @@ const Footer = () => {
                   <li>
                     <a
                       href="/app/events"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[1]}
                     </a>
@@ -73,7 +82,7 @@ const Footer = () => {
                   <li>
                     <a
                       href="https://blog.lessortiesdediane.com"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       Blogs
                     </a>
@@ -81,7 +90,7 @@ const Footer = () => {
                   <li>
                     <a
                       href="/contact-us"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.quickLinks.items[2]}
                     </a>
@@ -90,14 +99,14 @@ const Footer = () => {
               </div>
 
               <div>
-                <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
+                <h2 className="text-black font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.userLinks.title}
                 </h2>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="/app/profile"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.userLinks.items[0]}
                     </a>
@@ -106,7 +115,7 @@ const Footer = () => {
                   <li>
                     <a
                       href="/app/my-tickets"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.userLinks.items[2]}
                     </a>
@@ -116,14 +125,14 @@ const Footer = () => {
 
               {/* Legal Links */}
               <div className="sm:col-span-2 lg:col-span-1">
-                <h2 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
+                <h2 className="text-black font-semibold mb-3 text-base sm:text-lg">
                   {defaultTexts.footer.legal.title}
                 </h2>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="/privacy"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.legal.items[0]}
                     </a>
@@ -131,7 +140,7 @@ const Footer = () => {
                   <li>
                     <a
                       href="/terms"
-                      className="hover:text-[#E167FF] transition-colors duration-200"
+                      className="text-black transition-colors duration-200"
                     >
                       {defaultTexts.footer.legal.items[1]}
                     </a>
@@ -144,25 +153,25 @@ const Footer = () => {
           <div className="w-full lg:w-auto lg:flex-shrink-0 lg:min-w-[280px]">
             {/* Social Media */}
             <div className="mb-6">
-              <h3 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
+              <h3 className="text-black font-semibold mb-3 text-base sm:text-lg">
                 Follow Us
               </h3>
               <div className="flex gap-4 sm:gap-6">
                 <a
                   href="#"
-                  className="text-[#E167FF] hover:text-white transition-colors duration-200 text-sm sm:text-base"
+                  className="text-black hover:text-white transition-colors duration-200 text-sm sm:text-base"
                 >
                   {defaultTexts.footer.socialMedia[0]}
                 </a>
                 <a
                   href="#"
-                  className="text-[#E167FF] hover:text-white transition-colors duration-200 text-sm sm:text-base"
+                  className="text-black hover:text-white transition-colors duration-200 text-sm sm:text-base"
                 >
                   {defaultTexts.footer.socialMedia[1]}
                 </a>
                 <a
                   href="#"
-                  className="text-[#E167FF] hover:text-white transition-colors duration-200 text-sm sm:text-base"
+                  className="text-black hover:text-white transition-colors duration-200 text-sm sm:text-base"
                 >
                   {defaultTexts.footer.socialMedia[2]}
                 </a>
@@ -170,7 +179,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h3 className="text-[#E167FF] font-semibold mb-3 text-base sm:text-lg">
+              <h3 className="text-black font-semibold mb-3 text-base sm:text-lg">
                 Newsletter
               </h3>
               <form className="space-y-3" onSubmit={handleSubmit}>
@@ -194,7 +203,7 @@ const Footer = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 sm:px-5 py-3 bg-[#E167FF] text-white rounded-md hover:bg-white hover:text-[#3D004D] transition-colors duration-200 font-medium text-sm sm:text-base whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 sm:px-5 py-3 bg-black text-white rounded-md hover:bg-white hover:text-[#3D004D] transition-colors duration-200 font-medium text-sm sm:text-base whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting
                       ? "Subscribing..."
@@ -207,7 +216,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 sm:mt-10 lg:mt-12 pt-6 text-center">
-          <p className="text-xs sm:text-sm lg:text-base text-white">
+          <p className="text-xs sm:text-sm lg:text-base text-black">
             © {new Date().getFullYear()} {defaultTexts.footer.copyright}
           </p>
         </div>
