@@ -184,6 +184,13 @@ export default function Sidebar({ setMobileMenuOpen, mobileMenuOpen }) {
       badge: null,
     },
     {
+      id: "message",
+      name: "Messages",
+      path: "/admin/messages",
+      icon: <Mails size={25} />,
+      badge: null,
+    },
+    {
       id: "blogs",
       name: "Blogs",
       icon: <FaBloggerB size={25} />,

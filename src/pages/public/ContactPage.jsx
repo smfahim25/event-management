@@ -1,5 +1,4 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import Nav from "../../components/Nav";
 import { useData } from "../../context/DataContext";
 import {
@@ -7,9 +6,9 @@ import {
   FaEnvelope,
   FaComment,
   FaPaperPlane,
-  FaCheck,
   FaExclamationTriangle,
 } from "react-icons/fa";
+import useContactStore from "../../store/ContactStore";
 
 function ContactPage() {
   const { defaultTexts } = useData();
@@ -21,8 +20,21 @@ function ContactPage() {
     message: "",
   });
   const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { sendContactForm, loading, success, error, resetStatus } =
+    useContactStore();
+
+  useEffect(() => {
+    if (success) {
+      setFormData({ name: "", email: "", message: "" });
+      setErrors({});
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (error) {
+      setErrors({ api: error });
+    }
+  }, [error]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -42,27 +54,23 @@ function ContactPage() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
+
+    if (success || error) {
+      resetStatus();
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setErrors({});
+    resetStatus();
+
     try {
-      setLoading(true);
-      setSuccess("");
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/feedback`,
-        formData
-      );
-      if (response.status === 200 || response.status === 201) {
-        setSuccess(contactPage.successMessage);
-        setFormData({ name: "", email: "", message: "" });
-      }
-    } catch (error) {
-      setErrors({ api: contactPage.apiError });
-    } finally {
-      setLoading(false);
+      await sendContactForm(formData);
+    } catch (err) {
+      console.error("Form submission error:", err);
     }
   };
 
@@ -129,19 +137,15 @@ function ContactPage() {
                   {contactPage.message}
                 </h2>
 
-                {/* Success Message */}
-                {success && (
-                  <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
-                    <FaCheck className="mr-2 text-green-500" />
-                    <p>{success}</p>
-                  </div>
-                )}
-
                 {/* API Error */}
-                {errors.api && (
+                {(errors.api || error) && (
                   <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
                     <FaExclamationTriangle className="mr-2 text-red-500" />
-                    <p>{errors.api}</p>
+                    <p>
+                      {errors.api ||
+                        error ||
+                        "Something went wrong. Please try again."}
+                    </p>
                   </div>
                 )}
 
@@ -167,6 +171,7 @@ function ContactPage() {
                         className={`pl-10 block w-full px-4 py-3 border ${
                           errors.name ? "border-red-500" : "border-gray-300"
                         } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors`}
+                        disabled={loading}
                       />
                     </div>
                     {errors.name && (
@@ -195,6 +200,7 @@ function ContactPage() {
                         className={`pl-10 block w-full px-4 py-3 border ${
                           errors.email ? "border-red-500" : "border-gray-300"
                         } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors`}
+                        disabled={loading}
                       />
                     </div>
                     {errors.email && (
@@ -225,6 +231,7 @@ function ContactPage() {
                         className={`pl-10 block w-full px-4 py-3 border ${
                           errors.message ? "border-red-500" : "border-gray-300"
                         } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors`}
+                        disabled={loading}
                       ></textarea>
                     </div>
                     {errors.message && (

@@ -44,6 +44,7 @@ import CreateBlog from "./components/AdminDashboard/CreateBlog";
 import EditBlog from "./components/AdminDashboard/EditBlog";
 import BlogCategory from "./components/AdminDashboard/BlogCategory";
 import OrganizerPage from "./components/ui/BecomeOrganizerModal";
+import AdminContactDashboard from "./components/AdminDashboard/ContactMessage";
 
 function RoutesManager() {
   return (
@@ -127,6 +128,7 @@ function RoutesManager() {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="newsletter" element={<NewsletterSubscribers />} />
+        <Route path="messages" element={<AdminContactDashboard />} />
         <Route path="transaction" element={<AdminTransactionsTable />} />
         <Route path="blogs" element={<BlogsList />} />
         <Route path="blogs/create" element={<CreateBlog />} />
