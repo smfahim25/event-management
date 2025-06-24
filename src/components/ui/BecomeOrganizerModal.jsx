@@ -8,7 +8,7 @@ const OrganizerPage = () => {
   return (
     <div className="min-h-screen">
       <Nav />
-      <div className="relative h-64 bg-gradient-to-r from-purple-600 to-indigo-600 mt-10">
+      <div className="relative h-64 bg-gradient-to-r from-purple-600 to-indigo-600 mt-24">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">
@@ -17,12 +17,6 @@ const OrganizerPage = () => {
             <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
               Les Sorties de Diane
             </h2>
-            <button
-              onClick={() => navigate("/app/create-organizer")}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105 border border-white"
-            >
-              Proceed to Organizer Form
-            </button>
           </div>
         </div>
       </div>
@@ -51,6 +45,12 @@ const OrganizerPage = () => {
         </div>
 
         <div className="text-center mb-12">
+          <button
+            onClick={() => navigate("/app/create-organizer")}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105 border border-white mb-8"
+          >
+            Proceed to Organizer Form
+          </button>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Join Les Sorties de Diane as an organizer and become part of a
             community committed to creating authentic and inspiring encounters.
