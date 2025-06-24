@@ -48,7 +48,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start gap-5 lg:gap-5 xl:gap-12">
           <div className="w-full lg:w-auto lg:flex-shrink-0">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black qwigley-regular leading-tight">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
               {defaultTexts.footer.companyName}
             </h1>
             <p className="text-sm sm:text-base text-black mt-2 max-w-xs">

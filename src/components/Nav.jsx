@@ -92,7 +92,7 @@ const Nav = () => {
     <nav
       ref={navRef}
       className={`nav w-full z-40 h-[8vh] md:h-[7vh] xl:h-[8vh] flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 fixed top-0 left-0 transition-all duration-300 ease-in-out backdrop-blur-sm shadow-lg`}
-      style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
+      style={{ backgroundColor: settings?.navbarColor || "#e88e2e" }}
     >
       <div
         onClick={() => {
