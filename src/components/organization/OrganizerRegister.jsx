@@ -355,7 +355,7 @@ export default function OrganizerRegistrationForm() {
               {/* State Dropdown */}
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State/Province*
+                  State/Regions*
                 </label>
                 <SearchableSelect
                   options={availableStates}
@@ -426,11 +426,17 @@ export default function OrganizerRegistrationForm() {
               <div className="ml-3 text-sm">
                 <label htmlFor="terms" className="font-medium text-gray-700">
                   I agree to the{" "}
-                  <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                  <a
+                    href="/terms"
+                    className="text-indigo-600 hover:text-indigo-500"
+                  >
                     Terms and Conditions
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                  <a
+                    href="/privacy"
+                    className="text-indigo-600 hover:text-indigo-500"
+                  >
                     Privacy Policy
                   </a>
                   *
