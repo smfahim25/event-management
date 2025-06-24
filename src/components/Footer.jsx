@@ -43,7 +43,7 @@ const Footer = () => {
   return (
     <footer
       className=" text-black py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8"
-      style={{ backgroundColor: settings?.navbarColor || "#1e8489" }}
+      style={{ backgroundColor: settings?.navbarColor || "#e88e2e" }}
     >
       <div className="container mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start gap-5 lg:gap-5 xl:gap-12">
