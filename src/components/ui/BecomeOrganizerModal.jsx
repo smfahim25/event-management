@@ -2,8 +2,11 @@ import { Users, Calendar, Heart, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Nav from "../Nav";
 import Footer from "../Footer";
+import { useData } from "../../context/DataContext";
 
 const OrganizerPage = () => {
+  const { defaultTexts } = useData();
+  const { organizer } = defaultTexts;
   const navigate = useNavigate();
   return (
     <div className="min-h-screen">
@@ -12,10 +15,10 @@ const OrganizerPage = () => {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">
-              Become an organizer with
+              {organizer?.title_h1}
             </h1>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
-              Les Sorties de Diane
+              {organizer?.title_h2}
             </h2>
           </div>
         </div>
@@ -26,12 +29,10 @@ const OrganizerPage = () => {
         {/* Subtitle */}
         <div className="text-center mb-12">
           <p className="text-xl text-gray-700 font-medium mb-4">
-            Join a dynamic and passionate community
+            {organizer?.img_title}
           </p>
           <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Do you enjoy creating unique and convivial moments? Do you want to
-            share your passion for event planning and providing memorable
-            experiences for others?
+            {organizer?.img_des}
           </p>
         </div>
 
@@ -49,18 +50,17 @@ const OrganizerPage = () => {
             onClick={() => navigate("/app/create-organizer")}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105 border border-white mb-8"
           >
-            Proceed to Organizer Form
+            {organizer?.button}
           </button>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Join Les Sorties de Diane as an organizer and become part of a
-            community committed to creating authentic and inspiring encounters.
+            {organizer?.img_foot}
           </p>
         </div>
 
         {/* Why become an organizer section */}
         <div className="mb-16">
           <h3 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            Why become an organizer?
+            {organizer?.become_title}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -70,12 +70,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-3">
-                  Express your creativity
+                  {organizer?.benefit_tite_1}
                 </h4>
-                <p className="text-gray-600">
-                  Design and host events that reflect your personality, in line
-                  with your desires and ideas.
-                </p>
+                <p className="text-gray-600">{organizer?.benefit_des_1}</p>
               </div>
             </div>
 
@@ -85,12 +82,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-3">
-                  Share your passions
+                  {organizer?.benefit_tite_2}
                 </h4>
-                <p className="text-gray-600">
-                  Whether it&apos;s gastronomy, culture, wellness, or other
-                  themes, share what inspires you.
-                </p>
+                <p className="text-gray-600">{organizer?.benefit_des_2}</p>
               </div>
             </div>
 
@@ -100,12 +94,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-3">
-                  Expand your network
+                  {organizer?.benefit_tite_3}
                 </h4>
-                <p className="text-gray-600">
-                  Meet people with similar interests and expand your social and
-                  professional circle.
-                </p>
+                <p className="text-gray-600">{organizer?.benefit_des_3}</p>
               </div>
             </div>
 
@@ -115,12 +106,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-3">
-                  Receive support
+                  {organizer?.benefit_tite_4}
                 </h4>
-                <p className="text-gray-600">
-                  Benefit from the support and advice of the Les Sorties de
-                  Diane team to help you organize your events.
-                </p>
+                <p className="text-gray-600">{organizer?.benefit_des_4}</p>
               </div>
             </div>
           </div>
@@ -131,14 +119,14 @@ const OrganizerPage = () => {
             onClick={() => navigate("/app/create-organizer")}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105"
           >
-            Proceed to Organizer Form
+            {organizer?.button}
           </button>
         </div>
 
         {/* How it works section */}
         <div className="mb-16">
           <h3 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            How does it work?
+            {organizer?.how_title}
           </h3>
 
           <div className="space-y-6">
@@ -148,12 +136,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                  Submit your event idea
+                  {organizer?.how_title_1}
                 </h4>
-                <p className="text-gray-600">
-                  Complete the proposal form, detailing the concept, location,
-                  date, and target audience.
-                </p>
+                <p className="text-gray-600">{organizer?.how_des_1}</p>
               </div>
             </div>
 
@@ -163,12 +148,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                  Talk to our team
+                  {organizer?.how_title_2}
                 </h4>
-                <p className="text-gray-600">
-                  We&apos;ll review your proposal and get back to you to discuss
-                  it and help you implement it.
-                </p>
+                <p className="text-gray-600">{organizer?.how_des_2}</p>
               </div>
             </div>
 
@@ -178,12 +160,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                  Organize your event
+                  {organizer?.how_title_3}
                 </h4>
-                <p className="text-gray-600">
-                  With our support, plan and execute your event with complete
-                  peace of mind.
-                </p>
+                <p className="text-gray-600">{organizer?.how_des_3}</p>
               </div>
             </div>
 
@@ -193,12 +172,9 @@ const OrganizerPage = () => {
               </div>
               <div>
                 <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                  Share the experience
+                  {organizer?.how_title_4}
                 </h4>
-                <p className="text-gray-600">
-                  After the event, share your impressions and those of your
-                  attendees to enrich the community.
-                </p>
+                <p className="text-gray-600">{organizer?.how_des_4}</p>
               </div>
             </div>
           </div>
@@ -207,12 +183,9 @@ const OrganizerPage = () => {
         {/* Ready to get started */}
         <div className="text-center mb-12">
           <h3 className="text-3xl font-bold text-gray-800 mb-4">
-            Ready to get started?
+            {organizer?.read_title}
           </h3>
-          <p className="text-gray-600 text-lg">
-            Join us now and help create unforgettable moments within the Les
-            Sorties de Diane community.
-          </p>
+          <p className="text-gray-600 text-lg">{organizer?.read_des}</p>
         </div>
 
         {/* Action buttons */}
@@ -221,7 +194,7 @@ const OrganizerPage = () => {
             onClick={() => navigate("/app/create-organizer")}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl transition-all font-medium shadow-lg text-white text-lg transform hover:scale-105"
           >
-            Proceed to Organizer Form
+            {organizer?.button}
           </button>
         </div>
       </div>

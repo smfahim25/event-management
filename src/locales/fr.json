@@ -175,5 +175,33 @@
         }
       }
     }
+  },
+  "organizer": {
+    "title_h1": "Devenez organisateur avec",
+    "title_h2": "Les Sorties de Diane",
+    "button": "Accéder au formulaire d'organisateur",
+    "img_title": "Rejoignez une communauté dynamique et passionnée",
+    "img_des": "Vous aimez créer des moments uniques et conviviaux ? Vous souhaitez partager votre passion pour l’organisation d’événements et offrir des expériences mémorables aux autres ?",
+    "img_foot": "Rejoignez Les Sorties de Diane en tant qu'organisateur et faites partie d'une communauté engagée à créer des rencontres authentiques et inspirantes.",
+    "become_title": "Pourquoi devenir organisateur ?",
+    "benefit_tite_1": "Exprimez votre créativité",
+    "benefit_tite_2": "Partagez vos passions",
+    "benefit_tite_3": "Élargissez votre réseau",
+    "benefit_tite_4": "Recevez un accompagnement",
+    "benefit_des_1": "Imaginez et animez des événements qui vous ressemblent, selon vos envies et vos idées.",
+    "benefit_des_2": "Que ce soit la gastronomie, la culture, le bien-être ou d'autres thématiques, partagez ce qui vous inspire.",
+    "benefit_des_3": "Rencontrez des personnes partageant vos centres d’intérêt et élargissez votre cercle social et professionnel.",
+    "benefit_des_4": "Bénéficiez du soutien et des conseils de l'équipe Les Sorties de Diane pour vous aider à organiser vos événements.",
+    "how_title": "Comment ça fonctionne ?",
+    "how_title_1": "Soumettez votre idée d'événement",
+    "how_title_2": "Échangez avec notre équipe",
+    "how_title_3": "Organisez votre événement",
+    "how_title_4": "Partagez l'expérience",
+    "how_des_1": "Remplissez le formulaire de proposition en détaillant le concept, le lieu, la date et le public cible.",
+    "how_des_2": "Nous étudierons votre proposition et reviendrons vers vous pour en discuter et vous aider à la concrétiser.",
+    "how_des_3": "Avec notre accompagnement, planifiez et réalisez votre événement en toute sérénité.",
+    "how_des_4": "Après l'événement, partagez vos impressions et celles de vos participants pour enrichir la communauté.",
+    "read_title": "Prêt à vous lancer ?",
+    "read_des": "Rejoignez-nous dès maintenant et contribuez à créer des moments inoubliables au sein de la communauté Les Sorties de Diane."
   }
 }
