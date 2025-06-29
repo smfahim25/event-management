@@ -175,5 +175,33 @@
         }
       }
     }
+  },
+  "organizer": {
+    "title_h1": "Become an organizer with",
+    "title_h2": "Les Sorties de Diane",
+    "button": "Proceed to Organizer Form",
+    "img_title": "Join a dynamic and passionate community",
+    "img_des": "Do you enjoy creating unique and convivial moments? Do you want to share your passion for event planning and providing memorable experiences for others?",
+    "img_foot": "Join Les Sorties de Diane as an organizer and become part of a community committed to creating authentic and inspiring encounters.",
+    "become_title": "Why become an organizer?",
+    "benefit_tite_1": "Express your creativity",
+    "benefit_tite_2": "Share your passions",
+    "benefit_tite_3": "Expand your network",
+    "benefit_tite_4": "Receive support",
+    "benefit_des_1": "Design and host events that reflect your personality, in line with your desires and ideas.",
+    "benefit_des_2": "Whether it&apos;s gastronomy, culture, wellness, or other themes, share what inspires you.",
+    "benefit_des_3": "Meet people with similar interests and expand your social and professional circle.",
+    "benefit_des_4": "Benefit from the support and advice of the Les Sorties de Diane team to help you organize your events.",
+    "how_title": "How does it work?",
+    "how_title_1": "Submit your event idea",
+    "how_title_2": "Talk to our team",
+    "how_title_3": "Organize your event",
+    "how_title_4": "Share the experience",
+    "how_des_1": "Complete the proposal form, detailing the concept, location, date, and target audience.",
+    "how_des_2": "We'll review your proposal and get back to you to discuss it and help you implement it.",
+    "how_des_3": "With our support, plan and execute your event with complete peace of mind.",
+    "how_des_4": "After the event, share your impressions and those of your attendees to enrich the community.",
+    "read_title": "Ready to get started?",
+    "read_des": "Join us now and help create unforgettable moments within the Les Sorties de Diane community."
   }
 }
