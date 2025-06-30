@@ -45,6 +45,7 @@ import EditBlog from "./components/AdminDashboard/EditBlog";
 import BlogCategory from "./components/AdminDashboard/BlogCategory";
 import OrganizerPage from "./components/ui/BecomeOrganizerModal";
 import AdminContactDashboard from "./components/AdminDashboard/ContactMessage";
+import ResetPasswordPage from "./pages/auth/ResetPassword";
 
 function RoutesManager() {
   return (
@@ -155,6 +156,7 @@ function RoutesManager() {
       <Route path="/stripe-success" element={<StripeConnectSuccess />} />
       <Route path="/stripe-failed" element={<StripeConnectFailure />} />
       <Route path="/organizer-step" element={<OrganizerPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
     </Routes>
   );
 }
