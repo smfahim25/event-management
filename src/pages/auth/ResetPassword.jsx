@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Eye, EyeOff, Lock, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Eye, EyeOff, Lock, Shield, CheckCircle } from "lucide-react";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -8,7 +8,20 @@ export default function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
+  // Extract token from URL on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      setResetToken(token);
+    } else {
+      setErrors({ general: "Invalid or missing reset token" });
+    }
+  }, []);
+  console.log(resetToken);
   const validatePassword = (pass) => {
     const minLength = pass.length >= 8;
     const hasUpperCase = /[A-Z]/.test(pass);
@@ -34,6 +47,13 @@ export default function ResetPasswordPage() {
   const handleSubmit = async () => {
     const newErrors = {};
 
+    // Check if token exists
+    if (!resetToken) {
+      newErrors.general = "Reset token is missing";
+      setErrors(newErrors);
+      return;
+    }
+
     // Validate password
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
@@ -53,15 +73,72 @@ export default function ResetPasswordPage() {
 
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
-      // Simulate API call
-      setTimeout(() => {
+
+      try {
+        const response = await fetch(
+          "https://api.lessortiesdediane.com/api/v1/auth/reset-password",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              newPassword: password,
+              token: resetToken,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setIsSuccess(true);
+          setPassword("");
+          setConfirmPassword("");
+        } else {
+          // Handle API errors
+          setErrors({
+            general:
+              data.message || "Failed to reset password. Please try again.",
+          });
+        }
+      } catch {
+        setErrors({
+          general: "Network error. Please check your connection and try again.",
+        });
+      } finally {
         setIsLoading(false);
-        alert("Password reset successfully!");
-      }, 2000);
+      }
     }
   };
 
   const passwordValidation = validatePassword(password);
+
+  // Success state
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center">
+          <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Password Reset Successful!
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Your password has been successfully updated. You can now sign in
+            with your new password.
+          </p>
+          <a
+            href="/login"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 inline-block"
+          >
+            Sign In
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -75,6 +152,13 @@ export default function ResetPasswordPage() {
           </h1>
           <p className="text-gray-600">Enter your new password below</p>
         </div>
+
+        {/* General Error Message */}
+        {errors.general && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-600">{errors.general}</p>
+          </div>
+        )}
 
         <div className="space-y-6">
           {/* New Password Field */}
@@ -98,6 +182,7 @@ export default function ResetPasswordPage() {
                   errors.password ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Enter new password"
+                disabled={!resetToken}
               />
               <button
                 type="button"
@@ -228,6 +313,7 @@ export default function ResetPasswordPage() {
                   errors.confirmPassword ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Confirm new password"
+                disabled={!resetToken}
               />
               <button
                 type="button"
@@ -252,7 +338,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !resetToken}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
           >
             {isLoading ? (
@@ -289,7 +375,7 @@ export default function ResetPasswordPage() {
           <p className="text-sm text-gray-600">
             Remember your password?{" "}
             <a
-              href="#"
+              href="/login"
               className="text-blue-600 hover:text-blue-500 font-medium"
             >
               Sign in

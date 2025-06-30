@@ -150,7 +150,7 @@ function LoginPage() {
                     Password
                   </label>
                   <a
-                    href="#"
+                    href="/forget-password"
                     className="text-sm font-medium text-purple-600 hover:text-purple-500"
                   >
                     Forgot password?
